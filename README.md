@@ -18,3 +18,9 @@ and editing agent configuration files. It targets the flow configuration format.
   * Provide value by improving discoverability of components and configuration options
 * Expert users
   * Provide value by sharing configurations using a single URL
+
+# Setup
+
+1. Run `npm install` to install all dependencies.
+2. Run `npm start` to start the server.
+3. Access the config generator on your [local](localhost:3000).

@@ -33,7 +33,14 @@ export class Attribute {
     this.value = value;
   }
   marshal(): string {
-    return `${this.key} = ${this.value}`;
+    const begin = `${this.key} = `
+    switch(typeof this.value){
+      case "string":
+      case "object":
+        return begin + JSON.stringify(this.value);
+      default:
+        return begin + this.value
+    }
   }
 }
 
@@ -51,5 +58,25 @@ export function Unmarshal(source: string, n: Parser.SyntaxNode): Component {
       blockLabelIdentifierNode.endIndex
     );
   }
-  return new Component(name, label);
+  const attrNodes = n.childForFieldName("body")?.namedChildren;
+  const attrs: Attribute[] = [];
+  if (attrNodes) {
+    for (const attr of attrNodes) {
+      if (attr.type !== "attribute") continue;
+      const keyNode = attr.childForFieldName("key")!;
+      const valueNode = attr.childForFieldName("value")!;
+      const key = source.substring(keyNode.startIndex,keyNode.endIndex);
+      let value: any;
+      switch (valueNode.type) {
+        case "literal_value":
+        case "array":
+          value = JSON.parse(source.substring(valueNode.startIndex,valueNode.endIndex));
+          break;
+        default:
+          value = {}
+      }
+      attrs.push(new Attribute(key,value))
+    }
+  }
+  return new Component(name, label,attrs);
 }

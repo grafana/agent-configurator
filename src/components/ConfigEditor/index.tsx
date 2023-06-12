@@ -90,7 +90,6 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
       var editComponentCommand = editor.addCommand(
         0,
         function (ctx, component: river.Component, node: Parser.SyntaxNode) {
-          console.log(component);
           setCurrentComponent({
             component,
             node,
@@ -218,6 +217,7 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
       />
       {isDrawerOpen && (
         <Drawer
+          scrollableContent={true}
           onClose={() => setDrawerOpen(false)}
           title={currentComponent != null ? "Edit Component" : "Add Component"}
         >

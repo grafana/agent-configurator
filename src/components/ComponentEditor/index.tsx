@@ -1,23 +1,33 @@
-import { Field, Input, Button } from "@grafana/ui";
+import { Form, Field, Input, Button } from "@grafana/ui";
+import { Component } from "../../lib/river";
 
 interface ComponentEditorProps {
-  updateComponent: (component: string) => void;
+  updateComponent: (component: Component) => void;
+  component: Component;
 }
 
-const ComponentEditor = ({ updateComponent }: ComponentEditorProps) => {
+const ComponentEditor = ({
+  updateComponent,
+  component,
+}: ComponentEditorProps) => {
   return (
-    <>
-      <Field label="Redis Address" description="IP Address or Hostname">
-        <Input name="importantInput" required />
-      </Field>
-      <Button
-        onClick={() => {
-          updateComponent("");
-        }}
-      >
-        Save
-      </Button>
-    </>
+    <Form
+      onSubmit={async (values) =>
+        updateComponent(new Component(component.name, values.label))
+      }
+      defaultValues={{ label: component.label }}
+    >
+      {({ register, errors }) => {
+        return (
+          <>
+            <Field label="Label" description="Component Label">
+              <Input {...register("label")} />
+            </Field>
+            <Button type="submit">Save</Button>
+          </>
+        );
+      }}
+    </Form>
   );
 };
 

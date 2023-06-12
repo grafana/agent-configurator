@@ -1,7 +1,13 @@
-import { BusEventWithPayload, createTheme, EventBusExtended, EventBusSrv, GrafanaTheme2 } from '@grafana/data';
-import { ThemeContext } from '@grafana/ui';
-import memoizeOne from 'memoize-one';
-import React, { useContext, useEffect, useState } from 'react';
+import {
+  BusEventWithPayload,
+  createTheme,
+  EventBusExtended,
+  EventBusSrv,
+  GrafanaTheme2,
+} from "@grafana/data";
+import { ThemeContext } from "@grafana/ui";
+import memoizeOne from "memoize-one";
+import React, { useContext, useEffect, useState } from "react";
 
 export const appEvents: EventBusExtended = new EventBusSrv();
 
@@ -12,32 +18,42 @@ type ThemeObject = {
 };
 
 const themeRegistry: ThemeObject[] = [
-  { id: 'system', name: 'System preference', build: getSystemPreferenceTheme },
-  { id: 'dark', name: 'Dark', build: () => createTheme({ colors: { mode: 'dark' } }) },
-  { id: 'light', name: 'Light', build: () => createTheme({ colors: { mode: 'light' } }) },
+  { id: "system", name: "System preference", build: getSystemPreferenceTheme },
+  {
+    id: "dark",
+    name: "Dark",
+    build: () => createTheme({ colors: { mode: "dark" } }),
+  },
+  {
+    id: "light",
+    name: "Light",
+    build: () => createTheme({ colors: { mode: "light" } }),
+  },
 ];
 
 export enum Theme {
-  dark = 'dark',
-  light = 'light',
+  dark = "dark",
+  light = "light",
 }
 
 export class ThemeChangedEvent extends BusEventWithPayload<GrafanaTheme2> {
-  static type = 'theme-changed';
+  static type = "theme-changed";
 }
 
 const getDefaultThemeId = () => {
-  const value = window.localStorage.getItem('theme');
+  const value = window.localStorage.getItem("theme");
   if (value) {
     return value;
   }
 
-  const mediaResult = window.matchMedia('(prefers-color-scheme: dark)');
-  return mediaResult.matches ? 'dark' : 'light';
+  const mediaResult = window.matchMedia("(prefers-color-scheme: dark)");
+  return mediaResult.matches ? "dark" : "light";
 };
 
 export const ThemeProvider = ({ children }: React.PropsWithChildren) => {
-  const [theme, setTheme] = useState<GrafanaTheme2>(getThemeById(getDefaultThemeId()));
+  const [theme, setTheme] = useState<GrafanaTheme2>(
+    getThemeById(getDefaultThemeId())
+  );
 
   useEffect(() => {
     document.body.classList.add(theme.name.toLowerCase());
@@ -45,7 +61,7 @@ export const ThemeProvider = ({ children }: React.PropsWithChildren) => {
       const newTheme = event.payload;
       const newThemeName = newTheme.name.toLowerCase();
       setTheme(newTheme);
-      localStorage.setItem('theme', newThemeName);
+      localStorage.setItem("theme", newThemeName);
       if (newThemeName === Theme.dark) {
         document.body.classList.remove(Theme.light);
         document.body.classList.add(Theme.dark);
@@ -57,20 +73,22 @@ export const ThemeProvider = ({ children }: React.PropsWithChildren) => {
 
     return () => sub.unsubscribe();
   }, [theme.name]);
-  return <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>
+  );
 };
 
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useThemeContext must be used within the ThemeProvider');
+    throw new Error("useThemeContext must be used within the ThemeProvider");
   }
   return context;
 }
 
 function getSystemPreferenceTheme() {
-  const mediaResult = window.matchMedia('(prefers-color-scheme: dark)');
-  const id = mediaResult.matches ? 'dark' : 'light';
+  const mediaResult = window.matchMedia("(prefers-color-scheme: dark)");
+  const id = mediaResult.matches ? "dark" : "light";
   return getThemeById(id);
 }
 
@@ -88,7 +106,9 @@ export const memoizedStyleCreators = new WeakMap();
 export function useStyles<T>(getStyles: (theme: GrafanaTheme2) => T) {
   const theme = useTheme();
 
-  let memoizedStyleCreator = memoizedStyleCreators.get(getStyles) as typeof getStyles;
+  let memoizedStyleCreator = memoizedStyleCreators.get(
+    getStyles
+  ) as typeof getStyles;
   if (!memoizedStyleCreator) {
     memoizedStyleCreator = memoizeOne(getStyles);
     memoizedStyleCreators.set(getStyles, memoizedStyleCreator);
@@ -98,6 +118,6 @@ export function useStyles<T>(getStyles: (theme: GrafanaTheme2) => T) {
 }
 
 export const toggleTheme = (theme: GrafanaTheme2) => {
-  const newTheme = theme.isDark ? getThemeById('light') : getThemeById('dark');
+  const newTheme = theme.isDark ? getThemeById("light") : getThemeById("dark");
   appEvents.publish(new ThemeChangedEvent(newTheme));
 };

@@ -1,7 +1,8 @@
 import { Card, Button } from "@grafana/ui";
+import { Component, Attribute } from "../../lib/river";
 
 interface ComponentListProps {
-  addComponent: (component: string) => void;
+  addComponent: (component: Component) => void;
 }
 
 const ComponentList = ({ addComponent }: ComponentListProps) => {
@@ -14,7 +15,9 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
           <Button
             onClick={() => {
               addComponent(
-                'prometheus.exporter.redis "LABEL" {\nredis_addr = "REDIS_ADDRESS"\n}'
+                new Component("prometheus.exporter.redis", "LABEL", [
+                  new Attribute("redis_addr", '"REDIS_ADDRESS"'),
+                ])
               );
             }}
           >
@@ -29,7 +32,9 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
           <Button
             onClick={() => {
               addComponent(
-                'prometheus.exporter.redis "LABEL" {\n    redis_addr = "REDIS_ADDRESS"\n}'
+                new Component("prometheus.exporter.redis", "LABEL", [
+                  new Attribute("redis_addr", '"REDIS_ADDRESS"'),
+                ])
               );
             }}
           >

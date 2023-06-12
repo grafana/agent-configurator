@@ -1,15 +1,19 @@
-import { css } from '@emotion/css';
-import { GrafanaTheme2 } from '@grafana/data';
+import { css } from "@emotion/css";
+import { GrafanaTheme2 } from "@grafana/data";
 
-import { useStyles } from '../../theme';
-import ThemeSwitch from './ThemeSwitch';
+import { useStyles } from "../../theme";
+import ThemeSwitch from "./ThemeSwitch";
 
 const Header = () => {
   const styles = useStyles(getStyles);
   return (
     <div className={styles.header}>
       <div className={styles.flex}>
-        <img src={`${process.env.PUBLIC_URL}/grafana.svg`} alt={'Grafana logo'} className={styles.logo} />
+        <img
+          src={`${process.env.PUBLIC_URL}/grafana.svg`}
+          alt={"Grafana logo"}
+          className={styles.logo}
+        />
         <h4 className={styles.headerText}>Agent Config Generator</h4>
       </div>
       <div className={styles.flex}>

@@ -3,9 +3,12 @@ import * as monaco from "monaco-editor";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Drawer } from "@grafana/ui";
 
+import Parser from "web-tree-sitter";
+
 import { Theme, useTheme } from "../../theme";
 import ComponentList from "../ComponentList";
 import ComponentEditor from "../ComponentEditor";
+import * as river from "../../lib/river";
 
 const defaultOpts: monaco.editor.IStandaloneEditorConstructionOptions = {
   fontSize: 15,
@@ -27,12 +30,18 @@ interface Props {
   isReadOnly?: boolean;
 }
 
+type SelectedComponent = {
+  component: river.Component;
+  node: Parser.SyntaxNode;
+};
+
 const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
   const editorRef = useRef<null | monaco.editor.IStandaloneCodeEditor>(null);
   const monacoRef = useRef<null | Monaco>(null);
 
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [currentComponent, setCurrentComponent] = useState({ active: false });
+  const [currentComponent, setCurrentComponent] =
+    useState<SelectedComponent | null>(null);
 
   const theme = useTheme();
   const editorTheme = useMemo(
@@ -42,7 +51,16 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
   );
 
   const handleEditorDidMount = useCallback(
-    (editor: monaco.editor.IStandaloneCodeEditor, monaco: Monaco) => {
+    async (editor: monaco.editor.IStandaloneCodeEditor, monaco: Monaco) => {
+      await Parser.init({
+        locateFile(scriptName: string, scriptDirectory: string) {
+          return scriptName;
+        },
+      });
+      const parser = new Parser();
+      const River = await Parser.Language.load("/tree-sitter-river.wasm");
+      const componentQuery = River.query(`(config_file (block) @component)`);
+      parser.setLanguage(River);
       monaco.editor.defineTheme("thema-dark", {
         base: "vs-dark",
         inherit: true,
@@ -64,59 +82,71 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
       var addComponentCommand = editor.addCommand(
         0,
         function () {
-          setCurrentComponent({ active: false });
+          setCurrentComponent(null);
           setDrawerOpen(true);
         },
         ""
       );
       var editComponentCommand = editor.addCommand(
         0,
-        function () {
-          setCurrentComponent({ active: true });
+        function (ctx, component: river.Component, node: Parser.SyntaxNode) {
+          console.log(component);
+          setCurrentComponent({
+            component,
+            node,
+          });
           setDrawerOpen(true);
         },
         ""
       );
+
+      const provideCodeLenses = function (
+        model: monaco.editor.ITextModel,
+        token: monaco.CancellationToken
+      ) {
+        const lenses: monaco.languages.CodeLens[] = [];
+        const value = model.getValue();
+        const tree = parser.parse(value);
+        const components = componentQuery.matches(tree.rootNode);
+        lenses.push(
+          ...components.map((match) => {
+            const c = match.captures[0];
+
+            return {
+              range: {
+                startLineNumber: c.node.startPosition.row + 1,
+                startColumn: c.node.startPosition.column,
+                endLineNumber: c.node.endPosition.row + 1,
+                endColumn: c.node.endPosition.column,
+              },
+              command: {
+                id: editComponentCommand!,
+                title: "Edit Component",
+                arguments: [river.Unmarshal(value, c.node), c.node],
+              },
+            };
+          })
+        );
+        const lastLine = model.getLineCount();
+        lenses.push({
+          range: {
+            startLineNumber: lastLine,
+            endLineNumber: lastLine,
+            startColumn: 1,
+            endColumn: 1,
+          },
+          command: {
+            id: addComponentCommand!,
+            title: "Add Component",
+          },
+        });
+        return {
+          lenses,
+          dispose: () => {},
+        };
+      };
       monaco.languages.registerCodeLensProvider("hcl", {
-        provideCodeLenses: function (model, token) {
-          const components = model.findMatches(
-            '^[a-z_-]+\\.([a-z_-]+\\.?)+ ".*"',
-            true,
-            true,
-            false,
-            null,
-            true
-          );
-          const lastLine = model.getLineCount();
-          const lenses: monaco.languages.CodeLens[] = [];
-          lenses.push(
-            ...components.map((c) => {
-              return {
-                range: c.range,
-                command: {
-                  id: editComponentCommand!,
-                  title: "Edit Component",
-                },
-              };
-            })
-          );
-          lenses.push({
-            range: {
-              startLineNumber: lastLine,
-              endLineNumber: lastLine,
-              startColumn: 1,
-              endColumn: 1,
-            },
-            command: {
-              id: addComponentCommand!,
-              title: "Add Component",
-            },
-          });
-          return {
-            lenses,
-            dispose: () => {},
-          };
-        },
+        provideCodeLenses,
         resolveCodeLens: function (model, codeLens, token) {
           return codeLens;
         },
@@ -132,7 +162,7 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
     [isReadOnly]
   );
 
-  const insertComponent = (component: string) => {
+  const insertComponent = (component: river.Component) => {
     const editor = editorRef.current!;
     const model = editor.getModel()!;
 
@@ -146,7 +176,27 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
           startColumn: column,
           endColumn: column,
         },
-        text: "\n" + component + "\n",
+        text: component.marshal() + "\n",
+      },
+    ]);
+    setDrawerOpen(false);
+  };
+
+  const updateComponent = (component: river.Component) => {
+    const editor = editorRef.current!;
+    if (currentComponent == null) {
+      return;
+    }
+
+    editor.executeEdits("configuration-editor", [
+      {
+        range: {
+          startLineNumber: currentComponent.node.startPosition.row,
+          startColumn: currentComponent.node.startPosition.column,
+          endLineNumber: currentComponent.node.endPosition.row + 1,
+          endColumn: currentComponent.node.endPosition.column + 1,
+        },
+        text: component.marshal(),
       },
     ]);
     setDrawerOpen(false);
@@ -169,13 +219,16 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
       {isDrawerOpen && (
         <Drawer
           onClose={() => setDrawerOpen(false)}
-          title={currentComponent.active ? "Edit Component" : "Add Component"}
+          title={currentComponent != null ? "Edit Component" : "Add Component"}
         >
-          {!currentComponent.active && (
-              <ComponentList addComponent={insertComponent} />
+          {!currentComponent && (
+            <ComponentList addComponent={insertComponent} />
           )}
-          {currentComponent.active && (
-              <ComponentEditor updateComponent={(_) => setDrawerOpen(false) } />
+          {currentComponent && (
+            <ComponentEditor
+              component={currentComponent.component}
+              updateComponent={updateComponent}
+            />
           )}
         </Drawer>
       )}

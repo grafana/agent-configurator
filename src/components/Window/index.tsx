@@ -1,8 +1,8 @@
-import { css } from '@emotion/css';
-import { GrafanaTheme2 } from '@grafana/data';
-import { PropsWithChildren } from 'react';
+import { css } from "@emotion/css";
+import { GrafanaTheme2 } from "@grafana/data";
+import { PropsWithChildren } from "react";
 
-import { useStyles } from '../../theme';
+import { useStyles } from "../../theme";
 
 const Window = (props: PropsWithChildren<{}>) => {
   const styles = useStyles(getStyles);

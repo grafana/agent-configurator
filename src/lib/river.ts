@@ -117,6 +117,9 @@ export function toArgument(k: string,v: any): Argument {
     case "number":
       return new Attribute(k,v);
     default:
+      if (Array.isArray(v)) {
+        return new Attribute(k,v)
+      }
       return new Block(k,null,Object.keys(v).map(x => toArgument(x,v[x])))
   }
 }

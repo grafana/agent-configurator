@@ -74,7 +74,10 @@ replace github.com/prometheus/procfs => github.com/prometheus/procfs v0.8.0
 // and eventually remove if windows_exporter shifts to it. https://github.com/leoluk/perflib_exporter/pull/43
 replace github.com/leoluk/perflib_exporter => github.com/grafana/perflib_exporter v0.1.1-0.20230511173423-6166026bd090
 
-require github.com/grafana/agent v0.23.1-0.20230609181814-a93c357bbf1b
+require (
+	github.com/grafana/agent v0.23.1-0.20230609181814-a93c357bbf1b
+	golang.org/x/exp v0.0.0-20230124195608-d38c7dcee874
+)
 
 require (
 	cloud.google.com/go v0.107.0 // indirect
@@ -523,7 +526,6 @@ require (
 	go.uber.org/zap v1.24.0 // indirect
 	go4.org/netipx v0.0.0-20230125063823-8449b0a6169f // indirect
 	golang.org/x/crypto v0.8.0 // indirect
-	golang.org/x/exp v0.0.0-20230124195608-d38c7dcee874 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect

@@ -1,9 +1,9 @@
 import { Card, Button } from "@grafana/ui";
-import { Component } from "../../lib/river";
+import { Block } from "../../lib/river";
 import specs from "../../generated/component_spec.json";
 
 interface ComponentListProps {
-  addComponent: (component: Component) => void;
+  addComponent: (component: Block) => void;
 }
 
 const ComponentList = ({ addComponent }: ComponentListProps) => {
@@ -14,7 +14,7 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
                 <Card.Heading>{name}</Card.Heading>
                 <Card.Meta>{[name]}</Card.Meta>
                 <Card.Actions>
-                    <Button onClick={() => addComponent(new Component(name,"just_added"))}>Add</Button>
+                    <Button onClick={() => addComponent(new Block(name,"just_added"))}>Add</Button>
                 </Card.Actions>
             </Card>
         ))}

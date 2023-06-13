@@ -31,7 +31,7 @@ interface Props {
 }
 
 type SelectedComponent = {
-  component: river.Component;
+  component: river.Block;
   node: Parser.SyntaxNode;
 };
 
@@ -89,7 +89,7 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
       );
       var editComponentCommand = editor.addCommand(
         0,
-        function (ctx, component: river.Component, node: Parser.SyntaxNode) {
+        function (ctx, component: river.Block, node: Parser.SyntaxNode) {
           setCurrentComponent({
             component,
             node,
@@ -161,7 +161,7 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
     [isReadOnly]
   );
 
-  const insertComponent = (component: river.Component) => {
+  const insertComponent = (component: river.Block) => {
     const editor = editorRef.current!;
     const model = editor.getModel()!;
 
@@ -181,7 +181,7 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
     setDrawerOpen(false);
   };
 
-  const updateComponent = (component: river.Component) => {
+  const updateComponent = (component: river.Block) => {
     const editor = editorRef.current!;
     if (currentComponent == null) {
       return;

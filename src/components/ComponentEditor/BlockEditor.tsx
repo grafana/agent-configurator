@@ -1,17 +1,6 @@
 import { Form, Field, Input, Button, Switch } from "@grafana/ui";
-import { Block, Attribute, Argument } from "../../lib/river";
+import { Component, Attribute } from "../../lib/river";
 import React from "react";
-import specs_raw from "../../generated/component_spec.json";
-import { ComponentSpecs } from "../../generated";
-import BlockEditor from "./inputs/BlockEditor";
-
-
-const specs: Map<string, any> = new Map(Object.entries(specs_raw));
-
-interface ComponentEditorProps {
-  updateComponent: (component: Block) => void;
-  component: Block;
-}
 const DynamicInput = ({ attr, register }: { attr: any; register: any }) => {
   switch (attr.Type) {
     case "bool":
@@ -48,23 +37,21 @@ const ComponentEditor = ({
   updateComponent,
   component,
 }: ComponentEditorProps) => {
-  const cspec = ComponentSpecs.get(component.name)!;
-  const values = component.args.reduce((map: any, a: Argument) => {
-    if (a instanceof Attribute) {
-      if(Array.isArray(a.value)) {
-        map[a.key] = a.value.join(',');
-      } else {
-        map[a.key] = a.value;
-      }
+  const cspec = specs.get(component.name);
+  const attrMap = cspec.Attributes.reduce(
+    (map: Map<string, any>, attr: any) => {
+      return map.set(attr.Name, attr);
+    },
+    new Map<string, any>()
+  );
+  const parsedAttrs = component.attributes.reduce((map: any, a: Attribute) => {
+    if(Array.isArray(a.value)) {
+      map[a.key] = a.value.join(',');
+    } else {
+      map[a.key] = a.value;
     }
     return map
   },{ label: component.label});
-
-  for (k in cspec.Attributes) {
-    if(!(k in values))
-      values[k] = cspec.Attributes[k].Default
-  }
-
 
   return (
     <Form
@@ -77,9 +64,16 @@ const ComponentEditor = ({
           if (attrSpec.Type.startsWith("[]") && attrSpec.Default == null && (value as string[]).length === 0) continue;
           changed.push(new Attribute(key, value));
         }
-        updateComponent(new Block(component.name, values.label, changed));
+        updateComponent(new Component(component.name, values.label, changed));
       }}
-      defaultValues={values}
+      defaultValues={cspec.Attributes.filter((x: any) => x.Default).reduce(
+        (map: any, x: any) => {
+          if (!(x.Name in map))
+            map[x.Name] = x.Default;
+          return map;
+        },
+        parsedAttrs
+      )}
     >
       {({ register, errors }) => {
         return (
@@ -87,6 +81,18 @@ const ComponentEditor = ({
             <Field label="Label" description="Component Label">
               <Input {...register("label")} />
             </Field>
+            {cspec.Attributes.map((attr: any, i: number) => {
+              return (
+                <Field
+                  label={attr.Name}
+                  key={i}
+                  invalid={!!errors[attr.Name]}
+                  error="Attribute is required"
+                >
+                  <DynamicInput attr={attr} register={register} />
+                </Field>
+              );
+            })}
             <Button type="submit">Save</Button>
           </>
         );

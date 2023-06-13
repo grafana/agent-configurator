@@ -1,23 +1,24 @@
 import Parser from "web-tree-sitter";
+import { ComponentSpecs } from "../generated";
 
-export class Component {
+export class Block {
   name: string;
   label: string | null;
-  attributes: Attribute[];
+  args: Argument[];
   constructor(
     name: string,
     label: string | null = null,
-    attributes: Attribute[] = []
+    args: Argument[] = []
   ) {
     this.name = name;
     this.label = label;
-    this.attributes = attributes;
+    this.args = args;
   }
   marshal(): string {
     let out = `
 ${this.name} "${this.label}" {
 `;
-    this.attributes.forEach((a) => {
+    this.args.forEach((a) => {
       out += "  " + a.marshal() + "\n";
     });
     out += "}";
@@ -44,7 +45,9 @@ export class Attribute {
   }
 }
 
-export function Unmarshal(source: string, n: Parser.SyntaxNode): Component {
+export type Argument = Attribute | Block;
+
+export function Unmarshal(source: string, n: Parser.SyntaxNode): Block {
   const blockNameNode = n.childForFieldName("name")!;
   const name = source.substring(
     blockNameNode.startIndex,
@@ -63,20 +66,23 @@ export function Unmarshal(source: string, n: Parser.SyntaxNode): Component {
   if (attrNodes) {
     for (const attr of attrNodes) {
       if (attr.type !== "attribute") continue;
-      const keyNode = attr.childForFieldName("key")!;
-      const valueNode = attr.childForFieldName("value")!;
-      const key = source.substring(keyNode.startIndex,keyNode.endIndex);
-      let value: any;
-      switch (valueNode.type) {
-        case "literal_value":
-        case "array":
-          value = JSON.parse(source.substring(valueNode.startIndex,valueNode.endIndex));
-          break;
-        default:
-          value = {}
+      switch (attr.type) {
+        case "attribute":
+          const keyNode = attr.childForFieldName("key")!;
+          const valueNode = attr.childForFieldName("value")!;
+          const key = source.substring(keyNode.startIndex,keyNode.endIndex);
+          let value: any;
+          switch (valueNode.type) {
+            case "literal_value":
+            case "array":
+              value = JSON.parse(source.substring(valueNode.startIndex,valueNode.endIndex));
+              break;
+            default:
+              value = {}
+          }
+          attrs.push(new Attribute(key,value))
       }
-      attrs.push(new Attribute(key,value))
     }
   }
-  return new Component(name, label,attrs);
+  return new Block(name, label, attrs);
 }

@@ -1,1 +1,548 @@
-{"prometheus.exporter.mysql":{"Attributes":[{"Name":"data_source_name","Type":"rivertypes.Secret","Default":"","Required":false},{"Name":"enable_collectors","Type":"[]string","Default":null,"Required":false},{"Name":"disable_collectors","Type":"[]string","Default":null,"Required":false},{"Name":"set_collectors","Type":"[]string","Default":null,"Required":false},{"Name":"lock_wait_timeout","Type":"int","Default":2,"Required":false},{"Name":"log_slow_filter","Type":"bool","Default":false,"Required":false},{"Name":"info_schema.processlist","Type":"mysql.InfoSchemaProcessList","Default":{"MinTime":0,"ProcessesByUser":true,"ProcessesByHost":true},"Required":false},{"Name":"info_schema.tables","Type":"mysql.InfoSchemaTables","Default":{"Databases":"*"},"Required":false},{"Name":"perf_schema.eventsstatements","Type":"mysql.PerfSchemaEventsStatements","Default":{"Limit":250,"TimeLimit":86400,"TextLimit":120},"Required":false},{"Name":"perf_schema.file_instances","Type":"mysql.PerfSchemaFileInstances","Default":{"Filter":".*","RemovePrefix":"/var/lib/mysql"},"Required":false},{"Name":"heartbeat","Type":"mysql.Heartbeat","Default":{"Database":"heartbeat","Table":"heartbeat","UTC":false},"Required":false},{"Name":"mysql.user","Type":"mysql.MySQLUser","Default":{"Privileges":false},"Required":false}]},"prometheus.exporter.redis":{"Attributes":[{"Name":"include_exporter_metrics","Type":"bool","Default":false,"Required":false},{"Name":"redis_addr","Type":"string","Default":"","Required":true},{"Name":"redis_user","Type":"string","Default":"","Required":false},{"Name":"redis_password","Type":"rivertypes.Secret","Default":"","Required":false},{"Name":"redis_password_file","Type":"string","Default":"","Required":false},{"Name":"redis_password_map_file","Type":"string","Default":"","Required":false},{"Name":"namespace","Type":"string","Default":"redis","Required":false},{"Name":"config_command","Type":"string","Default":"CONFIG","Required":false},{"Name":"check_keys","Type":"[]string","Default":null,"Required":false},{"Name":"check_key_groups","Type":"[]string","Default":null,"Required":false},{"Name":"check_key_groups_batch_size","Type":"int64","Default":10000,"Required":false},{"Name":"max_distinct_key_groups","Type":"int64","Default":100,"Required":false},{"Name":"check_single_keys","Type":"[]string","Default":null,"Required":false},{"Name":"check_streams","Type":"[]string","Default":null,"Required":false},{"Name":"check_single_streams","Type":"[]string","Default":null,"Required":false},{"Name":"count_keys","Type":"[]string","Default":null,"Required":false},{"Name":"script_path","Type":"string","Default":"","Required":false},{"Name":"script_paths","Type":"[]string","Default":null,"Required":false},{"Name":"connection_timeout","Type":"time.Duration","Default":15000000000,"Required":false},{"Name":"tls_client_key_file","Type":"string","Default":"","Required":false},{"Name":"tls_client_cert_file","Type":"string","Default":"","Required":false},{"Name":"tls_ca_cert_file","Type":"string","Default":"","Required":false},{"Name":"set_client_name","Type":"bool","Default":true,"Required":false},{"Name":"is_tile38","Type":"bool","Default":false,"Required":false},{"Name":"is_cluster","Type":"bool","Default":false,"Required":false},{"Name":"export_client_list","Type":"bool","Default":false,"Required":false},{"Name":"export_client_port","Type":"bool","Default":false,"Required":false},{"Name":"redis_metrics_only","Type":"bool","Default":false,"Required":false},{"Name":"ping_on_connect","Type":"bool","Default":false,"Required":false},{"Name":"incl_system_metrics","Type":"bool","Default":false,"Required":false},{"Name":"skip_tls_verification","Type":"bool","Default":false,"Required":false}]}}
+{
+  "prometheus.exporter.mysql": {
+    "Attributes": {
+      "data_source_name": {
+        "Name": "data_source_name",
+        "Type": "rivertypes.Secret",
+        "Default": "",
+        "Required": false
+      },
+      "disable_collectors": {
+        "Name": "disable_collectors",
+        "Type": "[]string",
+        "Default": null,
+        "Required": false
+      },
+      "enable_collectors": {
+        "Name": "enable_collectors",
+        "Type": "[]string",
+        "Default": null,
+        "Required": false
+      },
+      "heartbeat": {
+        "Name": "heartbeat",
+        "Type": "block",
+        "Default": null,
+        "Required": false,
+        "BlockSpec": {
+          "Attributes": {
+            "database": {
+              "Name": "database",
+              "Type": "string",
+              "Default": "heartbeat",
+              "Required": false
+            },
+            "table": {
+              "Name": "table",
+              "Type": "string",
+              "Default": "heartbeat",
+              "Required": false
+            },
+            "utc": {
+              "Name": "utc",
+              "Type": "bool",
+              "Default": false,
+              "Required": false
+            }
+          }
+        }
+      },
+      "info_schema.processlist": {
+        "Name": "info_schema.processlist",
+        "Type": "block",
+        "Default": null,
+        "Required": false,
+        "BlockSpec": {
+          "Attributes": {
+            "min_time": {
+              "Name": "min_time",
+              "Type": "int",
+              "Default": 0,
+              "Required": false
+            },
+            "processes_by_host": {
+              "Name": "processes_by_host",
+              "Type": "bool",
+              "Default": true,
+              "Required": false
+            },
+            "processes_by_user": {
+              "Name": "processes_by_user",
+              "Type": "bool",
+              "Default": true,
+              "Required": false
+            }
+          }
+        }
+      },
+      "info_schema.tables": {
+        "Name": "info_schema.tables",
+        "Type": "block",
+        "Default": null,
+        "Required": false,
+        "BlockSpec": {
+          "Attributes": {
+            "databases": {
+              "Name": "databases",
+              "Type": "string",
+              "Default": "*",
+              "Required": false
+            }
+          }
+        }
+      },
+      "lock_wait_timeout": {
+        "Name": "lock_wait_timeout",
+        "Type": "int",
+        "Default": 2,
+        "Required": false
+      },
+      "log_slow_filter": {
+        "Name": "log_slow_filter",
+        "Type": "bool",
+        "Default": false,
+        "Required": false
+      },
+      "mysql.user": {
+        "Name": "mysql.user",
+        "Type": "block",
+        "Default": null,
+        "Required": false,
+        "BlockSpec": {
+          "Attributes": {
+            "privileges": {
+              "Name": "privileges",
+              "Type": "bool",
+              "Default": false,
+              "Required": false
+            }
+          }
+        }
+      },
+      "perf_schema.eventsstatements": {
+        "Name": "perf_schema.eventsstatements",
+        "Type": "block",
+        "Default": null,
+        "Required": false,
+        "BlockSpec": {
+          "Attributes": {
+            "limit": {
+              "Name": "limit",
+              "Type": "int",
+              "Default": 250,
+              "Required": false
+            },
+            "text_limit": {
+              "Name": "text_limit",
+              "Type": "int",
+              "Default": 120,
+              "Required": false
+            },
+            "time_limit": {
+              "Name": "time_limit",
+              "Type": "int",
+              "Default": 86400,
+              "Required": false
+            }
+          }
+        }
+      },
+      "perf_schema.file_instances": {
+        "Name": "perf_schema.file_instances",
+        "Type": "block",
+        "Default": null,
+        "Required": false,
+        "BlockSpec": {
+          "Attributes": {
+            "filter": {
+              "Name": "filter",
+              "Type": "string",
+              "Default": ".*",
+              "Required": false
+            },
+            "remove_prefix": {
+              "Name": "remove_prefix",
+              "Type": "string",
+              "Default": "/var/lib/mysql",
+              "Required": false
+            }
+          }
+        }
+      },
+      "set_collectors": {
+        "Name": "set_collectors",
+        "Type": "[]string",
+        "Default": null,
+        "Required": false
+      }
+    }
+  },
+  "prometheus.exporter.redis": {
+    "Attributes": {
+      "check_key_groups": {
+        "Name": "check_key_groups",
+        "Type": "[]string",
+        "Default": null,
+        "Required": false
+      },
+      "check_key_groups_batch_size": {
+        "Name": "check_key_groups_batch_size",
+        "Type": "int64",
+        "Default": 10000,
+        "Required": false
+      },
+      "check_keys": {
+        "Name": "check_keys",
+        "Type": "[]string",
+        "Default": null,
+        "Required": false
+      },
+      "check_single_keys": {
+        "Name": "check_single_keys",
+        "Type": "[]string",
+        "Default": null,
+        "Required": false
+      },
+      "check_single_streams": {
+        "Name": "check_single_streams",
+        "Type": "[]string",
+        "Default": null,
+        "Required": false
+      },
+      "check_streams": {
+        "Name": "check_streams",
+        "Type": "[]string",
+        "Default": null,
+        "Required": false
+      },
+      "config_command": {
+        "Name": "config_command",
+        "Type": "string",
+        "Default": "CONFIG",
+        "Required": false
+      },
+      "connection_timeout": {
+        "Name": "connection_timeout",
+        "Type": "time.Duration",
+        "Default": 15000000000,
+        "Required": false
+      },
+      "count_keys": {
+        "Name": "count_keys",
+        "Type": "[]string",
+        "Default": null,
+        "Required": false
+      },
+      "export_client_list": {
+        "Name": "export_client_list",
+        "Type": "bool",
+        "Default": false,
+        "Required": false
+      },
+      "export_client_port": {
+        "Name": "export_client_port",
+        "Type": "bool",
+        "Default": false,
+        "Required": false
+      },
+      "incl_system_metrics": {
+        "Name": "incl_system_metrics",
+        "Type": "bool",
+        "Default": false,
+        "Required": false
+      },
+      "include_exporter_metrics": {
+        "Name": "include_exporter_metrics",
+        "Type": "bool",
+        "Default": false,
+        "Required": false
+      },
+      "is_cluster": {
+        "Name": "is_cluster",
+        "Type": "bool",
+        "Default": false,
+        "Required": false
+      },
+      "is_tile38": {
+        "Name": "is_tile38",
+        "Type": "bool",
+        "Default": false,
+        "Required": false
+      },
+      "max_distinct_key_groups": {
+        "Name": "max_distinct_key_groups",
+        "Type": "int64",
+        "Default": 100,
+        "Required": false
+      },
+      "namespace": {
+        "Name": "namespace",
+        "Type": "string",
+        "Default": "redis",
+        "Required": false
+      },
+      "ping_on_connect": {
+        "Name": "ping_on_connect",
+        "Type": "bool",
+        "Default": false,
+        "Required": false
+      },
+      "redis_addr": {
+        "Name": "redis_addr",
+        "Type": "string",
+        "Default": "",
+        "Required": true
+      },
+      "redis_metrics_only": {
+        "Name": "redis_metrics_only",
+        "Type": "bool",
+        "Default": false,
+        "Required": false
+      },
+      "redis_password": {
+        "Name": "redis_password",
+        "Type": "rivertypes.Secret",
+        "Default": "",
+        "Required": false
+      },
+      "redis_password_file": {
+        "Name": "redis_password_file",
+        "Type": "string",
+        "Default": "",
+        "Required": false
+      },
+      "redis_password_map_file": {
+        "Name": "redis_password_map_file",
+        "Type": "string",
+        "Default": "",
+        "Required": false
+      },
+      "redis_user": {
+        "Name": "redis_user",
+        "Type": "string",
+        "Default": "",
+        "Required": false
+      },
+      "script_path": {
+        "Name": "script_path",
+        "Type": "string",
+        "Default": "",
+        "Required": false
+      },
+      "script_paths": {
+        "Name": "script_paths",
+        "Type": "[]string",
+        "Default": null,
+        "Required": false
+      },
+      "set_client_name": {
+        "Name": "set_client_name",
+        "Type": "bool",
+        "Default": true,
+        "Required": false
+      },
+      "skip_tls_verification": {
+        "Name": "skip_tls_verification",
+        "Type": "bool",
+        "Default": false,
+        "Required": false
+      },
+      "tls_ca_cert_file": {
+        "Name": "tls_ca_cert_file",
+        "Type": "string",
+        "Default": "",
+        "Required": false
+      },
+      "tls_client_cert_file": {
+        "Name": "tls_client_cert_file",
+        "Type": "string",
+        "Default": "",
+        "Required": false
+      },
+      "tls_client_key_file": {
+        "Name": "tls_client_key_file",
+        "Type": "string",
+        "Default": "",
+        "Required": false
+      }
+    }
+  },
+  "prometheus.remote_write": {
+    "Attributes": {
+      "endpoint": {
+        "Name": "endpoint",
+        "Type": "[]block",
+        "Default": null,
+        "Required": false,
+        "BlockSpec": {
+          "Attributes": {
+            "bearer_token": {
+              "Name": "bearer_token",
+              "Type": "rivertypes.Secret",
+              "Default": "",
+              "Required": false
+            },
+            "bearer_token_file": {
+              "Name": "bearer_token_file",
+              "Type": "string",
+              "Default": "",
+              "Required": false
+            },
+            "enable_http2": {
+              "Name": "enable_http2",
+              "Type": "bool",
+              "Default": false,
+              "Required": false
+            },
+            "follow_redirects": {
+              "Name": "follow_redirects",
+              "Type": "bool",
+              "Default": false,
+              "Required": false
+            },
+            "headers": {
+              "Name": "headers",
+              "Type": "map[string]string",
+              "Default": null,
+              "Required": false
+            },
+            "name": {
+              "Name": "name",
+              "Type": "string",
+              "Default": "",
+              "Required": false
+            },
+            "proxy_url": {
+              "Name": "proxy_url",
+              "Type": "config.URL",
+              "Default": "",
+              "Required": false
+            },
+            "remote_timeout": {
+              "Name": "remote_timeout",
+              "Type": "time.Duration",
+              "Default": 0,
+              "Required": false
+            },
+            "send_exemplars": {
+              "Name": "send_exemplars",
+              "Type": "bool",
+              "Default": false,
+              "Required": false
+            },
+            "send_native_histograms": {
+              "Name": "send_native_histograms",
+              "Type": "bool",
+              "Default": false,
+              "Required": false
+            },
+            "tls_config": {
+              "Name": "tls_config",
+              "Type": "block",
+              "Default": null,
+              "Required": false,
+              "BlockSpec": {
+                "Attributes": {
+                  "ca_file": {
+                    "Name": "ca_file",
+                    "Type": "string",
+                    "Default": "",
+                    "Required": false
+                  },
+                  "ca_pem": {
+                    "Name": "ca_pem",
+                    "Type": "string",
+                    "Default": "",
+                    "Required": false
+                  },
+                  "cert_file": {
+                    "Name": "cert_file",
+                    "Type": "string",
+                    "Default": "",
+                    "Required": false
+                  },
+                  "cert_pem": {
+                    "Name": "cert_pem",
+                    "Type": "string",
+                    "Default": "",
+                    "Required": false
+                  },
+                  "insecure_skip_verify": {
+                    "Name": "insecure_skip_verify",
+                    "Type": "bool",
+                    "Default": false,
+                    "Required": false
+                  },
+                  "key_file": {
+                    "Name": "key_file",
+                    "Type": "string",
+                    "Default": "",
+                    "Required": false
+                  },
+                  "key_pem": {
+                    "Name": "key_pem",
+                    "Type": "rivertypes.Secret",
+                    "Default": "",
+                    "Required": false
+                  },
+                  "min_version": {
+                    "Name": "min_version",
+                    "Type": "uint16",
+                    "Default": null,
+                    "Required": false
+                  },
+                  "server_name": {
+                    "Name": "server_name",
+                    "Type": "string",
+                    "Default": "",
+                    "Required": false
+                  }
+                }
+              }
+            },
+            "url": {
+              "Name": "url",
+              "Type": "string",
+              "Default": "",
+              "Required": true
+            }
+          }
+        }
+      },
+      "external_labels": {
+        "Name": "external_labels",
+        "Type": "map[string]string",
+        "Default": null,
+        "Required": false
+      },
+      "wal": {
+        "Name": "wal",
+        "Type": "block",
+        "Default": null,
+        "Required": false,
+        "BlockSpec": {
+          "Attributes": {
+            "max_keepalive_time": {
+              "Name": "max_keepalive_time",
+              "Type": "time.Duration",
+              "Default": 28800000000000,
+              "Required": false
+            },
+            "min_keepalive_time": {
+              "Name": "min_keepalive_time",
+              "Type": "time.Duration",
+              "Default": 300000000000,
+              "Required": false
+            },
+            "truncate_frequency": {
+              "Name": "truncate_frequency",
+              "Type": "time.Duration",
+              "Default": 7200000000000,
+              "Required": false
+            }
+          }
+        }
+      }
+    }
+  }
+}

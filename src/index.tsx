@@ -5,12 +5,18 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "rc-drawer/assets/index.css";
 import App from "./App";
 import { ThemeProvider } from "./theme";
+import { ParserProvider } from "./state";
+import { ComponentProvider } from "./state";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <ThemeProvider>
-    <App />
+    <ParserProvider>
+      <ComponentProvider>
+        <App />
+      </ComponentProvider>
+    </ParserProvider>
   </ThemeProvider>
 );

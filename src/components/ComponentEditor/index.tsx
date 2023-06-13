@@ -3,6 +3,8 @@ import { Block, toArgument } from "../../lib/river";
 import React from "react";
 import PrometheusRemoteWrite from "./components/PrometheusRemoteWrite";
 import PrometheusExporterRedis from "./components/PrometheusExporterRedis";
+import PrometheusScrape from "./components/PrometheusScrape";
+import UnsupportedComponent from "./components/UnsupportedComponent";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -21,8 +23,10 @@ const ComponentEditor = ({
         return <PrometheusRemoteWrite register={register}/>;
       case 'prometheus.exporter.redis':
         return <PrometheusExporterRedis register={register}/>;
+      case 'prometheus.scrape':
+        return <PrometheusScrape register={register}/>;
       default:
-        return 'foo';
+        return <UnsupportedComponent/>;
     }
   }
 

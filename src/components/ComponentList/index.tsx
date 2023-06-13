@@ -22,6 +22,13 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
                   <Button onClick={() => addComponent(new Block("prometheus.exporter.redis","default",[new Attribute("redis_addr","localhost:6317")]))}>Add</Button>
               </Card.Actions>
           </Card>
+          <Card>
+              <Card.Heading>Prometheus Scrape</Card.Heading>
+              <Card.Meta>{["Prometheus","Glue"]}</Card.Meta>
+              <Card.Actions>
+                  <Button onClick={() => addComponent(new Block("prometheus.scrape","default",[new Attribute("targets",[]),new Attribute("forward_to",[])]))}>Add</Button>
+              </Card.Actions>
+          </Card>
     </>
   );
 };

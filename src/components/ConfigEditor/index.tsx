@@ -8,7 +8,8 @@ import Parser from "web-tree-sitter";
 import { Theme, useTheme } from "../../theme";
 import ComponentList from "../ComponentList";
 import ComponentEditor from "../ComponentEditor";
-import * as river from "../../lib/river";
+import * as River from "../../lib/river";
+import {useComponentContext} from "../../state";
 
 const defaultOpts: monaco.editor.IStandaloneEditorConstructionOptions = {
   fontSize: 15,
@@ -31,11 +32,12 @@ interface Props {
 }
 
 type SelectedComponent = {
-  component: river.Block;
+  component: River.Block;
   node: Parser.SyntaxNode | null;
 };
 
 const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
+  const {components,setComponents} = useComponentContext();
   const editorRef = useRef<null | monaco.editor.IStandaloneCodeEditor>(null);
   const monacoRef = useRef<null | Monaco>(null);
 
@@ -58,9 +60,10 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
         },
       });
       const parser = new Parser();
-      const River = await Parser.Language.load("/tree-sitter-river.wasm");
-      const componentQuery = River.query(`(config_file (block) @component)`);
-      parser.setLanguage(River);
+      const river = await Parser.Language.load("/tree-sitter-river.wasm");
+      const componentQuery = river.query(`(config_file (block) @component)`);
+      parser.setLanguage(river);
+
       monaco.editor.defineTheme("thema-dark", {
         base: "vs-dark",
         inherit: true,
@@ -89,7 +92,7 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
       );
       var editComponentCommand = editor.addCommand(
         0,
-        function (ctx, component: river.Block, node: Parser.SyntaxNode) {
+        function (ctx, component: River.Block, node: Parser.SyntaxNode) {
           setCurrentComponent({
             component,
             node,
@@ -107,6 +110,11 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
         const value = model.getValue();
         const tree = parser.parse(value);
         const components = componentQuery.matches(tree.rootNode);
+
+        setComponents(components.map((match) => {
+            const c = match.captures[0];
+            return River.Unmarshal(value, c.node)
+        }));
         lenses.push(
           ...components.map((match) => {
             const c = match.captures[0];
@@ -121,7 +129,7 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
               command: {
                 id: editComponentCommand!,
                 title: "Edit Component",
-                arguments: [river.Unmarshal(value, c.node), c.node],
+                arguments: [River.Unmarshal(value, c.node), c.node],
               },
             };
           })
@@ -161,14 +169,14 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
     [isReadOnly]
   );
 
-  const insertComponent = (component: river.Block) => {
+  const insertComponent = (component: River.Block) => {
     setCurrentComponent({
       component,
       node: null,
     });
   };
 
-  const updateComponent = (component: river.Block) => {
+  const updateComponent = (component: River.Block) => {
     const editor = editorRef.current!;
     if (currentComponent == null) {
       return;

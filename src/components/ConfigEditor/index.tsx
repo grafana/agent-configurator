@@ -31,8 +31,8 @@ interface Props {
 }
 
 type SelectedComponent = {
-  component: river.Component;
-  node: Parser.SyntaxNode;
+  component: river.Block;
+  node: Parser.SyntaxNode | null;
 };
 
 const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
@@ -89,7 +89,7 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
       );
       var editComponentCommand = editor.addCommand(
         0,
-        function (ctx, component: river.Component, node: Parser.SyntaxNode) {
+        function (ctx, component: river.Block, node: Parser.SyntaxNode) {
           setCurrentComponent({
             component,
             node,
@@ -161,43 +161,47 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
     [isReadOnly]
   );
 
-  const insertComponent = (component: river.Component) => {
-    const editor = editorRef.current!;
-    const model = editor.getModel()!;
-
-    const lastLine = model.getLineCount();
-    const column = model.getLineMaxColumn(lastLine);
-    editor.executeEdits("configuration-editor", [
-      {
-        range: {
-          startLineNumber: model.getLineCount(),
-          endLineNumber: model.getLineCount(),
-          startColumn: column,
-          endColumn: column,
-        },
-        text: component.marshal() + "\n",
-      },
-    ]);
-    setDrawerOpen(false);
+  const insertComponent = (component: river.Block) => {
+    setCurrentComponent({
+      component,
+      node: null,
+    });
   };
 
-  const updateComponent = (component: river.Component) => {
+  const updateComponent = (component: river.Block) => {
     const editor = editorRef.current!;
     if (currentComponent == null) {
       return;
     }
-
-    editor.executeEdits("configuration-editor", [
-      {
-        range: {
-          startLineNumber: currentComponent.node.startPosition.row,
-          startColumn: currentComponent.node.startPosition.column,
-          endLineNumber: currentComponent.node.endPosition.row + 1,
-          endColumn: currentComponent.node.endPosition.column + 1,
+    if (currentComponent.node != null) {
+      editor.executeEdits("configuration-editor", [
+        {
+          range: {
+            startLineNumber: currentComponent.node.startPosition.row,
+            startColumn: currentComponent.node.startPosition.column,
+            endLineNumber: currentComponent.node.endPosition.row + 1,
+            endColumn: currentComponent.node.endPosition.column + 1,
+          },
+          text: component.marshal(),
         },
-        text: component.marshal(),
-      },
-    ]);
+      ]);
+    } else {
+      const model = editor.getModel()!;
+      const lastLine = model.getLineCount();
+      const column = model.getLineMaxColumn(lastLine);
+      editor.executeEdits("configuration-editor", [
+        {
+          range: {
+            startLineNumber: model.getLineCount(),
+            endLineNumber: model.getLineCount(),
+            startColumn: column,
+            endColumn: column,
+          },
+          text: component.marshal() + "\n",
+        },
+      ]);
+    }
+
     setDrawerOpen(false);
   };
 

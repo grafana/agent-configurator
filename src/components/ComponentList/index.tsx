@@ -1,23 +1,27 @@
 import { Card, Button } from "@grafana/ui";
-import { Component } from "../../lib/river";
-import specs from "../../generated/component_spec.json";
+import { Block, Attribute } from "../../lib/river";
 
 interface ComponentListProps {
-  addComponent: (component: Component) => void;
+  addComponent: (component: Block) => void;
 }
 
 const ComponentList = ({ addComponent }: ComponentListProps) => {
   return (
     <>
-        {Object.keys(specs).map((name: string, i: number) => (
-            <Card key={i}>
-                <Card.Heading>{name}</Card.Heading>
-                <Card.Meta>{[name]}</Card.Meta>
-                <Card.Actions>
-                    <Button onClick={() => addComponent(new Component(name,"just_added"))}>Add</Button>
-                </Card.Actions>
-            </Card>
-        ))}
+          <Card>
+              <Card.Heading>Prometheus Remote Write</Card.Heading>
+              <Card.Meta>{["Output","Cloud","Prometheus"]}</Card.Meta>
+              <Card.Actions>
+                  <Button onClick={() => addComponent(new Block("prometheus.remote_write","default",[new Block("endpoint",null,[new Attribute("url","https://example.com")])]))}>Add</Button>
+              </Card.Actions>
+          </Card>
+          <Card>
+              <Card.Heading>Prometheus Redis Exporter</Card.Heading>
+              <Card.Meta>{["Prometheus","Redis","Cache"]}</Card.Meta>
+              <Card.Actions>
+                  <Button onClick={() => addComponent(new Block("prometheus.exporter.redis","default",[new Attribute("redis_addr","localhost:6317")]))}>Add</Button>
+              </Card.Actions>
+          </Card>
     </>
   );
 };

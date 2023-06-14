@@ -1,5 +1,32 @@
 import Parser from "web-tree-sitter";
 
+export function encodeValue(v: any): string {
+  switch (typeof v) {
+    case "string":
+      return JSON.stringify(v);
+    case "object":
+      if (Array.isArray(v)) {
+        let out = "[\n";
+        v.forEach((e) => {
+          console.log(v);
+          out += "  " + encodeValue(e);
+          out += ",\n";
+        });
+        return out + "]";
+      }
+      if (v["-reference"]) {
+        return v["-reference"];
+      }
+      let out = "{\n";
+      for (const k in v) {
+        out += `${k} = ${encodeValue(v[k])},\n`;
+      }
+      return out + "}";
+    default:
+      return `${v}`;
+  }
+}
+
 export class Block {
   name: string;
   label: string | null;
@@ -47,14 +74,7 @@ export class Attribute {
     this.value = value;
   }
   marshal(): string {
-    const begin = `${this.name} = `;
-    switch (typeof this.value) {
-      case "object":
-      case "string":
-        return begin + JSON.stringify(this.value);
-      default:
-        return begin + this.value;
-    }
+    return `${this.name} = ${encodeValue(this.value)}`;
   }
   formValues(): Record<string, any> {
     let v: Record<string, any> = {};
@@ -95,7 +115,6 @@ export function Unmarshal(source: string, n: Parser.SyntaxNode): Block {
           let value: any;
           switch (valueNode.type) {
             case "literal_value":
-            case "array":
               value = JSON.parse(
                 source.substring(valueNode.startIndex, valueNode.endIndex)
               );
@@ -114,6 +133,7 @@ export function Unmarshal(source: string, n: Parser.SyntaxNode): Block {
 }
 
 export function toArgument(k: string, v: any): Argument {
+  console.log(v);
   switch (typeof v) {
     case "string":
     case "number":

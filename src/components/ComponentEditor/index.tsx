@@ -16,14 +16,14 @@ const ComponentEditor = ({
   let formValues = component.formValues();
   formValues["label"] = component.label;
 
-  const componentForm = function(register: any) {
+  const componentForm = function(register: any, control: any) {
     switch (component.name) {
       case "prometheus.remote_write":
         return <PrometheusRemoteWrite register={register} />;
       case "prometheus.exporter.redis":
         return <PrometheusExporterRedis register={register} />;
       case "prometheus.scrape":
-        return <PrometheusScrape register={register} />;
+        return <PrometheusScrape register={register} control={control} />;
       default:
         return <UnsupportedComponent />;
     }
@@ -44,13 +44,13 @@ const ComponentEditor = ({
       }}
       defaultValues={formValues}
     >
-      {({ register, errors }) => {
+      {({ register, errors, control }) => {
         return (
           <>
             <Field label="Label" description="Component Label">
               <Input {...register("label")} />
             </Field>
-            {componentForm(register)}
+            {componentForm(register, control)}
             <Button type="submit">Save</Button>
           </>
         );

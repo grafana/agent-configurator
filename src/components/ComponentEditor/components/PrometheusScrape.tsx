@@ -1,11 +1,31 @@
 import { Field } from "@grafana/ui";
-import TargetList from "../inputs/TargetList";
+import ReferenceSelect from "../inputs/ReferenceSelect";
 
-const PrometheusScrape = ({ register }: { register: any }) => {
+const PrometheusScrape = ({
+  register,
+  control,
+}: {
+  register: any;
+  control: any;
+}) => {
   return (
     <>
-      <Field label="Targets" description="	List of targets to scrape.">
-        <TargetList register={register} />
+      <Field label="Targets" description="List of targets to scrape.">
+        <ReferenceSelect
+          name="targets"
+          exportName="targets"
+          control={control}
+        />
+      </Field>
+      <Field
+        label="Forward to"
+        description="Receivers for the data scraped by this component"
+      >
+        <ReferenceSelect
+          name="forward_to"
+          exportName="receiver"
+          control={control}
+        />
       </Field>
     </>
   );

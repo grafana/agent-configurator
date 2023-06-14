@@ -16,25 +16,25 @@ export class Block {
   marshal(): string {
     let out = `${this.name} `;
     if (this.label) {
-      out += `"${this.label}" `
+      out += `"${this.label}" `;
     }
     out += "{\n";
     this.attributes.forEach((a) => {
-      out += "  " + a.marshal().replaceAll('\n','\n  ') + "\n";
+      out += "  " + a.marshal().replaceAll("\n", "\n  ") + "\n";
     });
     out += "}";
     return out;
   }
-  formValues(): Record<string,any> {
-    let values: Record<string,any> = {};
+  formValues(): Record<string, any> {
+    let values: Record<string, any> = {};
     this.attributes.forEach((a) => {
       if (a instanceof Attribute) {
-        values[`${a.name}`]=a.value;
+        values[`${a.name}`] = a.value;
       } else {
         const fv = a.formValues();
-        values[a.name]=fv;
+        values[a.name] = fv;
       }
-    })
+    });
     return values;
   }
 }
@@ -47,26 +47,26 @@ export class Attribute {
     this.value = value;
   }
   marshal(): string {
-    const begin = `${this.name} = `
-    switch(typeof this.value){
+    const begin = `${this.name} = `;
+    switch (typeof this.value) {
       case "object":
       case "string":
         return begin + JSON.stringify(this.value);
       default:
-        return begin + this.value
+        return begin + this.value;
     }
   }
-  formValues(): Record<string,any> {
-    let v: Record<string,any> = {};
+  formValues(): Record<string, any> {
+    let v: Record<string, any> = {};
     v[this.name] = this.value;
     return v;
   }
 }
 
 interface Argument {
-  name: string
-  marshal(): string
-  formValues(): Record<string,any>
+  name: string;
+  marshal(): string;
+  formValues(): Record<string, any>;
 }
 
 export function Unmarshal(source: string, n: Parser.SyntaxNode): Block {
@@ -91,35 +91,41 @@ export function Unmarshal(source: string, n: Parser.SyntaxNode): Block {
         case "attribute":
           const keyNode = arg.childForFieldName("key")!;
           const valueNode = arg.childForFieldName("value")!;
-          const key = source.substring(keyNode.startIndex,keyNode.endIndex);
+          const key = source.substring(keyNode.startIndex, keyNode.endIndex);
           let value: any;
           switch (valueNode.type) {
             case "literal_value":
             case "array":
-              value = JSON.parse(source.substring(valueNode.startIndex,valueNode.endIndex));
+              value = JSON.parse(
+                source.substring(valueNode.startIndex, valueNode.endIndex)
+              );
               break;
             default:
-              value = {}
+              value = {};
           }
-          args.push(new Attribute(key,value))
+          args.push(new Attribute(key, value));
           break;
         case "block":
-          args.push(Unmarshal(source, arg))
+          args.push(Unmarshal(source, arg));
       }
     }
   }
   return new Block(name, label, args);
 }
 
-export function toArgument(k: string,v: any): Argument {
-  switch(typeof v) {
+export function toArgument(k: string, v: any): Argument {
+  switch (typeof v) {
     case "string":
     case "number":
-      return new Attribute(k,v);
+      return new Attribute(k, v);
     default:
       if (Array.isArray(v)) {
-        return new Attribute(k,v)
+        return new Attribute(k, v);
       }
-      return new Block(k,null,Object.keys(v).map(x => toArgument(x,v[x])))
+      return new Block(
+        k,
+        null,
+        Object.keys(v).map((x) => toArgument(x, v[x]))
+      );
   }
 }

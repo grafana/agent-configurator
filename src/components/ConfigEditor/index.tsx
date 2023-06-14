@@ -9,7 +9,7 @@ import { Theme, useTheme } from "../../theme";
 import ComponentList from "../ComponentList";
 import ComponentEditor from "../ComponentEditor";
 import * as River from "../../lib/river";
-import {useComponentContext} from "../../state";
+import { useComponentContext } from "../../state";
 
 const defaultOpts: monaco.editor.IStandaloneEditorConstructionOptions = {
   fontSize: 15,
@@ -26,7 +26,7 @@ type SelectedComponent = {
 };
 
 const ConfigEditor = () => {
-  const {components,setComponents} = useComponentContext();
+  const { setComponents } = useComponentContext();
   const editorRef = useRef<null | monaco.editor.IStandaloneCodeEditor>(null);
   const monacoRef = useRef<null | Monaco>(null);
 
@@ -73,7 +73,7 @@ const ConfigEditor = () => {
 
       var addComponentCommand = editor.addCommand(
         0,
-        function () {
+        function() {
           setCurrentComponent(null);
           setDrawerOpen(true);
         },
@@ -81,7 +81,7 @@ const ConfigEditor = () => {
       );
       var editComponentCommand = editor.addCommand(
         0,
-        function (ctx, component: River.Block, node: Parser.SyntaxNode) {
+        function(ctx, component: River.Block, node: Parser.SyntaxNode) {
           setCurrentComponent({
             component,
             node,
@@ -91,7 +91,7 @@ const ConfigEditor = () => {
         ""
       );
 
-      const provideCodeLenses = function (
+      const provideCodeLenses = function(
         model: monaco.editor.ITextModel,
         token: monaco.CancellationToken
       ) {
@@ -100,10 +100,12 @@ const ConfigEditor = () => {
         const tree = parser.parse(value);
         const components = componentQuery.matches(tree.rootNode);
 
-        setComponents(components.map((match) => {
+        setComponents(
+          components.map((match) => {
             const c = match.captures[0];
-            return River.Unmarshal(value, c.node)
-        }));
+            return River.Unmarshal(value, c.node);
+          })
+        );
         lenses.push(
           ...components.map((match) => {
             const c = match.captures[0];
@@ -138,19 +140,19 @@ const ConfigEditor = () => {
         });
         return {
           lenses,
-          dispose: () => {},
+          dispose: () => { },
         };
       };
       monaco.languages.registerCodeLensProvider("hcl", {
         provideCodeLenses,
-        resolveCodeLens: function (model, codeLens, token) {
+        resolveCodeLens: function(model, codeLens, token) {
           return codeLens;
         },
       });
       editorRef.current = editor;
       monacoRef.current = monaco;
     },
-    [editorTheme]
+    [editorTheme, setComponents]
   );
 
   const insertComponent = (component: River.Block) => {
@@ -203,9 +205,7 @@ const ConfigEditor = () => {
         options={defaultOpts}
         theme={editorTheme}
         height="100%"
-        defaultValue={
-          "\n"
-        }
+        defaultValue={"\n"}
         defaultLanguage="hcl"
         onMount={handleEditorDidMount}
       />

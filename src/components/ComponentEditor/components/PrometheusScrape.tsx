@@ -1,4 +1,4 @@
-import { Field, Input } from "@grafana/ui";
+import { Field } from "@grafana/ui";
 import TargetList from "../inputs/TargetList";
 
 const PrometheusScrape = ({ register }: { register: any }) => {

@@ -1,10 +1,18 @@
-import { Field, Input, Select } from "@grafana/ui";
+import { Select } from "@grafana/ui";
 
-import {useComponentContext} from "../../../state";
+import { useComponentContext } from "../../../state";
 const TargetList = ({ register }: { register: any }) => {
-  const {components} = useComponentContext();
+  const { components } = useComponentContext();
   return (
-    <Select options={components.map((c) => {return {label: `${c.label} [${c.name}]`,value: `${c.name}.${c.label}`}} )} onChange={(v)=>{} } />
+    <Select
+      options={components.map((c) => {
+        return {
+          label: `${c.label} [${c.name}]`,
+          value: `${c.name}.${c.label}`,
+        };
+      })}
+      onChange={(_) => { }}
+    />
   );
 };
 

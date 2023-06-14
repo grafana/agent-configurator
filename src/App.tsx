@@ -1,7 +1,7 @@
 import { css } from "@emotion/css";
 import { GrafanaTheme2 } from "@grafana/data";
 import { useStyles } from "./theme";
-import { Alert, LinkButton, HorizontalGroup } from "@grafana/ui";
+import { Alert, LinkButton } from "@grafana/ui";
 import Header from "./components/Header";
 import ConfigEditor from "./components/ConfigEditor";
 

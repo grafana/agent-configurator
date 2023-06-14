@@ -20,23 +20,12 @@ const defaultOpts: monaco.editor.IStandaloneEditorConstructionOptions = {
   },
 };
 
-const readOnlyOpts: monaco.editor.IStandaloneEditorConstructionOptions = {
-  readOnly: true,
-  lineNumbers: "off",
-};
-
-interface Props {
-  value: string;
-  onChange?: (value?: string) => void;
-  isReadOnly?: boolean;
-}
-
 type SelectedComponent = {
   component: River.Block;
   node: Parser.SyntaxNode | null;
 };
 
-const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
+const ConfigEditor = () => {
   const {components,setComponents} = useComponentContext();
   const editorRef = useRef<null | monaco.editor.IStandaloneCodeEditor>(null);
   const monacoRef = useRef<null | Monaco>(null);
@@ -164,11 +153,6 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
     [editorTheme]
   );
 
-  const opts = useMemo(
-    () => (isReadOnly ? { ...defaultOpts, ...readOnlyOpts } : defaultOpts),
-    [isReadOnly]
-  );
-
   const insertComponent = (component: River.Block) => {
     setCurrentComponent({
       component,
@@ -216,16 +200,14 @@ const ConfigEditor = ({ value, onChange, isReadOnly }: Props) => {
   return (
     <>
       <Editor
-        options={opts}
+        options={defaultOpts}
         theme={editorTheme}
         height="100%"
-        value={value}
         defaultValue={
-          "# Welcome to the Grafana Agent Config Generator! Click on 'Add Component' below to get started\n\n"
+          "\n"
         }
         defaultLanguage="hcl"
         onMount={handleEditorDidMount}
-        onChange={onChange}
       />
       {isDrawerOpen && (
         <Drawer

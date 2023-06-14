@@ -9,6 +9,9 @@ body {
   --bs-body-color: attr(data-text);
 }
 
+html, body, #root, .App {
+  height: 100%;
+}
 /* Global themes */
 body.dark {
   color: rgb(204, 204, 220);

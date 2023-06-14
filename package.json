@@ -146,5 +146,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "typescript-eslint-language-service": "^5.0.5"
   }
 }

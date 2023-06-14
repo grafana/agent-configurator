@@ -1,6 +1,5 @@
-import { Form, Field, Input, Button, Card } from "@grafana/ui";
+import { Form, Field, Input, Button } from "@grafana/ui";
 import { Block, toArgument } from "../../lib/river";
-import React from "react";
 import PrometheusRemoteWrite from "./components/PrometheusRemoteWrite";
 import PrometheusExporterRedis from "./components/PrometheusExporterRedis";
 import PrometheusScrape from "./components/PrometheusScrape";
@@ -18,17 +17,17 @@ const ComponentEditor = ({
   formValues["label"] = component.label;
 
   const componentForm = function(register: any) {
-    switch(component.name) {
-      case 'prometheus.remote_write':
-        return <PrometheusRemoteWrite register={register}/>;
-      case 'prometheus.exporter.redis':
-        return <PrometheusExporterRedis register={register}/>;
-      case 'prometheus.scrape':
-        return <PrometheusScrape register={register}/>;
+    switch (component.name) {
+      case "prometheus.remote_write":
+        return <PrometheusRemoteWrite register={register} />;
+      case "prometheus.exporter.redis":
+        return <PrometheusExporterRedis register={register} />;
+      case "prometheus.scrape":
+        return <PrometheusScrape register={register} />;
       default:
-        return <UnsupportedComponent/>;
+        return <UnsupportedComponent />;
     }
-  }
+  };
 
   return (
     <Form

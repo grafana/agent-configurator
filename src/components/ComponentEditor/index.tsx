@@ -1,10 +1,9 @@
-import { Form, Field, Input, Button } from "@grafana/ui";
+import { Form, Field, Input, Button, FormAPI } from "@grafana/ui";
 import { Block, toArgument } from "../../lib/river";
 import PrometheusRemoteWrite from "./components/PrometheusRemoteWrite";
 import PrometheusExporterRedis from "./components/PrometheusExporterRedis";
 import PrometheusScrape from "./components/PrometheusScrape";
 import UnsupportedComponent from "./components/UnsupportedComponent";
-import { Control, UseFormRegister } from "react-hook-form";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -17,17 +16,14 @@ const ComponentEditor = ({
   let formValues = component.formValues();
   formValues["label"] = component.label;
 
-  const componentForm = (
-    register: UseFormRegister<Record<string, any>>,
-    control: Control<Record<string, any>>
-  ) => {
+  const componentForm = (methods: FormAPI<Record<string, any>>) => {
     switch (component.name) {
       case "prometheus.remote_write":
-        return <PrometheusRemoteWrite register={register} />;
+        return <PrometheusRemoteWrite methods={methods} />;
       case "prometheus.exporter.redis":
-        return <PrometheusExporterRedis register={register} />;
+        return <PrometheusExporterRedis methods={methods} />;
       case "prometheus.scrape":
-        return <PrometheusScrape control={control} />;
+        return <PrometheusScrape methods={methods} />;
       default:
         return <UnsupportedComponent />;
     }
@@ -48,7 +44,8 @@ const ComponentEditor = ({
       }}
       defaultValues={formValues}
     >
-      {({ register, errors, control }) => {
+      {(methods) => {
+        const { register, errors } = methods;
         return (
           <>
             <Field
@@ -59,7 +56,7 @@ const ComponentEditor = ({
             >
               <Input {...register("label", { required: true })} />
             </Field>
-            {componentForm(register, control)}
+            {componentForm(methods)}
             <Button type="submit">Save</Button>
           </>
         );

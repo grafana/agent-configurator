@@ -88,19 +88,13 @@ interface Argument {
   formValues(): Record<string, any>;
 }
 
-export function Unmarshal(source: string, n: Parser.SyntaxNode): Block {
+export function Unmarshal(n: Parser.SyntaxNode): Block {
   const blockNameNode = n.childForFieldName("name")!;
-  const name = source.substring(
-    blockNameNode.startIndex,
-    blockNameNode.endIndex
-  );
+  const name = blockNameNode.text;
   const blockLabelIdentifierNode = n.childForFieldName("label")?.namedChild(0);
   let label = null;
   if (blockLabelIdentifierNode != null) {
-    label = source.substring(
-      blockLabelIdentifierNode.startIndex,
-      blockLabelIdentifierNode.endIndex
-    );
+    label = blockLabelIdentifierNode.text;
   }
   const argNodes = n.childForFieldName("body")?.namedChildren;
   const args: Argument[] = [];
@@ -110,13 +104,11 @@ export function Unmarshal(source: string, n: Parser.SyntaxNode): Block {
         case "attribute":
           const keyNode = arg.childForFieldName("key")!;
           const valueNode = arg.childForFieldName("value")!;
-          const key = source.substring(keyNode.startIndex, keyNode.endIndex);
+          const key = keyNode.text;
           let value: any;
           switch (valueNode.type) {
             case "literal_value":
-              value = JSON.parse(
-                source.substring(valueNode.startIndex, valueNode.endIndex)
-              );
+              value = JSON.parse(valueNode.text);
               break;
             default:
               value = {};
@@ -124,7 +116,7 @@ export function Unmarshal(source: string, n: Parser.SyntaxNode): Block {
           args.push(new Attribute(key, value));
           break;
         case "block":
-          args.push(Unmarshal(source, arg));
+          args.push(Unmarshal(arg));
       }
     }
   }

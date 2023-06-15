@@ -103,7 +103,7 @@ const ConfigEditor = () => {
         setComponents(
           components.map((match) => {
             const c = match.captures[0];
-            return River.Unmarshal(value, c.node);
+            return River.Unmarshal(c.node);
           })
         );
         lenses.push(
@@ -120,7 +120,7 @@ const ConfigEditor = () => {
               command: {
                 id: editComponentCommand!,
                 title: "Edit Component",
-                arguments: [River.Unmarshal(value, c.node), c.node],
+                arguments: [River.Unmarshal(c.node), c.node],
               },
             };
           })

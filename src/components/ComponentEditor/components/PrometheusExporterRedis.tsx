@@ -1,6 +1,11 @@
 import { Field, Input } from "@grafana/ui";
+import { UseFormRegister } from "react-hook-form";
 
-const PrometheusExporterRedis = ({ register }: { register: any }) => {
+const PrometheusExporterRedis = ({
+  register,
+}: {
+  register: UseFormRegister<Record<string, any>>;
+}) => {
   return (
     <>
       <Field

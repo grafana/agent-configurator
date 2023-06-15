@@ -8,8 +8,7 @@ export function encodeValue(v: any): string {
       if (Array.isArray(v)) {
         let out = "[\n";
         v.forEach((e) => {
-          console.log(v);
-          out += "  " + encodeValue(e);
+          out += "  " + encodeValue(e).replaceAll("\n", "\n  ");
           out += ",\n";
         });
         return out + "]";
@@ -19,7 +18,7 @@ export function encodeValue(v: any): string {
       }
       let out = "{\n";
       for (const k in v) {
-        out += `${k} = ${encodeValue(v[k])},\n`;
+        out += `  "${k}" = ${encodeValue(v[k])},\n`;
       }
       return out + "}";
     default:
@@ -133,7 +132,6 @@ export function Unmarshal(source: string, n: Parser.SyntaxNode): Block {
 }
 
 export function toArgument(k: string, v: any): Argument {
-  console.log(v);
   switch (typeof v) {
     case "string":
     case "number":

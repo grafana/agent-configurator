@@ -1,7 +1,7 @@
 import { SelectableValue } from "@grafana/data";
 import { MultiSelect, InputControl } from "@grafana/ui";
+import { Control } from "react-hook-form";
 import { useState } from "react";
-import { encodeValue } from "../../../lib/river";
 
 import { useComponentContext } from "../../../state";
 
@@ -15,12 +15,12 @@ const ReferenceSelect = ({
   name,
   exportName,
 }: {
-  control: any;
+  control: Control<Record<string, any>>;
   name: string;
   exportName: string;
 }) => {
   const { components } = useComponentContext();
-  const [value, setValue] = useState<Array<SelectableValue<any>>>([]);
+  const [value, setValue] = useState<Array<SelectableValue<object>>>([]);
   const [customOptions, setCustomOptions] = useState<
     Array<SelectableValue<any>>
   >([]);
@@ -31,11 +31,15 @@ const ReferenceSelect = ({
           {...field}
           options={[
             ...components
-              .filter((c) => ComponentLookup[exportName].includes(c.name))
-              .map((c) => {
+              .filter((component) =>
+                ComponentLookup[exportName].includes(component.name)
+              )
+              .map((component) => {
                 return {
-                  label: `${c.label} [${c.name}]`,
-                  value: { "-reference": `${c.name}.${c.label}.targets` },
+                  label: `${component.label} [${component.name}]`,
+                  value: {
+                    "-reference": `${component.name}.${component.label}.${exportName}`,
+                  },
                 };
               }),
             ...customOptions,
@@ -46,10 +50,10 @@ const ReferenceSelect = ({
             setValue(v);
           }}
           value={value}
-          onCreateOption={(v) => {
-            const customValue: SelectableValue<any> = {
-              value: encodeValue(v),
-              label: v,
+          onCreateOption={(newOption) => {
+            const customValue: SelectableValue<object> = {
+              value: JSON.parse(newOption),
+              label: newOption,
             };
             setCustomOptions([...customOptions, customValue]);
             setValue([...value, customValue]);

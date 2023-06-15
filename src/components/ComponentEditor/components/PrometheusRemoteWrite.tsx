@@ -1,6 +1,11 @@
 import { Field, Input } from "@grafana/ui";
+import { UseFormRegister } from "react-hook-form";
 
-const PrometheusRemoteWrite = ({ register }: { register: any }) => {
+const PrometheusRemoteWrite = ({
+  register,
+}: {
+  register: UseFormRegister<Record<string, any>>;
+}) => {
   return (
     <>
       <Field label="Endpoint URL" description="Where to send metrics to">

@@ -1,12 +1,11 @@
 import { Field } from "@grafana/ui";
 import ReferenceSelect from "../inputs/ReferenceSelect";
+import { Control } from "react-hook-form";
 
 const PrometheusScrape = ({
-  register,
   control,
 }: {
-  register: any;
-  control: any;
+  control: Control<Record<string, any>>;
 }) => {
   return (
     <>

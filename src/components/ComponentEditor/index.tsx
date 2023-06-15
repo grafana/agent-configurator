@@ -4,6 +4,7 @@ import PrometheusRemoteWrite from "./components/PrometheusRemoteWrite";
 import PrometheusExporterRedis from "./components/PrometheusExporterRedis";
 import PrometheusScrape from "./components/PrometheusScrape";
 import UnsupportedComponent from "./components/UnsupportedComponent";
+import { Control, UseFormRegister } from "react-hook-form";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -16,14 +17,17 @@ const ComponentEditor = ({
   let formValues = component.formValues();
   formValues["label"] = component.label;
 
-  const componentForm = function(register: any, control: any) {
+  const componentForm = (
+    register: UseFormRegister<Record<string, any>>,
+    control: Control<Record<string, any>>
+  ) => {
     switch (component.name) {
       case "prometheus.remote_write":
         return <PrometheusRemoteWrite register={register} />;
       case "prometheus.exporter.redis":
         return <PrometheusExporterRedis register={register} />;
       case "prometheus.scrape":
-        return <PrometheusScrape register={register} control={control} />;
+        return <PrometheusScrape control={control} />;
       default:
         return <UnsupportedComponent />;
     }
@@ -47,8 +51,13 @@ const ComponentEditor = ({
       {({ register, errors, control }) => {
         return (
           <>
-            <Field label="Label" description="Component Label">
-              <Input {...register("label")} />
+            <Field
+              label="Label"
+              description="Component Label"
+              invalid={!!errors["label"]}
+              error="A label is required"
+            >
+              <Input {...register("label", { required: true })} />
             </Field>
             {componentForm(register, control)}
             <Button type="submit">Save</Button>

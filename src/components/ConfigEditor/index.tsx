@@ -171,7 +171,7 @@ const ConfigEditor = () => {
       editor.executeEdits("configuration-editor", [
         {
           range: {
-            startLineNumber: currentComponent.node.startPosition.row,
+            startLineNumber: currentComponent.node.startPosition.row + 1,
             startColumn: currentComponent.node.startPosition.column,
             endLineNumber: currentComponent.node.endPosition.row + 1,
             endColumn: currentComponent.node.endPosition.column + 1,

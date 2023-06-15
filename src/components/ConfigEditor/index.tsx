@@ -164,23 +164,43 @@ const ConfigEditor = () => {
 
   const updateComponent = (component: River.Block) => {
     const editor = editorRef.current!;
-    if (currentComponent == null) {
+    const model = editor.getModel()!;
+    if (currentComponent === null) {
       return;
     }
-    if (currentComponent.node != null) {
-      editor.executeEdits("configuration-editor", [
+    if (currentComponent.node !== null) {
+      const node = currentComponent.node!;
+      const edits = [
         {
           range: {
-            startLineNumber: currentComponent.node.startPosition.row + 1,
-            startColumn: currentComponent.node.startPosition.column,
-            endLineNumber: currentComponent.node.endPosition.row + 1,
-            endColumn: currentComponent.node.endPosition.column + 1,
+            startLineNumber: node.startPosition.row + 1,
+            startColumn: node.startPosition.column,
+            endLineNumber: node.endPosition.row + 1,
+            endColumn: node.endPosition.column + 1,
           },
           text: component.marshal(),
         },
-      ]);
+      ];
+      const oldLabel = node.childForFieldName("label")?.namedChild(0)?.text;
+      const oldRef = `${component.name}.${oldLabel}`;
+
+      const existingRefs = model.findMatches(
+        oldRef, // searchString
+        true, // searchOnlyEditableRange
+        false, // isRegex
+        true, // matchCase
+        null, // wordSeparators
+        false // captureMatches
+      );
+      console.log(existingRefs);
+      for (const ref of existingRefs) {
+        edits.push({
+          range: ref.range,
+          text: `${component.name}.${component.label}`,
+        });
+      }
+      editor.executeEdits("configuration-editor", edits);
     } else {
-      const model = editor.getModel()!;
       const lastLine = model.getLineCount();
       const column = model.getLineMaxColumn(lastLine);
       editor.executeEdits("configuration-editor", [

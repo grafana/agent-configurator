@@ -88,35 +88,51 @@ interface Argument {
   formValues(): Record<string, any>;
 }
 
-export function Unmarshal(n: Parser.SyntaxNode): Block {
-  const blockNameNode = n.childForFieldName("name")!;
-  const name = blockNameNode.text;
-  const blockLabelIdentifierNode = n.childForFieldName("label")?.namedChild(0);
-  let label = null;
-  if (blockLabelIdentifierNode != null) {
-    label = blockLabelIdentifierNode.text;
+export function UnmarshalArray(n: Parser.SyntaxNode): any[] {
+  let array = [];
+  for (const entryNode of n.namedChildren) {
+    array.push(UnmarshalValue(entryNode));
   }
+  return array;
+}
+
+export function UnmarshalValue(node: Parser.SyntaxNode): any {
+  let out: any;
+  switch (node.type) {
+    case "literal_value":
+      out = JSON.parse(node.text);
+      break;
+    case "identifier":
+      out = { "-reference": node.text };
+      break;
+    case "array":
+      out = UnmarshalArray(node);
+      break;
+    default:
+      out = {};
+  }
+  return out;
+}
+
+export function UnmarshalBlock(n: Parser.SyntaxNode): Block {
+  const name = n.childForFieldName("name")!.text;
+  const label = n.childForFieldName("label")?.namedChild(0)?.text;
   const argNodes = n.childForFieldName("body")?.namedChildren;
   const args: Argument[] = [];
   if (argNodes) {
     for (const arg of argNodes) {
       switch (arg.type) {
         case "attribute":
-          const keyNode = arg.childForFieldName("key")!;
-          const valueNode = arg.childForFieldName("value")!;
-          const key = keyNode.text;
-          let value: any;
-          switch (valueNode.type) {
-            case "literal_value":
-              value = JSON.parse(valueNode.text);
-              break;
-            default:
-              value = {};
-          }
-          args.push(new Attribute(key, value));
+          const key = arg.childForFieldName("key")!.text;
+          args.push(
+            new Attribute(key, UnmarshalValue(arg.childForFieldName("value")!))
+          );
           break;
         case "block":
-          args.push(Unmarshal(arg));
+          args.push(UnmarshalBlock(arg));
+          break;
+        default:
+          throw new Error("Unexpected argument type");
       }
     }
   }

@@ -1,6 +1,6 @@
 import Editor, { Monaco } from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { Drawer } from "@grafana/ui";
 
 import Parser from "web-tree-sitter";
@@ -9,7 +9,7 @@ import { Theme, useTheme } from "../../theme";
 import ComponentList from "../ComponentList";
 import ComponentEditor from "../ComponentEditor";
 import * as River from "../../lib/river";
-import { useComponentContext } from "../../state";
+import { useComponentContext, Component } from "../../state";
 
 const defaultOpts: monaco.editor.IStandaloneEditorConstructionOptions = {
   fontSize: 15,
@@ -29,6 +29,15 @@ const ConfigEditor = () => {
   const { setComponents } = useComponentContext();
   const editorRef = useRef<null | monaco.editor.IStandaloneCodeEditor>(null);
   const monacoRef = useRef<null | Monaco>(null);
+  const parserRef = useRef<null | { parser: Parser; river: Parser.Language }>(
+    null
+  );
+  const commandRef = useRef<null | {
+    addComponent: string;
+    editComponent: string;
+  }>(null);
+
+  const componentsRef = useRef<Component[]>([]);
 
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [currentComponent, setCurrentComponent] =
@@ -41,8 +50,8 @@ const ConfigEditor = () => {
     [theme]
   );
 
-  const handleEditorDidMount = useCallback(
-    async (editor: monaco.editor.IStandaloneCodeEditor, monaco: Monaco) => {
+  useEffect(() => {
+    (async () => {
       await Parser.init({
         locateFile(scriptName: string, scriptDirectory: string) {
           return scriptName;
@@ -50,9 +59,65 @@ const ConfigEditor = () => {
       });
       const parser = new Parser();
       const river = await Parser.Language.load("/tree-sitter-river.wasm");
-      const componentQuery = river.query(`(config_file (block) @component)`);
       parser.setLanguage(river);
+      parserRef.current = { parser, river };
+    })();
+  }, []);
 
+  const provideCodeLenses = useCallback(function(
+    model: monaco.editor.ITextModel,
+    token: monaco.CancellationToken
+  ) {
+    if (!commandRef.current) return;
+    const { addComponent, editComponent } = commandRef.current;
+    const lastLine = model.getLineCount();
+    const lenses: monaco.languages.CodeLens[] = [
+      {
+        range: {
+          startLineNumber: lastLine,
+          endLineNumber: lastLine,
+          startColumn: 1,
+          endColumn: 1,
+        },
+        command: {
+          id: addComponent,
+          title: "Add Component",
+        },
+      },
+    ];
+    if (!parserRef.current) {
+      return {
+        lenses,
+        dispose: () => { },
+      };
+    }
+    if (!componentsRef.current) return;
+    lenses.push(
+      ...componentsRef.current.map((c) => {
+        return {
+          range: {
+            startLineNumber: c.node.startPosition.row + 1,
+            startColumn: c.node.startPosition.column,
+            endLineNumber: c.node.endPosition.row + 1,
+            endColumn: c.node.endPosition.column,
+          },
+          command: {
+            id: editComponent,
+            title: "Edit Component",
+            arguments: [River.UnmarshalBlock(c.node), c.node],
+          },
+        };
+      })
+    );
+    return {
+      lenses,
+      dispose: () => { },
+    };
+  },
+    []);
+
+  const handleEditorDidMount = useCallback(
+    (editor: monaco.editor.IStandaloneCodeEditor, monaco: Monaco) => {
       monaco.editor.defineTheme("thema-dark", {
         base: "vs-dark",
         inherit: true,
@@ -91,58 +156,11 @@ const ConfigEditor = () => {
         ""
       );
 
-      const provideCodeLenses = function(
-        model: monaco.editor.ITextModel,
-        token: monaco.CancellationToken
-      ) {
-        const lenses: monaco.languages.CodeLens[] = [];
-        const value = model.getValue();
-        const tree = parser.parse(value);
-        const components = componentQuery.matches(tree.rootNode);
-
-        setComponents(
-          components.map((match) => {
-            const c = match.captures[0];
-            return River.UnmarshalBlock(c.node);
-          })
-        );
-        lenses.push(
-          ...components.map((match) => {
-            const c = match.captures[0];
-
-            return {
-              range: {
-                startLineNumber: c.node.startPosition.row + 1,
-                startColumn: c.node.startPosition.column,
-                endLineNumber: c.node.endPosition.row + 1,
-                endColumn: c.node.endPosition.column,
-              },
-              command: {
-                id: editComponentCommand!,
-                title: "Edit Component",
-                arguments: [River.UnmarshalBlock(c.node), c.node],
-              },
-            };
-          })
-        );
-        const lastLine = model.getLineCount();
-        lenses.push({
-          range: {
-            startLineNumber: lastLine,
-            endLineNumber: lastLine,
-            startColumn: 1,
-            endColumn: 1,
-          },
-          command: {
-            id: addComponentCommand!,
-            title: "Add Component",
-          },
-        });
-        return {
-          lenses,
-          dispose: () => { },
-        };
+      commandRef.current = {
+        addComponent: addComponentCommand!,
+        editComponent: editComponentCommand!,
       };
+
       monaco.languages.registerCodeLensProvider("hcl", {
         provideCodeLenses,
         resolveCodeLens: function(model, codeLens, token) {
@@ -152,8 +170,22 @@ const ConfigEditor = () => {
       editorRef.current = editor;
       monacoRef.current = monaco;
     },
-    [editorTheme, setComponents]
+    [editorTheme, provideCodeLenses]
   );
+  const onChange = (text: string | undefined) => {
+    if (!parserRef.current) return;
+    if (!text) return;
+    const { parser, river } = parserRef.current;
+    const tree = parser.parse(text);
+    const componentQuery = river.query(`(config_file (block) @component)`);
+    const matches = componentQuery.matches(tree.rootNode);
+    const components = matches.map((match) => {
+      const node = match.captures[0].node;
+      return { node, block: River.UnmarshalBlock(node) };
+    });
+    setComponents(components);
+    componentsRef.current = components;
+  };
 
   const insertComponent = (component: River.Block) => {
     setCurrentComponent({
@@ -227,6 +259,7 @@ const ConfigEditor = () => {
         defaultValue={"\n"}
         defaultLanguage="hcl"
         onMount={handleEditorDidMount}
+        onChange={onChange}
       />
       {isDrawerOpen && (
         <Drawer

@@ -37,14 +37,14 @@ const ReferenceSelect = ({
           {...field}
           options={[
             ...components
-              .filter((component) =>
-                ComponentLookup[exportName].includes(component.name)
+              .filter(({ block }) =>
+                ComponentLookup[exportName].includes(block.name)
               )
-              .map((component) => {
+              .map(({ block }) => {
                 return {
-                  label: `${component.label} [${component.name}]`,
+                  label: `${block.label} [${block.name}]`,
                   value: {
-                    "-reference": `${component.name}.${component.label}.${exportName}`,
+                    "-reference": `${block.name}.${block.label}.${exportName}`,
                   },
                 };
               }),

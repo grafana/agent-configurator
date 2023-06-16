@@ -1,5 +1,5 @@
 import { Form, Field, Input, Button, FormAPI } from "@grafana/ui";
-import { Block, toArgument } from "../../lib/river";
+import { Block, toBlock } from "../../lib/river";
 import PrometheusRemoteWrite from "./components/PrometheusRemoteWrite";
 import PrometheusExporterRedis from "./components/PrometheusExporterRedis";
 import PrometheusScrape from "./components/PrometheusScrape";
@@ -31,16 +31,8 @@ const ComponentEditor = ({
 
   return (
     <Form
-      onSubmit={async (values) => {
-        updateComponent(
-          new Block(
-            component.name,
-            values.label,
-            Object.keys(values)
-              .filter((x) => x !== "label")
-              .map((x) => toArgument(x, values[x]))
-          )
-        );
+      onSubmit={async ({ label, ...args }) => {
+        updateComponent(toBlock(component.name, args, label)!);
       }}
       defaultValues={formValues}
     >

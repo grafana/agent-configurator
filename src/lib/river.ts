@@ -139,19 +139,30 @@ export function UnmarshalBlock(n: Parser.SyntaxNode): Block {
   return new Block(name, label, args);
 }
 
-export function toArgument(k: string, v: any): Argument {
+export function toArgument(k: string, v: any): Argument | null {
   switch (typeof v) {
     case "string":
     case "number":
+      if (v === "" || v === null) return null;
       return new Attribute(k, v);
     default:
       if (Array.isArray(v)) {
         return new Attribute(k, v);
       }
-      return new Block(
-        k,
-        null,
-        Object.keys(v).map((x) => toArgument(x, v[x]))
-      );
+      return toBlock(k, v);
   }
+}
+
+export function toBlock(k: string, v: any, label?: string): Block | null {
+  // flatmap instead of filter to avoid introducing the null type
+  const args = Object.keys(v).flatMap((x) => {
+    const arg = toArgument(x, v[x]);
+    if (arg == null) {
+      return [];
+    }
+    return [arg];
+  });
+  if (label) return new Block(k, label, args);
+  if (args.length === 0) return null;
+  return new Block(k, label, args);
 }

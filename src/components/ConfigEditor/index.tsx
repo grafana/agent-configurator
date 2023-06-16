@@ -192,7 +192,6 @@ const ConfigEditor = () => {
         null, // wordSeparators
         false // captureMatches
       );
-      console.log(existingRefs);
       for (const ref of existingRefs) {
         edits.push({
           range: ref.range,

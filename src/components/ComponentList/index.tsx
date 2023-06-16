@@ -1,4 +1,4 @@
-import { Card, Button } from "@grafana/ui";
+import { Card, Button, LinkButton, Icon } from "@grafana/ui";
 import { Block, Attribute } from "../../lib/river";
 
 interface ComponentListProps {
@@ -10,6 +10,9 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
     <>
       <Card>
         <Card.Heading>Prometheus Remote Write</Card.Heading>
+        <Card.Figure>
+          <Icon size="xxxl" name="cloud-upload" />
+        </Card.Figure>
         <Card.Meta>{["Output", "Cloud", "Prometheus"]}</Card.Meta>
         <Card.Actions>
           <Button
@@ -25,10 +28,19 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
           >
             Add
           </Button>
+          <LinkButton
+            variant="secondary"
+            href="https://grafana.com/docs/agent/latest/flow/reference/components/prometheus.remote_write/"
+          >
+            Documentation
+          </LinkButton>
         </Card.Actions>
       </Card>
       <Card>
         <Card.Heading>Prometheus Redis Exporter</Card.Heading>
+        <Card.Figure>
+          <Icon size="xxxl" name="database" />
+        </Card.Figure>
         <Card.Meta>{["Prometheus", "Redis", "Cache"]}</Card.Meta>
         <Card.Actions>
           <Button
@@ -42,10 +54,19 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
           >
             Add
           </Button>
+          <LinkButton
+            variant="secondary"
+            href="https://grafana.com/docs/agent/latest/flow/reference/components/prometheus.exporter.redis/"
+          >
+            Documentation
+          </LinkButton>
         </Card.Actions>
       </Card>
       <Card>
         <Card.Heading>Prometheus Scrape</Card.Heading>
+        <Card.Figure>
+          <Icon size="xxxl" name="bolt" />
+        </Card.Figure>
         <Card.Meta>{["Prometheus", "Glue"]}</Card.Meta>
         <Card.Actions>
           <Button
@@ -60,6 +81,12 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
           >
             Add
           </Button>
+          <LinkButton
+            variant="secondary"
+            href="https://grafana.com/docs/agent/latest/flow/reference/components/prometheus.scrape/"
+          >
+            Documentation
+          </LinkButton>
         </Card.Actions>
       </Card>
     </>

@@ -1,11 +1,10 @@
-import { Field } from "@grafana/ui";
+import { Field, FormAPI } from "@grafana/ui";
 import ReferenceSelect from "../inputs/ReferenceSelect";
-import { Control } from "react-hook-form";
 
 const PrometheusScrape = ({
-  control,
+  methods,
 }: {
-  control: Control<Record<string, any>>;
+  methods: FormAPI<Record<string, any>>;
 }) => {
   return (
     <>
@@ -13,7 +12,7 @@ const PrometheusScrape = ({
         <ReferenceSelect
           name="targets"
           exportName="targets"
-          control={control}
+          control={methods.control}
         />
       </Field>
       <Field
@@ -23,7 +22,7 @@ const PrometheusScrape = ({
         <ReferenceSelect
           name="forward_to"
           exportName="receiver"
-          control={control}
+          control={methods.control}
         />
       </Field>
     </>

@@ -1,18 +1,19 @@
-import { Field, Input } from "@grafana/ui";
-import { UseFormRegister } from "react-hook-form";
+import { Field, FormAPI, Input } from "@grafana/ui";
 
 const PrometheusExporterRedis = ({
-  register,
+  methods,
 }: {
-  register: UseFormRegister<Record<string, any>>;
+  methods: FormAPI<Record<string, any>>;
 }) => {
   return (
     <>
       <Field
         label="Redis Address"
         description="Address (host and port) of the Redis instance to connect to."
+        error="The redis address is required"
+        invalid={!!methods.errors["redis_addr"]}
       >
-        <Input {...register("redis_addr")} />
+        <Input {...methods.register("redis_addr")} />
       </Field>
     </>
   );

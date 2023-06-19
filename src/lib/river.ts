@@ -141,8 +141,6 @@ export function UnmarshalBlock(n: Parser.SyntaxNode): Block {
         case "block":
           args.push(UnmarshalBlock(arg));
           break;
-        default:
-          throw new Error("Unexpected argument type");
       }
     }
   }

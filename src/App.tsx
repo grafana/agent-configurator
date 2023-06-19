@@ -1,12 +1,15 @@
 import { css } from "@emotion/css";
 import { GrafanaTheme2 } from "@grafana/data";
 import { useStyles } from "./theme";
-import { Alert, LinkButton } from "@grafana/ui";
+import { Alert, LinkButton, Button, Modal } from "@grafana/ui";
 import Header from "./components/Header";
 import ConfigEditor from "./components/ConfigEditor";
+import { useState } from "react";
+import ExamplesCatalog from "./components/ExamplesCatalog";
 
 function App() {
   const styles = useStyles(getStyles);
+  const [isModalOpen, setModalOpen] = useState(false);
   return (
     <div className={styles.container}>
       <Header />
@@ -28,6 +31,17 @@ function App() {
               View Flow Docs
             </LinkButton>
           </Alert>
+          <Alert
+            severity="success"
+            title="Get started with an example configuration"
+          >
+            <p>
+              If this is your first time working with the agent, we reccomend
+              you get started with an example configuration, based on your
+              usecase
+            </p>
+            <Button onClick={() => setModalOpen(true)}>Open catalog</Button>
+          </Alert>
         </div>
       </section>
       <section className={styles.section}>
@@ -35,6 +49,13 @@ function App() {
           <ConfigEditor />
         </div>
       </section>
+      <Modal
+        title="Example Catalog"
+        isOpen={isModalOpen}
+        onDismiss={() => setModalOpen(false)}
+      >
+        <ExamplesCatalog dismiss={() => setModalOpen(false)} />
+      </Modal>
     </div>
   );
 }
@@ -49,6 +70,11 @@ const getStyles = (theme: GrafanaTheme2) => {
     `,
     content: css`
       width: 80vw;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 10px;
     `,
     window: css`
       height: 60vh;
@@ -65,6 +91,7 @@ const getStyles = (theme: GrafanaTheme2) => {
       background: ${theme.colors.background.primary};
       font-family: Inter, Helvetica, Arial, sans-serif;
       height: 100%;
+      justify-content: flex-start;
     `,
   };
 };

@@ -4,6 +4,8 @@ import PrometheusRemoteWrite from "./components/PrometheusRemoteWrite";
 import PrometheusExporterRedis from "./components/PrometheusExporterRedis";
 import PrometheusScrape from "./components/PrometheusScrape";
 import UnsupportedComponent from "./components/UnsupportedComponent";
+import PrometheusExporterMysql from "./components/PrometheusExporterMysql";
+import PrometheusExporterGithub from "./components/PrometheusExporterGithub";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -24,6 +26,10 @@ const ComponentEditor = ({
         return <PrometheusExporterRedis methods={methods} />;
       case "prometheus.scrape":
         return <PrometheusScrape methods={methods} />;
+      case "prometheus.exporter.mysql":
+        return <PrometheusExporterMysql methods={methods} />;
+      case "prometheus.exporter.github":
+        return <PrometheusExporterGithub methods={methods} />;
       default:
         return <UnsupportedComponent />;
     }

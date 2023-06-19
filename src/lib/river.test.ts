@@ -153,6 +153,29 @@ targets = [prometheus.exporter.redis.target]
       ])
     );
   });
+  test("unmarshal mixed array", () => {
+    const tree = parser.parse(`prometheus.scrape "redis" {
+  targets = [
+    {"__address__" = "localhost:1234"},
+    prometheus.exporter.redis.default.targets,
+  ]
+  forward_to = [
+    prometheus.remote_write.default.receiver,
+  ]
+}`);
+    const out = UnmarshalBlock(tree.rootNode.namedChild(0)!);
+    expect(out).toEqual(
+      new Block("prometheus.scrape", "redis", [
+        new Attribute("targets", [
+          { __address__: "localhost:1234" },
+          { "-reference": "prometheus.exporter.redis.default.targets" },
+        ]),
+        new Attribute("forward_to", [
+          { "-reference": "prometheus.remote_write.default.receiver" },
+        ]),
+      ])
+    );
+  });
   test("reproducability", () => {
     const testcases: { raw: string; parsed: Block }[] = [
       {

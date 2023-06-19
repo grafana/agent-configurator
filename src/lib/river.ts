@@ -108,6 +108,16 @@ export function UnmarshalValue(node: Parser.SyntaxNode): any {
     case "array":
       out = UnmarshalArray(node);
       break;
+    case "object":
+      out = {};
+      for (const n of node.namedChildren) {
+        const key = n.namedChild(0)!;
+        const value = n.namedChild(1)!;
+        if (key.type === "string_lit")
+          out[JSON.parse(key.text)] = UnmarshalValue(value);
+        else out[key.text] = UnmarshalValue(value);
+      }
+      break;
     default:
       out = {};
   }

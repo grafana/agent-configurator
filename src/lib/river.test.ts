@@ -112,7 +112,7 @@ describe("marshall/unmarshal", () => {
 
   test("unmarshal attributes", () => {
     const tree = parser.parse(`prometheus.exporter.redis "my_redis" {
-  redis_addr = "localhost:6137"
+  redis_addr = "localhost:6137" // comment
 }`);
     const out = UnmarshalBlock(tree.rootNode.namedChild(0)!);
     expect(out).toEqual(

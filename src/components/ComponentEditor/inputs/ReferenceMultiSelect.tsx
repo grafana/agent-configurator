@@ -1,5 +1,5 @@
 import { SelectableValue } from "@grafana/data";
-import { MultiSelect, Select, InputControl } from "@grafana/ui";
+import { MultiSelect, InputControl } from "@grafana/ui";
 import { Control } from "react-hook-form";
 import { useState } from "react";
 import { toOptions } from "./ReferenceSelect";

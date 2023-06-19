@@ -159,6 +159,9 @@ export function toArgument(k: string, v: any): Argument | null {
       if (Array.isArray(v)) {
         return new Attribute(k, v);
       }
+      if (v["-reference"]) {
+        return new Attribute(k, v);
+      }
       return toBlock(k, v);
   }
 }

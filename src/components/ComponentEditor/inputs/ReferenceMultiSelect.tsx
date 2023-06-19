@@ -1,33 +1,12 @@
 import { SelectableValue } from "@grafana/data";
-import { Select, InputControl } from "@grafana/ui";
+import { MultiSelect, Select, InputControl } from "@grafana/ui";
 import { Control } from "react-hook-form";
 import { useState } from "react";
-import { Block } from "../../../lib/river";
+import { toOptions } from "./ReferenceSelect";
 
 import { useComponentContext } from "../../../state";
 
-const ComponentLookup: Record<string, string[]> = {
-  targets: ["prometheus.exporter.redis"],
-  receiver: ["prometheus.remote_write"],
-};
-
-export function toOptions(
-  components: Block[],
-  exportName: string
-): SelectableValue<object>[] {
-  return components
-    .filter((component) => ComponentLookup[exportName].includes(component.name))
-    .map((component) => {
-      return {
-        label: `${component.label} [${component.name}]`,
-        value: {
-          "-reference": `${component.name}.${component.label}.${exportName}`,
-        },
-      };
-    });
-}
-
-const ReferenceSelect = ({
+const ReferenceMultiSelect = ({
   control,
   name,
   exportName,
@@ -36,14 +15,13 @@ const ReferenceSelect = ({
   name: string;
   exportName: string;
 }) => {
-  console.log(control.defaultValuesRef);
   const { components } = useComponentContext();
-  const defaultValue = control.defaultValuesRef.current[name];
-  const [value, setValue] = useState<SelectableValue<object>>(() => {
-    if ("-reference" in defaultValue)
-      return { label: defaultValue["-reference"], value: defaultValue };
-    else return { label: JSON.stringify(defaultValue), value: defaultValue };
-  });
+  const [value, setValue] = useState<Array<SelectableValue<object>>>(
+    control.defaultValuesRef.current[name].map((x: SelectableValue<object>) => {
+      if ("-reference" in x) return { label: x["-reference"], value: x };
+      else return { label: JSON.stringify(x), value: x };
+    })
+  );
   const [customOptions, setCustomOptions] = useState<
     Array<SelectableValue<any>>
   >([]);
@@ -54,12 +32,12 @@ const ReferenceSelect = ({
   return (
     <InputControl
       render={({ field: { onChange, ref, ...field } }) => (
-        <Select
+        <MultiSelect
           {...field}
           options={[...targetComponents, ...customOptions]}
           allowCustomValue={true}
           onChange={(v) => {
-            onChange(v.value);
+            onChange(v.map((x) => x.value));
             setValue(v);
           }}
           value={value}
@@ -69,7 +47,7 @@ const ReferenceSelect = ({
               label: newOption,
             };
             setCustomOptions([...customOptions, customValue]);
-            setValue(customValue);
+            setValue([...value, customValue]);
           }}
         />
       )}
@@ -79,4 +57,4 @@ const ReferenceSelect = ({
   );
 };
 
-export default ReferenceSelect;
+export default ReferenceMultiSelect;

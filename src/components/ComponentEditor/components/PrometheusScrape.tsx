@@ -1,5 +1,6 @@
 import { Field, FormAPI } from "@grafana/ui";
 import ReferenceSelect from "../inputs/ReferenceSelect";
+import ReferenceMultiSelect from "../inputs/ReferenceMultiSelect";
 
 const PrometheusScrape = ({
   methods,
@@ -19,7 +20,7 @@ const PrometheusScrape = ({
         label="Forward to"
         description="Receivers for the data scraped by this component"
       >
-        <ReferenceSelect
+        <ReferenceMultiSelect
           name="forward_to"
           exportName="receiver"
           control={methods.control}

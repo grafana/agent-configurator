@@ -13,7 +13,7 @@ const PrometheusExporterRedis = ({
         error="The redis address is required"
         invalid={!!methods.errors["redis_addr"]}
       >
-        <Input {...methods.register("redis_addr")} />
+        <Input {...methods.register("redis_addr", { required: true })} />
       </Field>
     </>
   );

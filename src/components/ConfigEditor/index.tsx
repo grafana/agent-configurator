@@ -9,7 +9,7 @@ import { Theme, useTheme } from "../../theme";
 import ComponentList from "../ComponentList";
 import ComponentEditor from "../ComponentEditor";
 import * as River from "../../lib/river";
-import { useComponentContext, Component } from "../../state";
+import { useComponentContext, Component, useModelContext } from "../../state";
 
 const defaultOpts: monaco.editor.IStandaloneEditorConstructionOptions = {
   fontSize: 15,
@@ -27,6 +27,7 @@ type SelectedComponent = {
 
 const ConfigEditor = () => {
   const { setComponents } = useComponentContext();
+  const { model, setModel } = useModelContext();
   const editorRef = useRef<null | monaco.editor.IStandaloneCodeEditor>(null);
   const monacoRef = useRef<null | Monaco>(null);
   const parserRef = useRef<null | { parser: Parser; river: Parser.Language }>(
@@ -172,11 +173,10 @@ const ConfigEditor = () => {
     },
     [editorTheme, provideCodeLenses]
   );
-  const onChange = (text: string | undefined) => {
+  useEffect(() => {
     if (!parserRef.current) return;
-    if (!text) return;
     const { parser, river } = parserRef.current;
-    const tree = parser.parse(text);
+    const tree = parser.parse(model);
     const componentQuery = river.query(`(config_file (block) @component)`);
     const matches = componentQuery.matches(tree.rootNode);
     const components = matches.map((match) => {
@@ -185,6 +185,10 @@ const ConfigEditor = () => {
     });
     setComponents(components);
     componentsRef.current = components;
+  }, [model, setComponents]);
+  const onChange = (text: string | undefined) => {
+    if (!text) return;
+    setModel(text);
   };
 
   const insertComponent = (component: River.Block) => {
@@ -256,7 +260,7 @@ const ConfigEditor = () => {
         options={defaultOpts}
         theme={editorTheme}
         height="100%"
-        defaultValue={"\n"}
+        value={model}
         defaultLanguage="hcl"
         onMount={handleEditorDidMount}
         onChange={onChange}

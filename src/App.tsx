@@ -1,15 +1,41 @@
 import { css } from "@emotion/css";
 import { GrafanaTheme2 } from "@grafana/data";
 import { useStyles } from "./theme";
-import { Alert, LinkButton, Button, Modal } from "@grafana/ui";
+import {
+  Alert,
+  LinkButton,
+  Button,
+  Modal,
+  Input,
+  Icon,
+  Tooltip,
+  VerticalGroup,
+} from "@grafana/ui";
 import Header from "./components/Header";
 import ConfigEditor from "./components/ConfigEditor";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ExamplesCatalog from "./components/ExamplesCatalog";
+import { useModelContext } from "./state";
 
 function App() {
   const styles = useStyles(getStyles);
   const [isModalOpen, setModalOpen] = useState(false);
+  const { model } = useModelContext();
+  const [copied, setCopied] = useState(false);
+
+  const shareLink = useMemo(
+    () => `${window.location}?c=${btoa(model)}`,
+    [model]
+  );
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(shareLink);
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 5 * 1000);
+  };
+
   return (
     <div className={styles.container}>
       <Header />
@@ -45,8 +71,33 @@ function App() {
         </div>
       </section>
       <section className={styles.section}>
-        <div className={styles.window}>
+        <div className={styles.editorWindow}>
           <ConfigEditor />
+        </div>
+      </section>
+      <section className={styles.section}>
+        <div className={styles.shareSection}>
+          <h4>Share this Configuration</h4>
+          <p>To share this configuration, use the following link:</p>
+          <VerticalGroup>
+            <Input
+              value={shareLink}
+              readOnly
+              addonAfter={
+                <Tooltip
+                  content={(copied ? "Copied" : "Copy") + " link to clipboard"}
+                >
+                  <Button variant="secondary" onClick={copyLink}>
+                    <Icon name={copied ? "check" : "copy"} />
+                  </Button>
+                </Tooltip>
+              }
+            />
+            <Alert
+              severity="warning"
+              title="By copying the link to your clipboard you may be unintentionally sharing sensitive data. Check the included information before copying and ensure that you avoid sharing confidential data like secrets or API-Tokens"
+            ></Alert>
+          </VerticalGroup>
         </div>
       </section>
       <Modal
@@ -76,7 +127,15 @@ const getStyles = (theme: GrafanaTheme2) => {
       justify-content: space-between;
       gap: 10px;
     `,
-    window: css`
+    shareSection: css`
+      width: 80vw;
+      display: block;
+      border: rgba(204, 204, 220, 0.07) solid 1px;
+      background-color: ${theme.colors.background.secondary};
+      border-radius: 2px;
+      padding: ${theme.spacing(2, 2)};
+    `,
+    editorWindow: css`
       height: 60vh;
       width: 80vw;
       padding: 10px;
@@ -87,7 +146,7 @@ const getStyles = (theme: GrafanaTheme2) => {
     container: css`
       display: flex;
       flex-direction: column;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       background: ${theme.colors.background.primary};
       font-family: Inter, Helvetica, Arial, sans-serif;
       height: 100%;

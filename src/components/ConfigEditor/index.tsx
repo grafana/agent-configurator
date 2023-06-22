@@ -187,8 +187,7 @@ const ConfigEditor = () => {
     componentsRef.current = components;
   }, [model, setComponents]);
   const onChange = (text: string | undefined) => {
-    if (!text) return;
-    setModel(text);
+    setModel(text ? text : "");
   };
 
   const insertComponent = (component: River.Block) => {

@@ -59,7 +59,7 @@ const ConfigEditor = () => {
         },
       });
       const parser = new Parser();
-      const river = await Parser.Language.load("/tree-sitter-river.wasm");
+      const river = await Parser.Language.load("tree-sitter-river.wasm");
       parser.setLanguage(river);
       parserRef.current = { parser, river };
     })();

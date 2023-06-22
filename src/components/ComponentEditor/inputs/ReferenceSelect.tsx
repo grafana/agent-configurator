@@ -36,7 +36,6 @@ const ReferenceSelect = ({
   name: string;
   exportName: string;
 }) => {
-  console.log(control.defaultValuesRef);
   const { components } = useComponentContext();
   const defaultValue = control.defaultValuesRef.current[name];
   const [value, setValue] = useState<SelectableValue<object>>(() => {

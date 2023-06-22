@@ -189,7 +189,8 @@ const ConfigEditor = () => {
     componentsRef.current = components;
   }, [model, setComponents]);
   const onChange = (text: string | undefined) => {
-    setModel(text ? text : "");
+    setModel(text || "");
+    localStorage.setItem("config.river", text || "");
   };
 
   const insertComponent = (component: River.Block) => {

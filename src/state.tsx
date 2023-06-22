@@ -38,7 +38,11 @@ const ModelContext = React.createContext<{
 // Model provider
 export const ModelProvider = ({ children }: React.PropsWithChildren) => {
   const urlModel = new URLSearchParams(document.location.search).get("c");
-  const [model, setModel] = useState<string>(urlModel ? atob(urlModel) : "");
+  const localStorageModel = localStorage.getItem("config.river");
+  let initialModel = "";
+  if (urlModel) initialModel = atob(urlModel);
+  else if (localStorageModel) initialModel = localStorageModel;
+  const [model, setModel] = useState<string>(initialModel);
   // Remember to pass the state and the updater function to the provider
   return (
     <ModelContext.Provider value={{ model, setModel }}>

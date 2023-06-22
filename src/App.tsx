@@ -149,8 +149,9 @@ const getStyles = (theme: GrafanaTheme2) => {
       flex-wrap: nowrap;
       background: ${theme.colors.background.primary};
       font-family: Inter, Helvetica, Arial, sans-serif;
-      height: 100%;
+      min-height: 100vh;
       justify-content: flex-start;
+      padding-bottom: 10em;
     `,
   };
 };

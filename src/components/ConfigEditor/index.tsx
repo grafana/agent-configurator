@@ -141,7 +141,8 @@ const ConfigEditor = () => {
         0,
         function() {
           setCurrentComponent(null);
-          setDrawerOpen(true);
+          // need a timeout to prevent the drawer from immediately closing as this happens during the mousedown event
+          setTimeout(() => setDrawerOpen(true), 1);
         },
         ""
       );
@@ -152,7 +153,8 @@ const ConfigEditor = () => {
             component,
             node,
           });
-          setDrawerOpen(true);
+          // need a timeout to prevent the drawer from immediately closing as this happens during the mousedown event
+          setTimeout(() => setDrawerOpen(true), 1);
         },
         ""
       );

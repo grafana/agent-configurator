@@ -1,7 +1,7 @@
 import Editor, { Monaco } from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
-import { Drawer } from "@grafana/ui";
+import { Drawer, LinkButton } from "@grafana/ui";
 
 import Parser from "web-tree-sitter";
 
@@ -271,7 +271,23 @@ const ConfigEditor = () => {
         <Drawer
           scrollableContent={true}
           onClose={() => setDrawerOpen(false)}
-          title={currentComponent != null ? "Edit Component" : "Add Component"}
+          title={
+            currentComponent != null
+              ? `Edit Component [${currentComponent.component.name}]`
+              : "Add Component"
+          }
+          subtitle={
+            currentComponent != null ? (
+              <LinkButton
+                href={`https://grafana.com/docs/agent/latest/flow/reference/components/${currentComponent.component.name}`}
+                icon="external-link-alt"
+                variant="secondary"
+                target="_blank"
+              >
+                Component Documentation
+              </LinkButton>
+            ) : null
+          }
         >
           {!currentComponent && (
             <ComponentList addComponent={insertComponent} />

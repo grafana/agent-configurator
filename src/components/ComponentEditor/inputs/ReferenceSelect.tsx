@@ -39,6 +39,7 @@ const ReferenceSelect = ({
   const { components } = useComponentContext();
   const defaultValue = control.defaultValuesRef.current[name];
   const [value, setValue] = useState<SelectableValue<object>>(() => {
+    if (!defaultValue) return null;
     if ("-reference" in defaultValue)
       return { label: defaultValue["-reference"], value: defaultValue };
     else return { label: JSON.stringify(defaultValue), value: defaultValue };

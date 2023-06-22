@@ -16,12 +16,14 @@ const ReferenceMultiSelect = ({
   exportName: string;
 }) => {
   const { components } = useComponentContext();
-  const [value, setValue] = useState<Array<SelectableValue<object>>>(
-    control.defaultValuesRef.current[name].map((x: SelectableValue<object>) => {
+  const defaultValue = control.defaultValuesRef.current[name];
+  const [value, setValue] = useState<Array<SelectableValue<object>>>(() => {
+    if (!defaultValue) return null;
+    return defaultValue.map((x: SelectableValue<object>) => {
       if ("-reference" in x) return { label: x["-reference"], value: x };
       else return { label: JSON.stringify(x), value: x };
-    })
-  );
+    });
+  });
   const [customOptions, setCustomOptions] = useState<
     Array<SelectableValue<any>>
   >([]);

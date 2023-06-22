@@ -71,12 +71,7 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
         <Card.Actions>
           <Button
             onClick={() =>
-              addComponent(
-                new Block("prometheus.scrape", "default", [
-                  new Attribute("targets", []),
-                  new Attribute("forward_to", []),
-                ])
-              )
+              addComponent(new Block("prometheus.scrape", "default", []))
             }
           >
             Add

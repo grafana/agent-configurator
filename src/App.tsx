@@ -53,6 +53,8 @@ function App() {
             <LinkButton
               variant="secondary"
               href="https://grafana.com/docs/agent/latest/flow/"
+              target="_blank"
+              icon="external-link-alt"
             >
               View Flow Docs
             </LinkButton>

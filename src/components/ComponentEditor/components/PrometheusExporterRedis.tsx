@@ -1,10 +1,12 @@
-import { Field, FormAPI, Input } from "@grafana/ui";
+import { Field, FormAPI, Input, CollapsableSection } from "@grafana/ui";
+import { useState } from "react";
 
 const PrometheusExporterRedis = ({
   methods,
 }: {
   methods: FormAPI<Record<string, any>>;
 }) => {
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   return (
     <>
       <Field
@@ -15,6 +17,24 @@ const PrometheusExporterRedis = ({
       >
         <Input {...methods.register("redis_addr", { required: true })} />
       </Field>
+      <CollapsableSection
+        label="Advanced Options"
+        isOpen={advancedOpen}
+        onToggle={() => setAdvancedOpen(!advancedOpen)}
+      >
+        <Field
+          label="Redis User"
+          description="User name to use for authentication (Redis ACL for Redis 6.0 and newer)."
+        >
+          <Input {...methods.register("redis_user")} />
+        </Field>
+        <Field
+          label="Redis Password"
+          description="Password of the Redis instance."
+        >
+          <Input {...methods.register("redis_password")} />
+        </Field>
+      </CollapsableSection>
     </>
   );
 };

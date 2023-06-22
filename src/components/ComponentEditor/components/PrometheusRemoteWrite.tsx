@@ -1,4 +1,4 @@
-import { Field, FormAPI, Input, Alert } from "@grafana/ui";
+import { Field, FormAPI, Input, Alert, LinkButton } from "@grafana/ui";
 
 const PrometheusRemoteWrite = ({
   methods,
@@ -7,6 +7,17 @@ const PrometheusRemoteWrite = ({
 }) => {
   return (
     <>
+      <Alert severity="info" title="Connection Information">
+        To view your connection information, navigate to{" "}
+        <LinkButton
+          href="https://grafana.com/profile/org"
+          fill="text"
+          icon="external-link-alt"
+          target="_blank"
+        >
+          your cloud console
+        </LinkButton>
+      </Alert>
       <Field
         label="Endpoint URL"
         description="Where to send metrics to"

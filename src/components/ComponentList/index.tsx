@@ -47,7 +47,7 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
             onClick={() =>
               addComponent(
                 new Block("prometheus.exporter.redis", "default", [
-                  new Attribute("redis_addr", "localhost:6317"),
+                  new Attribute("redis_addr", "localhost:6379"),
                 ])
               )
             }

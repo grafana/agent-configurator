@@ -43,10 +43,10 @@ describe("marshall/unmarshal", () => {
   });
   test("marshal simple block", () => {
     const emptyBlock = new Block("prometheus.exporter.redis", "my_redis", [
-      new Attribute("redis_addr", "localhost:6317"),
+      new Attribute("redis_addr", "localhost:6379"),
     ]);
     expect(emptyBlock.marshal()).toEqual(`prometheus.exporter.redis "my_redis" {
-  redis_addr = "localhost:6317"
+  redis_addr = "localhost:6379"
 }`);
   });
   test("marshal blocks with arrays", () => {
@@ -112,12 +112,12 @@ describe("marshall/unmarshal", () => {
 
   test("unmarshal attributes", () => {
     const tree = parser.parse(`prometheus.exporter.redis "my_redis" {
-  redis_addr = "localhost:6137" // comment
+  redis_addr = "localhost:6379" // comment
 }`);
     const out = UnmarshalBlock(tree.rootNode.namedChild(0)!);
     expect(out).toEqual(
       new Block("prometheus.exporter.redis", "my_redis", [
-        new Attribute("redis_addr", "localhost:6137"),
+        new Attribute("redis_addr", "localhost:6379"),
       ])
     );
   });
@@ -180,10 +180,10 @@ targets = [prometheus.exporter.redis.target]
     const testcases: { raw: string; parsed: Block }[] = [
       {
         raw: `prometheus.exporter.redis "redis" {
-  redis_addr = "localhost:6137"
+  redis_addr = "localhost:6379"
 }`,
         parsed: new Block("prometheus.exporter.redis", "redis", [
-          new Attribute("redis_addr", "localhost:6137"),
+          new Attribute("redis_addr", "localhost:6379"),
         ]),
       },
       {

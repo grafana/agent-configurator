@@ -1,4 +1,4 @@
-import { Field, FormAPI, Input } from "@grafana/ui";
+import { Field, FormAPI, Input, Alert } from "@grafana/ui";
 
 const PrometheusRemoteWrite = ({
   methods,
@@ -19,9 +19,22 @@ const PrometheusRemoteWrite = ({
           })}
         />
       </Field>
-      <Field label="Basic auth username" description="Basic auth username">
+      <Field label="Basic auth username">
         <Input {...methods.register("endpoint.basic_auth.username")} />
       </Field>
+      <Field label="Basic auth password">
+        <Input {...methods.register("endpoint.basic_auth.password")} />
+      </Field>
+      <Field
+        label="Basic auth password file"
+        description="File containing the basic auth password."
+      >
+        <Input {...methods.register("endpoint.basic_auth.password_file")} />
+      </Field>
+      <Alert
+        severity="info"
+        title="password and password_file are mutually exclusive and only one can be provided."
+      ></Alert>
     </>
   );
 };

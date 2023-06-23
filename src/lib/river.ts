@@ -58,7 +58,15 @@ export class Block {
         values[`${a.name}`] = a.value;
       } else {
         const fv = a.formValues();
-        values[a.name] = fv;
+        const blockIdent = `-block-${a.name}`;
+        if (blockIdent in values) {
+          values[blockIdent].push(fv);
+        } else if (a.name in values) {
+          values[blockIdent] = [values[a.name], fv];
+          delete values[a.name];
+        } else {
+          values[a.name] = fv;
+        }
       }
     });
     return values;
@@ -151,7 +159,7 @@ export function toArgument(k: string, v: any): Argument | null {
   switch (typeof v) {
     case "string":
     case "number":
-      if (v === "" || v === null) return null;
+      if (v === "" || v === null || Number.isNaN(v)) return null;
       return new Attribute(k, v);
     default:
       if (Array.isArray(v)) {
@@ -167,6 +175,13 @@ export function toArgument(k: string, v: any): Argument | null {
 export function toBlock(k: string, v: any, label?: string): Block | null {
   // flatmap instead of filter to avoid introducing the null type
   const args = Object.keys(v).flatMap((x) => {
+    if (x.startsWith("-block-")) {
+      return (v[x] as Array<any>).flatMap((blockinstance) => {
+        const b = toBlock(x.slice(7), blockinstance);
+        if (b == null) return [];
+        return [b];
+      });
+    }
     const arg = toArgument(x, v[x]);
     if (arg == null) {
       return [];

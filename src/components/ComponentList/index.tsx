@@ -1,113 +1,106 @@
-import { Card, Button, LinkButton, Icon } from "@grafana/ui";
+import {
+  Card,
+  Button,
+  LinkButton,
+  Icon,
+  IconName,
+  Input,
+  Field,
+} from "@grafana/ui";
+import { useMemo, useState } from "react";
 import { Block, Attribute } from "../../lib/river";
 
 interface ComponentListProps {
   addComponent: (component: Block) => void;
 }
 
+type ListEntry = {
+  name: string;
+  title: string;
+  meta: Array<string>;
+  icon: IconName;
+  component: Block;
+};
+
+const components: ListEntry[] = [
+  {
+    name: "prometheus.remote_write",
+    title: "Prometheus Remote Write",
+    meta: ["Output", "Cloud", "Prometheus"],
+    icon: "cloud-upload",
+    component: new Block("prometheus.remote_write", "default", [
+      new Block("endpoint", null, [
+        new Attribute("url", "https://example.com"),
+      ]),
+    ]),
+  },
+  {
+    name: "prometheus.exporter.redis",
+    title: "Prometheus Redis Exporter",
+    meta: ["Prometheus", "Redis", "Cache"],
+    icon: "database",
+    component: new Block("prometheus.exporter.redis", "default", [
+      new Attribute("redis_addr", "localhost:6379"),
+    ]),
+  },
+  {
+    name: "prometheus.exporter.github",
+    title: "Prometheus GitHub Exporter",
+    meta: ["Prometheus", "GitHub", "SaaS"],
+    icon: "code-branch",
+    component: new Block("prometheus.exporter.github", "default", []),
+  },
+  {
+    name: "prometheus.scrape",
+    title: "Prometheus Scrape",
+    meta: ["Prometheus", "Glue"],
+    icon: "bolt",
+    component: new Block("prometheus.scrape", "default", []),
+  },
+];
+
 const ComponentList = ({ addComponent }: ComponentListProps) => {
+  const [filter, setFilter] = useState("");
+  const filtered = useMemo(() => {
+    if (filter === "") return components;
+    return components.filter(
+      (c) =>
+        c.name.includes(filter.toLowerCase()) ||
+        c.title.toLowerCase().includes(filter.toLowerCase())
+    );
+  }, [filter]);
   return (
     <>
-      <Card>
-        <Card.Heading>Prometheus Remote Write</Card.Heading>
-        <Card.Figure>
-          <Icon size="xxxl" name="cloud-upload" />
-        </Card.Figure>
-        <Card.Meta>{["Output", "Cloud", "Prometheus"]}</Card.Meta>
-        <Card.Actions>
-          <Button
-            onClick={() =>
-              addComponent(
-                new Block("prometheus.remote_write", "default", [
-                  new Block("endpoint", null, [
-                    new Attribute("url", "https://example.com"),
-                  ]),
-                ])
-              )
-            }
-          >
-            Add
-          </Button>
-          <LinkButton
-            variant="secondary"
-            href="https://grafana.com/docs/agent/latest/flow/reference/components/prometheus.remote_write/"
-          >
-            Documentation
-          </LinkButton>
-        </Card.Actions>
-      </Card>
-      <Card>
-        <Card.Heading>Prometheus Redis Exporter</Card.Heading>
-        <Card.Figure>
-          <Icon size="xxxl" name="database" />
-        </Card.Figure>
-        <Card.Meta>{["Prometheus", "Redis", "Cache"]}</Card.Meta>
-        <Card.Actions>
-          <Button
-            onClick={() =>
-              addComponent(
-                new Block("prometheus.exporter.redis", "default", [
-                  new Attribute("redis_addr", "localhost:6379"),
-                ])
-              )
-            }
-          >
-            Add
-          </Button>
-          <LinkButton
-            variant="secondary"
-            href="https://grafana.com/docs/agent/latest/flow/reference/components/prometheus.exporter.redis/"
-          >
-            Documentation
-          </LinkButton>
-        </Card.Actions>
-      </Card>
-      <Card>
-        <Card.Heading>GitHub Exporter</Card.Heading>
-        <Card.Figure>
-          <Icon size="xxxl" name="code-branch" />
-        </Card.Figure>
-        <Card.Meta>{["Prometheus", "GitHub", "SaaS"]}</Card.Meta>
-        <Card.Actions>
-          <Button
-            onClick={() =>
-              addComponent(
-                new Block("prometheus.exporter.github", "default", [])
-              )
-            }
-          >
-            Add
-          </Button>
-          <LinkButton
-            variant="secondary"
-            href="https://grafana.com/docs/agent/latest/flow/reference/components/prometheus.exporter.github/"
-          >
-            Documentation
-          </LinkButton>
-        </Card.Actions>
-      </Card>
-      <Card>
-        <Card.Heading>Prometheus Scrape</Card.Heading>
-        <Card.Figure>
-          <Icon size="xxxl" name="bolt" />
-        </Card.Figure>
-        <Card.Meta>{["Prometheus", "Glue"]}</Card.Meta>
-        <Card.Actions>
-          <Button
-            onClick={() =>
-              addComponent(new Block("prometheus.scrape", "default", []))
-            }
-          >
-            Add
-          </Button>
-          <LinkButton
-            variant="secondary"
-            href="https://grafana.com/docs/agent/latest/flow/reference/components/prometheus.scrape/"
-          >
-            Documentation
-          </LinkButton>
-        </Card.Actions>
-      </Card>
+      <Field label="Search components">
+        <Input
+          value={filter}
+          onChange={(e) => setFilter(e.currentTarget.value)}
+          prefix={<Icon name="search" />}
+          required
+        />
+      </Field>
+      <section>
+        {filtered.map((c) => {
+          return (
+            <Card key={c.name}>
+              <Card.Heading>{c.title}</Card.Heading>
+              <Card.Figure>
+                <Icon size="xxxl" name={c.icon} />
+              </Card.Figure>
+              <Card.Meta>{c.meta}</Card.Meta>
+              <Card.Actions>
+                <Button onClick={() => addComponent(c.component)}>Add</Button>
+                <LinkButton
+                  variant="secondary"
+                  href={`https://grafana.com/docs/agent/latest/flow/reference/components/${c.name}/`}
+                >
+                  Documentation
+                </LinkButton>
+              </Card.Actions>
+            </Card>
+          );
+        })}
+      </section>
     </>
   );
 };

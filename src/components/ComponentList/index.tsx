@@ -63,6 +63,30 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
         </Card.Actions>
       </Card>
       <Card>
+        <Card.Heading>GitHub Exporter</Card.Heading>
+        <Card.Figure>
+          <Icon size="xxxl" name="code-branch" />
+        </Card.Figure>
+        <Card.Meta>{["Prometheus", "GitHub", "SaaS"]}</Card.Meta>
+        <Card.Actions>
+          <Button
+            onClick={() =>
+              addComponent(
+                new Block("prometheus.exporter.github", "default", [])
+              )
+            }
+          >
+            Add
+          </Button>
+          <LinkButton
+            variant="secondary"
+            href="https://grafana.com/docs/agent/latest/flow/reference/components/prometheus.exporter.github/"
+          >
+            Documentation
+          </LinkButton>
+        </Card.Actions>
+      </Card>
+      <Card>
         <Card.Heading>Prometheus Scrape</Card.Heading>
         <Card.Figure>
           <Icon size="xxxl" name="bolt" />

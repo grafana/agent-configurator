@@ -155,7 +155,7 @@ export function toArgument(k: string, v: any): Argument | null {
       return new Attribute(k, v);
     default:
       if (Array.isArray(v)) {
-        return new Attribute(k, v);
+        return v.length === 0 ? null : new Attribute(k, v);
       }
       if (v["-reference"]) {
         return new Attribute(k, v);

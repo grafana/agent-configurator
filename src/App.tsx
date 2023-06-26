@@ -10,6 +10,7 @@ import {
   Icon,
   Tooltip,
   VerticalGroup,
+  HorizontalGroup,
 } from "@grafana/ui";
 import Header from "./components/Header";
 import ConfigEditor from "./components/ConfigEditor";
@@ -38,38 +39,34 @@ function App() {
 
   return (
     <div className={styles.container}>
-      <Header />
+      <Header></Header>
       <section className={styles.section}>
-        <div className={styles.content}>
-          <Alert
-            severity="info"
-            title="Welcome to the Grafana Agent Configurator"
-          >
-            <p>
-              This tool allows for easy configuration of Grafana Agents{" "}
-              <i>Flow</i> system. To get started click on{" "}
-              <code>Add Component</code> in the editor below
-            </p>
-            <LinkButton
-              variant="secondary"
-              href="https://grafana.com/docs/agent/latest/flow/"
-              target="_blank"
-              icon="external-link-alt"
-            >
-              View Flow Docs
-            </LinkButton>
-          </Alert>
-          <Alert
-            severity="success"
-            title="Get started with an example configuration"
-          >
+        <div className={styles.hero}>
+          <h1>Welcome to the Grafana Agent Configuration Generator</h1>
+          <p>
+            This tool allows for easy configuration of Grafana Agents{" "}
+            <i>Flow</i> system. To get started click on{" "}
+            <code>Add Component</code> in the editor below
+          </p>
+          <hr />
+          <VerticalGroup>
             <p>
               If this is your first time working with the agent, we reccomend
               you get started with an example configuration, based on your
-              usecase
+              usecase.
             </p>
-            <Button onClick={() => setModalOpen(true)}>Open catalog</Button>
-          </Alert>
+            <HorizontalGroup>
+              <Button onClick={() => setModalOpen(true)}>Open catalog</Button>
+              <LinkButton
+                variant="secondary"
+                href="https://grafana.com/docs/agent/latest/flow/"
+                target="_blank"
+                icon="external-link-alt"
+              >
+                View Flow Docs
+              </LinkButton>
+            </HorizontalGroup>
+          </VerticalGroup>
         </div>
       </section>
       <section className={styles.section}>
@@ -154,6 +151,16 @@ const getStyles = (theme: GrafanaTheme2) => {
       min-height: 100vh;
       justify-content: flex-start;
       padding-bottom: 10em;
+    `,
+    hero: css`
+      width: 80vw;
+    `,
+    split: css`
+      display: flex;
+      gap: 2rem;
+    `,
+    splitLeft: css`
+      height: 5rem;
     `,
   };
 };

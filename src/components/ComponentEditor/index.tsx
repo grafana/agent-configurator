@@ -1,4 +1,11 @@
-import { Form, Field, Input, Button, FormAPI } from "@grafana/ui";
+import {
+  Form,
+  Field,
+  Input,
+  Button,
+  FormAPI,
+  HorizontalGroup,
+} from "@grafana/ui";
 import { Block, toBlock } from "../../lib/river";
 import PrometheusRemoteWrite from "./components/PrometheusRemoteWrite";
 import PrometheusExporterRedis from "./components/PrometheusExporterRedis";
@@ -11,11 +18,13 @@ import { KnownComponents } from "../../lib/components";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
+  discard: () => void;
   component: Block;
 }
 const ComponentEditor = ({
   updateComponent,
   component,
+  discard,
 }: ComponentEditorProps) => {
   let formValues = component.formValues(KnownComponents[component.name]);
   formValues["label"] = component.label;
@@ -61,7 +70,12 @@ const ComponentEditor = ({
               <Input {...register("label", { required: true })} />
             </Field>
             {componentForm(methods)}
-            <Button type="submit">Save</Button>
+            <HorizontalGroup>
+              <Button type="submit">Save</Button>
+              <Button onClick={discard} variant="secondary">
+                Discard
+              </Button>
+            </HorizontalGroup>
           </>
         );
       }}

@@ -100,6 +100,7 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
                 <LinkButton
                   variant="secondary"
                   href={`https://grafana.com/docs/agent/latest/flow/reference/components/${c.name}/`}
+                  target="_blank"
                 >
                   Documentation
                 </LinkButton>

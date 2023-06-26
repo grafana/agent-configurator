@@ -6,6 +6,7 @@ import PrometheusScrape from "./components/PrometheusScrape";
 import UnsupportedComponent from "./components/UnsupportedComponent";
 import PrometheusExporterMysql from "./components/PrometheusExporterMysql";
 import PrometheusExporterGithub from "./components/PrometheusExporterGithub";
+import { KnownComponents } from "../../lib/components";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -15,7 +16,7 @@ const ComponentEditor = ({
   updateComponent,
   component,
 }: ComponentEditorProps) => {
-  let formValues = component.formValues();
+  let formValues = component.formValues(KnownComponents[component.name]);
   formValues["label"] = component.label;
 
   const componentForm = (methods: FormAPI<Record<string, any>>) => {
@@ -38,7 +39,9 @@ const ComponentEditor = ({
   return (
     <Form
       onSubmit={async ({ label, ...args }) => {
-        updateComponent(toBlock(component.name, args, label)!);
+        updateComponent(
+          toBlock(component.name, args, label, KnownComponents[component.name])!
+        );
       }}
       defaultValues={formValues}
     >

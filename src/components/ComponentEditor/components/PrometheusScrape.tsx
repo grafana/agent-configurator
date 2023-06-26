@@ -7,7 +7,6 @@ const PrometheusScrape = ({
 }: {
   methods: FormAPI<Record<string, any>>;
 }) => {
-  console.log(methods);
   return (
     <>
       <Field

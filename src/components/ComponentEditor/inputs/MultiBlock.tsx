@@ -1,15 +1,11 @@
 import {
   Button,
   Card,
-  Field,
   FieldArray,
   FieldSet,
   FormAPI,
   IconButton,
-  Input,
-  VerticalGroup,
 } from "@grafana/ui";
-import { useFieldArray } from "react-hook-form";
 
 const MultiBlock = ({
   methods,
@@ -20,10 +16,11 @@ const MultiBlock = ({
   methods: FormAPI<Record<string, any>>;
   name: string;
   title: string;
-  children: (field: any, index: number) => React.ReactNode[] | React.ReactNode;
+  children: (
+    field: Record<string, any>,
+    index: number
+  ) => React.ReactNode[] | React.ReactNode;
 }) => {
-  console.log(methods.control.defaultValuesRef);
-
   return (
     <FieldSet label={title}>
       <FieldArray control={methods.control} name={name}>
@@ -31,7 +28,7 @@ const MultiBlock = ({
           <>
             {fields.map((field, index) => (
               <Card key={field.id}>
-                <VerticalGroup>{children(field, index)}</VerticalGroup>
+                {children(field, index)}
                 <Card.SecondaryActions>
                   <IconButton
                     key="delete"

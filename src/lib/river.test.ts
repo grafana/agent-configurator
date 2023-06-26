@@ -1,5 +1,6 @@
-import { toArgument, UnmarshalBlock, Attribute, Block } from "./river";
+import { toArgument, UnmarshalBlock, Attribute, Block, toBlock } from "./river";
 import Parser from "web-tree-sitter";
+import { KnownComponents } from "./components";
 
 describe("argument parsing", () => {
   test("construct plain arguments", () => {
@@ -172,6 +173,44 @@ targets = [prometheus.exporter.redis.target]
         ]),
         new Attribute("forward_to", [
           { "-reference": "prometheus.remote_write.default.receiver" },
+        ]),
+      ])
+    );
+  });
+  test("to form with spec", () => {
+    const block = new Block("discovery.ec2", "aws", [
+      new Block("filter", null, [
+        new Attribute("name", "foo"),
+        new Attribute("values", ["a", "b"]),
+      ]),
+    ]);
+    const out = block.formValues(KnownComponents["discovery.ec2"]);
+    expect(out).toEqual({
+      filter: [{ name: "foo", values: ["a", "b"] }],
+    });
+  });
+  test("from form with spec", () => {
+    const fv = {
+      filter: [
+        { name: "foo", values: ["a", "b"] },
+        { name: "bar", values: ["b", "c"] },
+      ],
+    };
+    const out = toBlock(
+      "discovery.ec2",
+      fv,
+      "aws",
+      KnownComponents["discovery.ec2"]
+    );
+    expect(out).toEqual(
+      new Block("discovery.ec2", "aws", [
+        new Block("filter", null, [
+          new Attribute("name", "foo"),
+          new Attribute("values", ["a", "b"]),
+        ]),
+        new Block("filter", null, [
+          new Attribute("name", "bar"),
+          new Attribute("values", ["b", "c"]),
         ]),
       ])
     );

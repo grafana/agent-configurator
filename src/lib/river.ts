@@ -1,4 +1,5 @@
 import Parser from "web-tree-sitter";
+import { BlockType } from "./components";
 
 export function encodeValue(v: any): string {
   switch (typeof v) {
@@ -51,19 +52,15 @@ export class Block {
     out += "}";
     return out;
   }
-  formValues(): Record<string, any> {
+  formValues(spec?: BlockType): Record<string, any> {
     let values: Record<string, any> = {};
     this.attributes.forEach((a) => {
       if (a instanceof Attribute) {
         values[`${a.name}`] = a.value;
       } else {
         const fv = a.formValues();
-        const blockIdent = `-block-${a.name}`;
-        if (blockIdent in values) {
-          values[blockIdent].push(fv);
-        } else if (a.name in values) {
-          values[blockIdent] = [values[a.name], fv];
-          delete values[a.name];
+        if (spec?.args[a.name]?.multiple()) {
+          values[a.name] = values[a.name] ? [...values[a.name], fv] : [fv];
         } else {
           values[a.name] = fv;
         }
@@ -93,7 +90,7 @@ export class Attribute {
 interface Argument {
   name: string;
   marshal(): string;
-  formValues(): Record<string, any>;
+  formValues(spec?: BlockType): Record<string, any>;
 }
 
 export function UnmarshalArray(n: Parser.SyntaxNode): any[] {
@@ -172,21 +169,27 @@ export function toArgument(k: string, v: any): Argument | null {
   }
 }
 
-export function toBlock(k: string, v: any, label?: string): Block | null {
+export function toBlock(
+  k: string,
+  v: any,
+  label?: string,
+  spec?: BlockType
+): Block | null {
   // flatmap instead of filter to avoid introducing the null type
   const args = Object.keys(v).flatMap((x) => {
-    if (x.startsWith("-block-")) {
+    if (spec?.args[x]?.multiple()) {
       return (v[x] as Array<any>).flatMap((blockinstance) => {
-        const b = toBlock(x.slice(7), blockinstance);
+        const b = toBlock(x, blockinstance);
         if (b == null) return [];
         return [b];
       });
+    } else {
+      const arg = toArgument(x, v[x]);
+      if (arg == null) {
+        return [];
+      }
+      return [arg];
     }
-    const arg = toArgument(x, v[x]);
-    if (arg == null) {
-      return [];
-    }
-    return [arg];
   });
   if (label) return new Block(k, label, args);
   if (args.length === 0) return null;

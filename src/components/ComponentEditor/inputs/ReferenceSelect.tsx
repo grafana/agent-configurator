@@ -7,7 +7,7 @@ import { Block } from "../../../lib/river";
 import { useComponentContext } from "../../../state";
 
 const ComponentLookup: Record<string, string[]> = {
-  targets: ["prometheus.exporter.redis"],
+  targets: ["prometheus.exporter.redis", "discovery.ec2"],
   receiver: ["prometheus.remote_write"],
 };
 

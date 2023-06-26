@@ -57,6 +57,13 @@ const components: ListEntry[] = [
     icon: "bolt",
     component: new Block("prometheus.scrape", "default", []),
   },
+  {
+    name: "discovery.ec2",
+    title: "EC2 Discovery",
+    meta: ["AWS", "EC2", "Discovery"],
+    icon: "sitemap",
+    component: new Block("discovery.ec2", "ec2_instances", []),
+  },
 ];
 
 const ComponentList = ({ addComponent }: ComponentListProps) => {

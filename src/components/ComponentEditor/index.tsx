@@ -6,6 +6,7 @@ import PrometheusScrape from "./components/PrometheusScrape";
 import UnsupportedComponent from "./components/UnsupportedComponent";
 import PrometheusExporterMysql from "./components/PrometheusExporterMysql";
 import PrometheusExporterGithub from "./components/PrometheusExporterGithub";
+import DiscoveryEc2 from "./components/DiscoveryEc2";
 import { KnownComponents } from "../../lib/components";
 
 interface ComponentEditorProps {
@@ -21,6 +22,8 @@ const ComponentEditor = ({
 
   const componentForm = (methods: FormAPI<Record<string, any>>) => {
     switch (component.name) {
+      case "discovery.ec2":
+        return <DiscoveryEc2 methods={methods} />;
       case "prometheus.remote_write":
         return <PrometheusRemoteWrite methods={methods} />;
       case "prometheus.exporter.redis":

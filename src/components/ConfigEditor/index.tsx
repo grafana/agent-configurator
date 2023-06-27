@@ -1,7 +1,7 @@
 import Editor, { Monaco } from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
-import { Drawer, LinkButton } from "@grafana/ui";
+import { Button, Drawer, HorizontalGroup, LinkButton } from "@grafana/ui";
 
 import Parser from "web-tree-sitter";
 
@@ -278,14 +278,24 @@ const ConfigEditor = () => {
           }
           subtitle={
             currentComponent != null ? (
-              <LinkButton
-                href={`https://grafana.com/docs/agent/latest/flow/reference/components/${currentComponent.component.name}`}
-                icon="external-link-alt"
-                variant="secondary"
-                target="_blank"
-              >
-                Component Documentation
-              </LinkButton>
+              <HorizontalGroup>
+                {currentComponent?.node == null && (
+                  <Button
+                    icon="arrow-left"
+                    fill="text"
+                    variant="secondary"
+                    onClick={() => setCurrentComponent(null)}
+                  />
+                )}
+                <LinkButton
+                  href={`https://grafana.com/docs/agent/latest/flow/reference/components/${currentComponent.component.name}`}
+                  icon="external-link-alt"
+                  variant="secondary"
+                  target="_blank"
+                >
+                  Component Documentation
+                </LinkButton>
+              </HorizontalGroup>
             ) : null
           }
         >
@@ -296,6 +306,7 @@ const ConfigEditor = () => {
             <ComponentEditor
               component={currentComponent.component}
               updateComponent={updateComponent}
+              discard={() => setDrawerOpen(false)}
             />
           )}
         </Drawer>

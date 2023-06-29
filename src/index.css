@@ -29,3 +29,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.page-heading {
+  font-size: 1.28571rem;
+  margin-top: 0px;
+  margin-bottom: 16px;
+}

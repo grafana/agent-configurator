@@ -10,17 +10,22 @@ const ReferenceMultiSelect = ({
   control,
   name,
   exportName,
+  rules,
 }: {
   control: Control<Record<string, any>>;
   name: string;
   exportName: string;
+  rules?: Object;
 }) => {
   const { components } = useComponentContext();
-  const defaultValue = control.defaultValuesRef.current[name];
+  const defaultValue = name
+    .split(".")
+    .reduce((o, k) => (o ? o[k] : null), control.defaultValuesRef.current);
   const [value, setValue] = useState<Array<SelectableValue<object>>>(() => {
-    if (!defaultValue) return null;
+    if (!defaultValue) return [];
     return defaultValue.map((x: SelectableValue<object>) => {
-      if ("-reference" in x) return { label: x["-reference"], value: x };
+      if ("-reference" in x)
+        return { label: x["-reference"], value: x, key: x["-reference"] };
       else return { label: JSON.stringify(x), value: x };
     });
   });
@@ -33,6 +38,7 @@ const ReferenceMultiSelect = ({
   );
   return (
     <InputControl
+      defaultValue={value}
       render={({ field: { onChange, ref, ...field } }) => (
         <MultiSelect
           {...field}
@@ -55,6 +61,7 @@ const ReferenceMultiSelect = ({
       )}
       control={control}
       name={name}
+      rules={rules || {}}
     />
   );
 };

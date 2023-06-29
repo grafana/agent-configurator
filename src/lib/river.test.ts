@@ -215,6 +215,51 @@ targets = [prometheus.exporter.redis.target]
       ])
     );
   });
+  test("omit default values", () => {
+    const fv = {
+      grpc: {
+        endpoint: "0.0.0.0:4137",
+        include_metadata: false,
+      },
+    };
+    const out = toBlock(
+      "otelcol.receiver.otlp",
+      fv,
+      "default",
+      KnownComponents["otelcol.receiver.otlp"]
+    );
+    expect(out).toEqual(
+      new Block("otelcol.receiver.otlp", "default", [
+        new Block("grpc", null, [new Attribute("endpoint", "0.0.0.0:4137")]),
+      ])
+    );
+  });
+  test("fill default values", () => {
+    const block = new Block("otelcol.exporter.prometheus", "default", []);
+    const out = block.formValues(
+      KnownComponents["otelcol.exporter.prometheus"]
+    );
+    expect(out).toEqual({
+      include_scope_info: true,
+      include_target_info: true,
+    });
+  });
+  test("allow empty block according to spec", () => {
+    const fv = {
+      grpc: {},
+    };
+    const out = toBlock(
+      "otelcol.receiver.otlp",
+      fv,
+      "default",
+      KnownComponents["otelcol.receiver.otlp"]
+    );
+    expect(out).toEqual(
+      new Block("otelcol.receiver.otlp", "default", [
+        new Block("grpc", null, []),
+      ])
+    );
+  });
   test("reproducability", () => {
     const testcases: { raw: string; parsed: Block }[] = [
       {

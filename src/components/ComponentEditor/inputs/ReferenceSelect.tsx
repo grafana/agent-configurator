@@ -9,6 +9,7 @@ import { useComponentContext } from "../../../state";
 const ComponentLookup: Record<string, string[]> = {
   targets: ["prometheus.exporter.redis", "discovery.ec2"],
   receiver: ["prometheus.remote_write"],
+  input: ["otelcol.processor.batch", "otelcol.exporter.prometheus"],
 };
 
 export function toOptions(

@@ -1,4 +1,4 @@
-import { Field, FormAPI } from "@grafana/ui";
+import { FormAPI, InlineField } from "@grafana/ui";
 import ReferenceSelect from "../inputs/ReferenceSelect";
 import ReferenceMultiSelect from "../inputs/ReferenceMultiSelect";
 
@@ -9,9 +9,10 @@ const PrometheusScrape = ({
 }) => {
   return (
     <>
-      <Field
+      <InlineField
         label="Targets"
-        description="List of targets to scrape."
+        tooltip="List of targets to scrape."
+        labelWidth={14}
         error="You must specify the targets parameter"
         invalid={!!methods.errors["targets"]}
       >
@@ -20,10 +21,11 @@ const PrometheusScrape = ({
           exportName="targets"
           control={methods.control}
         />
-      </Field>
-      <Field
+      </InlineField>
+      <InlineField
         label="Forward to"
-        description="Receivers for the data scraped by this component"
+        tooltip="Receivers for the data scraped by this component"
+        labelWidth={14}
         error="You must specify the destination"
         invalid={!!methods.errors["forward_to"]}
       >
@@ -32,7 +34,7 @@ const PrometheusScrape = ({
           exportName="receiver"
           control={methods.control}
         />
-      </Field>
+      </InlineField>
     </>
   );
 };

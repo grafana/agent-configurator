@@ -64,6 +64,27 @@ const components: ListEntry[] = [
     icon: "sitemap",
     component: new Block("discovery.ec2", "ec2_instances", []),
   },
+  {
+    name: "otelcol.receiver.otlp",
+    title: "OpenTelemetry Collector OTLP Receiver",
+    meta: ["OTEL", "Receiver", "Metrics", "Logs", "Traces"],
+    icon: "import",
+    component: new Block("otelcol.receiver.otlp", "default", []),
+  },
+  {
+    name: "otelcol.exporter.prometheus",
+    title: "OpenTelemetry Collector Prometheus Export",
+    meta: ["OTEL", "Prometheus", "Exporter"],
+    icon: "rocket",
+    component: new Block("otelcol.exporter.prometheus", "to_prometheus", []),
+  },
+  {
+    name: "otelcol.processor.batch",
+    title: "OpenTelemetry Collector Batch Processor",
+    meta: ["OTEL", "Processor"],
+    icon: "process",
+    component: new Block("otelcol.processor.batch", "default", []),
+  },
 ];
 
 const ComponentList = ({ addComponent }: ComponentListProps) => {

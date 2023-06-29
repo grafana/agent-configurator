@@ -1,9 +1,11 @@
 import Parser from "web-tree-sitter";
-import { BlockType } from "./components";
+import { BlockType, ArgumentType } from "./components";
 
 export function encodeValue(v: any): string {
   switch (typeof v) {
     case "string":
+    case "boolean":
+    case "number":
       return JSON.stringify(v);
     case "object":
       if (Array.isArray(v)) {
@@ -54,10 +56,14 @@ export class Block {
   }
   formValues(spec?: BlockType): Record<string, any> {
     let values: Record<string, any> = {};
+    for (const argName of spec ? Object.keys(spec.args) : []) {
+      values[argName] = spec!.args[argName].default();
+    }
     this.attributes.forEach((a) => {
       if (a instanceof Attribute) {
         values[`${a.name}`] = a.value;
       } else {
+        console.log(`working on ${a.name}. already present: ${values[a.name]}`);
         const fv = a.formValues();
         if (spec?.args[a.name]?.multiple()) {
           values[a.name] = values[a.name] ? [...values[a.name], fv] : [fv];
@@ -152,11 +158,17 @@ export function UnmarshalBlock(n: Parser.SyntaxNode): Block {
   return new Block(name, label, args);
 }
 
-export function toArgument(k: string, v: any): Argument | null {
+export function toArgument(
+  k: string,
+  v: any,
+  spec?: ArgumentType
+): Argument | null {
   switch (typeof v) {
     case "string":
+    case "boolean":
     case "number":
       if (v === "" || v === null || Number.isNaN(v)) return null;
+      if (v === spec?.default()) return null;
       return new Attribute(k, v);
     default:
       if (Array.isArray(v)) {
@@ -165,7 +177,7 @@ export function toArgument(k: string, v: any): Argument | null {
       if (v["-reference"]) {
         return new Attribute(k, v);
       }
-      return toBlock(k, v);
+      return toBlock(k, v, undefined, spec as BlockType);
   }
 }
 
@@ -184,7 +196,7 @@ export function toBlock(
         return [b];
       });
     } else {
-      const arg = toArgument(x, v[x]);
+      const arg = toArgument(x, v[x], spec?.args[x]);
       if (arg == null) {
         return [];
       }
@@ -192,6 +204,6 @@ export function toBlock(
     }
   });
   if (label) return new Block(k, label, args);
-  if (args.length === 0) return null;
+  if (args.length === 0 && !(spec as BlockType)?.allowEmpty) return null;
   return new Block(k, label, args);
 }

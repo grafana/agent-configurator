@@ -1,33 +1,46 @@
-import { Field, FormAPI, Input, InputControl, MultiSelect } from "@grafana/ui";
+import {
+  FormAPI,
+  InlineField,
+  Input,
+  InputControl,
+  MultiSelect,
+  VerticalGroup,
+} from "@grafana/ui";
 
 const PrometheusExporterGithub = ({
   methods,
 }: {
   methods: FormAPI<Record<string, any>>;
 }) => {
+  const commonOptions = {
+    labelWidth: 14,
+  };
   return (
-    <>
-      <Field
+    <VerticalGroup>
+      <InlineField
         label="api_token"
-        description="API token to use to authenticate against GitHub."
+        tooltip="API token to use to authenticate against GitHub."
+        {...commonOptions}
       >
         <Input {...methods.register("api_token")} />
-      </Field>
-      <Field
+      </InlineField>
+      <InlineField
         label="api_token_file"
-        description="File containing API token to use to authenticate against GitHub."
+        tooltip="File containing API token to use to authenticate against GitHub."
+        {...commonOptions}
       >
         <Input {...methods.register("api_token_file")} />
-      </Field>
-      <Field
+      </InlineField>
+      <InlineField
         label="api_token_file"
-        description="File containing API token to use to authenticate against GitHub. Takes precedence over api_token"
+        tooltip="File containing API token to use to authenticate against GitHub. Takes precedence over api_token"
+        {...commonOptions}
       >
         <Input {...methods.register("api_token_file")} />
-      </Field>
+      </InlineField>
       {["organizations", "users", "repositories"].map((type) => {
         return (
-          <Field label={type} key={type}>
+          <InlineField label={type} key={type} {...commonOptions}>
             <InputControl
               render={({ field: { onChange, ...field } }) => (
                 <MultiSelect
@@ -36,13 +49,14 @@ const PrometheusExporterGithub = ({
                   options={[]}
                   allowCustomValue
                   placeholder={`Enter ${type}`}
+                  width={26}
                 />
               )}
               defaultValue={[]}
               control={methods.control}
               name={type}
             />
-          </Field>
+          </InlineField>
         );
       })}
       <p>
@@ -51,7 +65,7 @@ const PrometheusExporterGithub = ({
         configure either <code>api_token</code> or <code>api_token_file</code>{" "}
         to authenticate against GitHub.
       </p>
-    </>
+    </VerticalGroup>
   );
 };
 

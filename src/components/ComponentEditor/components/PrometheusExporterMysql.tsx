@@ -1,4 +1,4 @@
-import { Field, FormAPI, Input } from "@grafana/ui";
+import { FormAPI, InlineField, Input } from "@grafana/ui";
 
 const PrometheusExporterMysql = ({
   methods,
@@ -7,14 +7,18 @@ const PrometheusExporterMysql = ({
 }) => {
   return (
     <>
-      <Field
+      <InlineField
         label="Data Source Name"
-        description="Data Source Name for the MySQL server to connect to."
+        tooltip="Data Source Name for the MySQL server to connect to."
         error="The data source name is required"
         invalid={!!methods.errors["data_source_name"]}
+        labelWidth={20}
       >
-        <Input {...methods.register("data_source_name", { required: true })} />
-      </Field>
+        <Input
+          {...methods.register("data_source_name", { required: true })}
+          placeholder="root@(server-a:3306)/"
+        />
+      </InlineField>
     </>
   );
 };

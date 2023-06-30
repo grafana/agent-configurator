@@ -92,4 +92,22 @@ export const KnownComponents: Record<string, BlockType> = {
       include_scope_info: new LiteralArgument("boolean", true),
     },
   }),
+  "prometheus.exporter.redis": new BlockType({
+    args: {
+      namespace: new LiteralArgument("string", "redis"),
+      config_command: new LiteralArgument("string", "CONFIG"),
+      check_key_groups_batch_size: new LiteralArgument("number", 10000),
+      max_distinct_key_groups: new LiteralArgument("number", 100),
+      connection_timeout: new LiteralArgument("string", "15s"),
+      is_cluster: new LiteralArgument("boolean", false),
+      skip_tls_verification: new LiteralArgument("boolean", false),
+      incl_system_metrics: new LiteralArgument("boolean", false),
+      ping_on_connect: new LiteralArgument("boolean", false),
+      redis_metrics_only: new LiteralArgument("boolean", false),
+      export_client_port: new LiteralArgument("boolean", false),
+      export_client_list: new LiteralArgument("boolean", false),
+      is_tile38: new LiteralArgument("boolean", false),
+      set_client_name: new LiteralArgument("boolean", true),
+    },
+  }),
 };

@@ -1,33 +1,348 @@
-import { Field, FormAPI, Input } from "@grafana/ui";
+import {
+  FormAPI,
+  InlineField,
+  InlineSwitch,
+  Input,
+  InputControl,
+  MultiSelect,
+} from "@grafana/ui";
 
 const PrometheusExporterRedis = ({
   methods,
 }: {
   methods: FormAPI<Record<string, any>>;
 }) => {
+  const commonOptions = {
+    labelWidth: 26,
+  };
   return (
     <>
-      <Field
+      <InlineField
         label="Redis Address"
-        description="Address (host and port) of the Redis instance to connect to."
+        tooltip="Address (host and port) of the Redis instance to connect to."
         error="The redis address is required"
         invalid={!!methods.errors["redis_addr"]}
+        {...commonOptions}
       >
-        <Input {...methods.register("redis_addr", { required: true })} />
-      </Field>
-      <h6>Advanced Options</h6>
-      <Field
+        <Input
+          {...methods.register("redis_addr", { required: true })}
+          placeholder="localhost:6379"
+        />
+      </InlineField>
+      <InlineField
         label="Redis User"
-        description="User name to use for authentication (Redis ACL for Redis 6.0 and newer)."
+        tooltip="User name to use for authentication (Redis ACL for Redis 6.0 and newer)."
+        {...commonOptions}
       >
         <Input {...methods.register("redis_user")} />
-      </Field>
-      <Field
-        label="Redis Password"
-        description="Password of the Redis instance."
+      </InlineField>
+      <InlineField
+        label="Redis password"
+        tooltip="Password of the Redis instance."
+        {...commonOptions}
       >
         <Input {...methods.register("redis_password")} />
-      </Field>
+      </InlineField>
+      <InlineField
+        label="Redis password file"
+        tooltip="Path of a file containing a password."
+        {...commonOptions}
+      >
+        <Input {...methods.register("redis_password_file")} />
+      </InlineField>
+      <InlineField
+        label="Connection timeout"
+        tooltip="Timeout for connection to Redis instance (in Golang duration format)."
+        {...commonOptions}
+      >
+        <Input {...methods.register("connection_timeout")} placeholder="15s" />
+      </InlineField>
+      <InlineField
+        label="Cluster"
+        tooltip="Whether the connection is to a Redis cluster."
+        {...commonOptions}
+      >
+        <InlineSwitch {...methods.register("is_cluster")} />
+      </InlineField>
+      <h6>Advanced Options</h6>
+      <InlineField
+        label="Redis password map file"
+        tooltip="Path of a JSON file containing a map of Redis URIs to passwords."
+        {...commonOptions}
+      >
+        <Input {...methods.register("redis_password_map_file")} />
+      </InlineField>
+      <InlineField
+        label="TLS client key file"
+        tooltip="Name of the client key file (including full path) if the server requires TLS client authentication."
+        {...commonOptions}
+      >
+        <Input {...methods.register("tls_client_key_file")} />
+      </InlineField>
+      <InlineField
+        label="TLS client cert file"
+        tooltip="Name of the client certificate file (including full path) if the server requires TLS client authentication."
+        {...commonOptions}
+      >
+        <Input {...methods.register("tls_client_cert_file")} />
+      </InlineField>
+      <InlineField
+        label="TLS CA cert file"
+        tooltip="Name of the CA certificate file (including full path) if the server requires TLS client authentication."
+        {...commonOptions}
+      >
+        <Input {...methods.register("tls_ca_cert_file")} />
+      </InlineField>
+      <InlineField
+        label="Skip tls verification"
+        tooltip="Whether to to skip TLS verification."
+        {...commonOptions}
+      >
+        <InlineSwitch {...methods.register("skip_tls_verification")} />
+      </InlineField>
+      <InlineField
+        label="Namespace"
+        tooltip="Namespace for the metrics."
+        {...commonOptions}
+      >
+        <Input {...methods.register("namespace")} placeholder="redis" />
+      </InlineField>
+      <InlineField
+        label="Config command"
+        tooltip="What to use for the CONFIG command."
+        {...commonOptions}
+      >
+        <Input {...methods.register("config_command")} placeholder="CONFIG" />
+      </InlineField>
+      <InlineField
+        label="Check keys"
+        tooltip="List of key-patterns to export value and length/size, searched for with SCAN."
+        {...commonOptions}
+      >
+        <InputControl
+          render={({ field: { onChange, ref, ...field } }) => (
+            <MultiSelect
+              {...field}
+              onChange={(v) => onChange(v.map((x) => x.value))}
+              options={[]}
+              allowCustomValue
+              placeholder="Add new value"
+              width={26}
+            />
+          )}
+          defaultValue={[]}
+          control={methods.control}
+          name="check_keys"
+        />
+      </InlineField>
+      <InlineField
+        label="Check keys groups"
+        tooltip="List of Lua regular expressions (regex) for grouping keys."
+        {...commonOptions}
+      >
+        <InputControl
+          render={({ field: { onChange, ref, ...field } }) => (
+            <MultiSelect
+              {...field}
+              onChange={(v) => onChange(v.map((x) => x.value))}
+              options={[]}
+              allowCustomValue
+              placeholder="Add new value"
+              width={26}
+            />
+          )}
+          defaultValue={[]}
+          control={methods.control}
+          name="check_keys_groups"
+        />
+      </InlineField>
+      <InlineField
+        label="Key groups batch size"
+        tooltip="Check key or key groups batch size hint for the underlying SCAN."
+        {...commonOptions}
+      >
+        <Input
+          type="number"
+          {...methods.register("check_key_groups_batch_size", {
+            valueAsNumber: true,
+          })}
+          placeholder="10000"
+        />
+      </InlineField>
+      <InlineField
+        label="Maximum distinct key groups"
+        tooltip="The maximum number of distinct key groups with the most memory utilization to present as distinct metrics per database."
+        {...commonOptions}
+      >
+        <Input
+          type="number"
+          {...methods.register("max_distinct_key_groups", {
+            valueAsNumber: true,
+          })}
+          placeholder="100"
+        />
+      </InlineField>
+      <InlineField
+        label="Check single keys"
+        tooltip="List of single keys to export value and length/size."
+        {...commonOptions}
+      >
+        <InputControl
+          render={({ field: { onChange, ref, ...field } }) => (
+            <MultiSelect
+              {...field}
+              onChange={(v) => onChange(v.map((x) => x.value))}
+              options={[]}
+              allowCustomValue
+              placeholder="Add new value"
+              width={26}
+            />
+          )}
+          defaultValue={[]}
+          control={methods.control}
+          name="check_single_keys"
+        />
+      </InlineField>
+      <InlineField
+        label="Check streams"
+        tooltip="List of stream-patterns to export info about streams, groups, and consumers to search for with SCAN."
+        {...commonOptions}
+      >
+        <InputControl
+          render={({ field: { onChange, ref, ...field } }) => (
+            <MultiSelect
+              {...field}
+              onChange={(v) => onChange(v.map((x) => x.value))}
+              options={[]}
+              allowCustomValue
+              placeholder="Add new value"
+              width={26}
+            />
+          )}
+          defaultValue={[]}
+          control={methods.control}
+          name="check_streams"
+        />
+      </InlineField>
+      <InlineField
+        label="Check single streams"
+        tooltip="List of single streams to export info about streams, groups, and consumers."
+        {...commonOptions}
+      >
+        <InputControl
+          render={({ field: { onChange, ref, ...field } }) => (
+            <MultiSelect
+              {...field}
+              onChange={(v) => onChange(v.map((x) => x.value))}
+              options={[]}
+              allowCustomValue
+              placeholder="Add new value"
+              width={26}
+            />
+          )}
+          defaultValue={[]}
+          control={methods.control}
+          name="check_single_streams"
+        />
+      </InlineField>
+      <InlineField
+        label="Count keys"
+        tooltip="List of individual keys to export counts for."
+        {...commonOptions}
+      >
+        <InputControl
+          render={({ field: { onChange, ref, ...field } }) => (
+            <MultiSelect
+              {...field}
+              onChange={(v) => onChange(v.map((x) => x.value))}
+              options={[]}
+              allowCustomValue
+              placeholder="Add new value"
+              width={26}
+            />
+          )}
+          defaultValue={[]}
+          control={methods.control}
+          name="count_keys"
+        />
+      </InlineField>
+      <InlineField
+        label="Script path"
+        tooltip="Path to Lua Redis script for collecting extra metrics."
+        {...commonOptions}
+      >
+        <Input {...methods.register("script_path")} />
+      </InlineField>
+      <InlineField
+        label="Script paths"
+        tooltip="	List of paths to Lua Redis scripts for collecting extra metrics."
+        {...commonOptions}
+      >
+        <InputControl
+          render={({ field: { onChange, ref, ...field } }) => (
+            <MultiSelect
+              {...field}
+              onChange={(v) => onChange(v.map((x) => x.value))}
+              options={[]}
+              allowCustomValue
+              placeholder="Add new value"
+              width={26}
+            />
+          )}
+          defaultValue={[]}
+          control={methods.control}
+          name="script_paths"
+        />
+      </InlineField>
+      <InlineField
+        label="Export client list"
+        tooltip="Whether to scrape Client List specific metrics."
+        {...commonOptions}
+      >
+        <InlineSwitch {...methods.register("export_client_list")} />
+      </InlineField>
+      <InlineField
+        label="Export client port"
+        tooltip="Whether to include the client’s port when exporting the client list."
+        {...commonOptions}
+      >
+        <InlineSwitch {...methods.register("export_client_port")} />
+      </InlineField>
+      <InlineField
+        label="Redis metrics only"
+        tooltip="Whether to just export metrics or to also export go runtime metrics."
+        {...commonOptions}
+      >
+        <InlineSwitch {...methods.register("redis_metrics_only")} />
+      </InlineField>
+      <InlineField
+        label="Ping on connect"
+        tooltip="Whether to ping the Redis instance after connecting."
+        {...commonOptions}
+      >
+        <InlineSwitch {...methods.register("ping_on_connect")} />
+      </InlineField>
+      <InlineField
+        label="Include system metrics"
+        tooltip="Whether to include system metrics (e.g. redis_total_system_memory_bytes)."
+        {...commonOptions}
+      >
+        <InlineSwitch {...methods.register("incl_system_metrics")} />
+      </InlineField>
+      <InlineField
+        label="Set client name"
+        tooltip="Whether to set client name to redis_exporter."
+        {...commonOptions}
+      >
+        <InlineSwitch {...methods.register("set_client_name")} />
+      </InlineField>
+      <InlineField
+        label="Tile38"
+        tooltip="Whether to scrape Tile38-specific metrics."
+        {...commonOptions}
+      >
+        <InlineSwitch {...methods.register("is_tile38")} />
+      </InlineField>
     </>
   );
 };

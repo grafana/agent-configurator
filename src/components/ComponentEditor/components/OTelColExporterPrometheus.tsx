@@ -18,7 +18,7 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
           <ReferenceMultiSelect
             control={methods.control}
             name="forward_to"
-            exportName="receiver"
+            exportName="PrometheusReceiver"
           />
         </InlineField>
         <InlineField

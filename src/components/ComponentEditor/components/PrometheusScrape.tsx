@@ -18,7 +18,7 @@ const PrometheusScrape = ({
       >
         <ReferenceSelect
           name="targets"
-          exportName="targets"
+          exportName="list(PrometheusTarget)"
           control={methods.control}
         />
       </InlineField>
@@ -31,7 +31,7 @@ const PrometheusScrape = ({
       >
         <ReferenceMultiSelect
           name="forward_to"
-          exportName="receiver"
+          exportName="PrometheusReceiver"
           control={methods.control}
         />
       </InlineField>

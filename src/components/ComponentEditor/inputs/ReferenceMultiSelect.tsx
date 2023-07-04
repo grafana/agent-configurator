@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toOptions } from "./ReferenceSelect";
 
 import { useComponentContext } from "../../../state";
+import { ExportType } from "../../../lib/components";
 
 const ReferenceMultiSelect = ({
   control,
@@ -14,7 +15,7 @@ const ReferenceMultiSelect = ({
 }: {
   control: Control<Record<string, any>>;
   name: string;
-  exportName: string;
+  exportName: ExportType;
   rules?: Object;
 }) => {
   const { components } = useComponentContext();

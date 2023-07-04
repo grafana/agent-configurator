@@ -1,4 +1,11 @@
 type LiteralType = "string" | "number" | "boolean" | "list(string)";
+// adapted slightly from upstream to provide a safer way to select references
+export type ExportType =
+  | "list(PrometheusTarget)"
+  | "PrometheusReceiver"
+  | "otel.LogsConsumer"
+  | "otel.TracesConsumer"
+  | "otel.MetricsConsumer";
 
 export class LiteralArgument {
   type: LiteralType;
@@ -20,6 +27,7 @@ export class LiteralArgument {
 
 export class BlockType {
   args: Record<string, ArgumentType> = {};
+  exports: Record<string, ExportType> = {};
   multi: boolean = false;
   allowEmpty: boolean = false;
   isBlock(): boolean {
@@ -28,10 +36,21 @@ export class BlockType {
   multiple(): boolean {
     return this.multi;
   }
-  constructor({ multi = false, args = {}, allowEmpty = false }) {
+  constructor({
+    multi = false,
+    args = {},
+    allowEmpty = false,
+    exports = {},
+  }: {
+    multi?: boolean;
+    args?: Record<string, ArgumentType>;
+    allowEmpty?: boolean;
+    exports?: Record<string, ExportType>;
+  }) {
     this.multi = multi;
     this.args = args;
     this.allowEmpty = allowEmpty;
+    this.exports = exports;
   }
   default(): any {
     if (this.multi) return [];
@@ -51,6 +70,9 @@ export interface ArgumentType {
 
 export const KnownComponents: Record<string, BlockType> = {
   "prometheus.remote_write": new BlockType({
+    exports: {
+      receiver: "PrometheusReceiver",
+    },
     args: {
       endpoint: new BlockType({
         multi: true,
@@ -58,6 +80,9 @@ export const KnownComponents: Record<string, BlockType> = {
     },
   }),
   "discovery.ec2": new BlockType({
+    exports: {
+      targets: "list(PrometheusTarget)",
+    },
     args: {
       filter: new BlockType({
         multi: true,
@@ -69,6 +94,9 @@ export const KnownComponents: Record<string, BlockType> = {
     },
   }),
   "otelcol.receiver.otlp": new BlockType({
+    exports: {
+      targets: "list(PrometheusTarget)",
+    },
     args: {
       grpc: new BlockType({
         allowEmpty: true,
@@ -91,8 +119,19 @@ export const KnownComponents: Record<string, BlockType> = {
       include_target_info: new LiteralArgument("boolean", true),
       include_scope_info: new LiteralArgument("boolean", true),
     },
+    exports: {
+      input: "otel.MetricsConsumer",
+    },
+  }),
+  "prometheus.exporter.github": new BlockType({
+    exports: {
+      targets: "list(PrometheusTarget)",
+    },
   }),
   "prometheus.exporter.redis": new BlockType({
+    exports: {
+      targets: "list(PrometheusTarget)",
+    },
     args: {
       namespace: new LiteralArgument("string", "redis"),
       config_command: new LiteralArgument("string", "CONFIG"),

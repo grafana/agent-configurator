@@ -5,27 +5,28 @@ import { useState } from "react";
 import { Block } from "../../../lib/river";
 
 import { useComponentContext } from "../../../state";
-
-const ComponentLookup: Record<string, string[]> = {
-  targets: ["prometheus.exporter.redis", "discovery.ec2"],
-  receiver: ["prometheus.remote_write"],
-  input: ["otelcol.processor.batch", "otelcol.exporter.prometheus"],
-};
+import { ExportType, KnownComponents } from "../../../lib/components";
 
 export function toOptions(
   components: Block[],
-  exportName: string
+  exportName: ExportType
 ): SelectableValue<object>[] {
-  return components
-    .filter((component) => ComponentLookup[exportName].includes(component.name))
-    .map((component) => {
-      return {
-        label: `${component.label} [${component.name}]`,
-        value: {
-          "-reference": `${component.name}.${component.label}.${exportName}`,
-        },
-      };
-    });
+  const options: SelectableValue<object>[] = [];
+  for (const component of components) {
+    const spec = KnownComponents[component.name];
+    if (!spec) continue;
+    for (const en of Object.keys(spec.exports)) {
+      if (spec.exports[en] === exportName) {
+        options.push({
+          label: `${component.label} [${component.name}]`,
+          value: {
+            "-reference": `${component.name}.${component.label}.${en}`,
+          },
+        });
+      }
+    }
+  }
+  return options;
 }
 
 const ReferenceSelect = ({
@@ -35,7 +36,7 @@ const ReferenceSelect = ({
 }: {
   control: Control<Record<string, any>>;
   name: string;
-  exportName: string;
+  exportName: ExportType;
 }) => {
   const { components } = useComponentContext();
   const defaultValue = control.defaultValuesRef.current[name];

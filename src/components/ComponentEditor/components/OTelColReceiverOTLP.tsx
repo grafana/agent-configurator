@@ -201,21 +201,21 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
           <ReferenceMultiSelect
             control={methods.control}
             name="output.metrics"
-            exportName="input"
+            exportName="otel.MetricsConsumer"
           />
         </InlineField>
         <InlineField label="Logs" {...commonOptions}>
           <ReferenceMultiSelect
             control={methods.control}
             name="output.logs"
-            exportName="input"
+            exportName="otel.LogsConsumer"
           />
         </InlineField>
         <InlineField label="traces" {...commonOptions}>
           <ReferenceMultiSelect
             control={methods.control}
             name="output.traces"
-            exportName="input"
+            exportName="otel.TracesConsumer"
           />
         </InlineField>
       </VerticalGroup>

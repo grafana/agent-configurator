@@ -288,7 +288,7 @@ const ConfigEditor = () => {
                   />
                 )}
                 <LinkButton
-                  href={`https://grafana.com/docs/agent/latest/flow/reference/components/${currentComponent.component.name}`}
+                  href={`https://grafana.com/docs/agent/latest/flow/reference/components/${currentComponent.component.name}/`}
                   icon="external-link-alt"
                   variant="secondary"
                   target="_blank"

@@ -2,10 +2,15 @@ import { SelectableValue } from "@grafana/data";
 import { Select, InputControl } from "@grafana/ui";
 import { Control } from "react-hook-form";
 import { useState } from "react";
-import { Block } from "../../../lib/river";
+import { Attribute, Block } from "../../../lib/river";
 
 import { useComponentContext } from "../../../state";
-import { ExportType, KnownComponents } from "../../../lib/components";
+import {
+  BlockType,
+  ExportType,
+  KnownComponents,
+  KnownModules,
+} from "../../../lib/components";
 
 export function toOptions(
   components: Block[],
@@ -13,7 +18,20 @@ export function toOptions(
 ): SelectableValue<object>[] {
   const options: SelectableValue<object>[] = [];
   for (const component of components) {
-    const spec = KnownComponents[component.name];
+    let spec: BlockType | null = null;
+    if (component.name.startsWith("module.git")) {
+      const repo = component.attributes.find(
+        (x) => x.name === "repository"
+      ) as Attribute | null;
+      const path = component.attributes.find(
+        (x) => x.name === "path"
+      ) as Attribute | null;
+      if (repo && path && KnownModules[repo.value]) {
+        spec = KnownModules[repo.value][path.value];
+      }
+    } else {
+      spec = KnownComponents[component.name];
+    }
     if (!spec) continue;
     for (const en of Object.keys(spec.exports)) {
       if (spec.exports[en] === exportName) {

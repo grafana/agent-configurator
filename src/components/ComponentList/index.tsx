@@ -24,6 +24,20 @@ type ListEntry = {
 
 const components: ListEntry[] = [
   {
+    name: "module.git",
+    title: "Grafana Cloud Autoconfigure",
+    meta: ["cloud", "metrics", "logs", "traces", "profiles"],
+    icon: "grafana",
+    component: new Block("module.git", "grafana_cloud", [
+      new Attribute(
+        "repository",
+        "https://github.com/grafana/agent-modules.git"
+      ),
+      new Attribute("path", "modules/grafana-cloud/autoconfigure/module.river"),
+      new Attribute("revision", "main"),
+    ]),
+  },
+  {
     name: "prometheus.remote_write",
     title: "Prometheus Remote Write",
     meta: ["Output", "Cloud", "Prometheus"],
@@ -110,7 +124,7 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
       <section>
         {filtered.map((c) => {
           return (
-            <Card key={c.name}>
+            <Card key={c.name + c.title}>
               <Card.Heading>{c.title}</Card.Heading>
               <Card.Figure>
                 <Icon size="xxxl" name={c.icon} />

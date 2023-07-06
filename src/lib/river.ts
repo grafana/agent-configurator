@@ -63,7 +63,6 @@ export class Block {
       if (a instanceof Attribute) {
         values[`${a.name}`] = a.value;
       } else {
-        console.log(`working on ${a.name}. already present: ${values[a.name]}`);
         const fv = a.formValues();
         if (spec?.args[a.name]?.multiple()) {
           values[a.name] = values[a.name] ? [...values[a.name], fv] : [fv];

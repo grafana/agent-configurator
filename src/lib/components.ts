@@ -3,6 +3,8 @@ type LiteralType = "string" | "number" | "boolean" | "list(string)";
 export type ExportType =
   | "list(PrometheusTarget)"
   | "PrometheusReceiver"
+  | "LokiReceiver"
+  | "PyroscopeReceiver"
   | "otel.LogsConsumer"
   | "otel.TracesConsumer"
   | "otel.MetricsConsumer";
@@ -149,4 +151,17 @@ export const KnownComponents: Record<string, BlockType> = {
       set_client_name: new LiteralArgument("boolean", true),
     },
   }),
+};
+
+export const KnownModules: Record<string, Record<string, BlockType>> = {
+  "https://github.com/grafana/agent-modules.git": {
+    "modules/grafana-cloud/autoconfigure/module.river": new BlockType({
+      exports: {
+        "exports.metrics_receiver": "PrometheusReceiver",
+        "exports.logs_receiver": "LokiReceiver",
+        "exports.traces_receiver": "otel.TracesConsumer",
+        "exports.profiles_receiver": "PyroscopeReceiver",
+      },
+    }),
+  },
 };

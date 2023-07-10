@@ -189,7 +189,7 @@ export function toArgument(
       if (Array.isArray(v)) {
         return v.length === 0 ? null : new Attribute(k, v);
       }
-      if (v["-reference"]) {
+      if (v["-reference"] || v["-function"]) {
         return new Attribute(k, v);
       }
       return toBlock(k, v, undefined, spec as BlockType);

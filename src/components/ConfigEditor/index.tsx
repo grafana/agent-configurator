@@ -276,6 +276,7 @@ const ConfigEditor = () => {
               ? `Edit Component [${currentComponent.component.name}]`
               : "Add Component"
           }
+          closeOnMaskClick={false}
           subtitle={
             currentComponent != null ? (
               <HorizontalGroup>

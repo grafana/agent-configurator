@@ -1,4 +1,4 @@
-import { Alert, FormAPI, InlineField, Input, VerticalGroup } from "@grafana/ui";
+import { Alert, FormAPI, InlineField, VerticalGroup } from "@grafana/ui";
 import TypedInput from "../../inputs/TypedInput";
 
 const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {

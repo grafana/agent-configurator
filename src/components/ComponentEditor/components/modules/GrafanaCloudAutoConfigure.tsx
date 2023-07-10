@@ -1,4 +1,5 @@
 import { Alert, FormAPI, InlineField, Input, VerticalGroup } from "@grafana/ui";
+import TypedInput from "../../inputs/TypedInput";
 
 const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
   const commonOptions = {
@@ -14,8 +15,10 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
           invalid={!!methods.errors["arguments"]?.stack_name}
           {...commonOptions}
         >
-          <Input
-            {...methods.register("arguments.stack_name", { required: true })}
+          <TypedInput
+            name="arguments.stack_name"
+            control={methods.control}
+            rules={{ required: true }}
           />
         </InlineField>
         <InlineField
@@ -25,7 +28,11 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
           invalid={!!methods.errors["arguments"]?.token}
           {...commonOptions}
         >
-          <Input {...methods.register("arguments.token", { required: true })} />
+          <TypedInput
+            name="arguments.token"
+            control={methods.control}
+            rules={{ required: true }}
+          />
         </InlineField>
 
         <Alert severity="info" title="Creating the token">
@@ -42,7 +49,6 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
           add the <code>stacks:read</code> scope using the dropdown menu.
           Afterwards, create a new token for this access policy and use it here.
         </Alert>
-        <p></p>
       </VerticalGroup>
     </>
   );

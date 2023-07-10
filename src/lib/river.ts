@@ -19,6 +19,10 @@ export function encodeValue(v: any): string {
       if (v["-reference"]) {
         return v["-reference"];
       }
+      if (v["-function"]) {
+        const f = v["-function"];
+        return `${f.name}(${f.params?.map((p: any) => encodeValue(p))})`;
+      }
       let out = "{\n";
       for (const k in v) {
         out += `  "${k}" = ${encodeValue(v[k])},\n`;
@@ -126,6 +130,18 @@ export function UnmarshalValue(node: Parser.SyntaxNode): any {
         if (key.type === "string_lit")
           out[JSON.parse(key.text)] = UnmarshalValue(value);
         else out[key.text] = UnmarshalValue(value);
+      }
+      break;
+    case "function_call":
+      out = {
+        "-function": {
+          name: node.childForFieldName("function")?.text,
+        },
+      };
+      if (node.childForFieldName("params")) {
+        out["-function"].params = UnmarshalArray(
+          node.childForFieldName("params")!
+        );
       }
       break;
     default:

@@ -272,7 +272,9 @@ targets = [prometheus.exporter.redis.target]
       },
       {
         raw: `prometheus.scrape "redis" {
-targets = [prometheus.exporter.redis.target]
+  targets = [
+    prometheus.exporter.redis.target,
+  ]
 }`,
         parsed: new Block("prometheus.scrape", "redis", [
           new Attribute("targets", [
@@ -280,10 +282,39 @@ targets = [prometheus.exporter.redis.target]
           ]),
         ]),
       },
+      {
+        raw: `prometheus.remote_write "grafana_cloud" {
+  endpoint {
+    url = "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom"
+    basic_auth {
+      username = "foo"
+      password = env("GRAFANA_API_KEY")
+    }
+  }
+}`,
+        parsed: new Block("prometheus.remote_write", "grafana_cloud", [
+          new Block("endpoint", null, [
+            new Attribute(
+              "url",
+              "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom"
+            ),
+            new Block("basic_auth", null, [
+              new Attribute("username", "foo"),
+              new Attribute("password", {
+                "-function": {
+                  name: "env",
+                  params: ["GRAFANA_API_KEY"],
+                },
+              }),
+            ]),
+          ]),
+        ]),
+      },
     ];
     for (const tc of testcases) {
       let parsed = UnmarshalBlock(parser.parse(tc.raw).rootNode.namedChild(0)!);
       expect(parsed).toEqual(tc.parsed);
+      expect(parsed.marshal()).toEqual(tc.raw);
       let reparsed = UnmarshalBlock(
         parser.parse(parsed.marshal()).rootNode.namedChild(0)!
       );

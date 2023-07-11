@@ -22,6 +22,7 @@ import { GrafanaTheme2 } from "@grafana/data";
 import OTelColProcessorBatch from "./components/OTelColProcessorBatch";
 import OTelColExporterPrometheus from "./components/OTelColExporterPrometheus";
 import GrafanaCloudAutoconfigure from "./components/modules/GrafanaCloudAutoConfigure";
+import OTelColExporterLoki from "./components/OTelColExporterLoki";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -92,6 +93,8 @@ const ComponentEditor = ({
         return OTelColProcessorBatch;
       case "otelcol.exporter.prometheus":
         return OTelColExporterPrometheus;
+      case "otelcol.exporter.loki":
+        return OTelColExporterLoki;
       //@ts-ignore if no module matches, we fall through to the unsupported component path
       case "module.git":
         const repo = component.attributes.find(

@@ -93,6 +93,13 @@ const components: ListEntry[] = [
     component: new Block("otelcol.exporter.prometheus", "to_prometheus", []),
   },
   {
+    name: "otelcol.exporter.loki",
+    title: "OpenTelemetry Collector Loki Export",
+    meta: ["OTEL", "Loki", "Logs", "Exporter"],
+    icon: "rocket",
+    component: new Block("otelcol.exporter.loki", "to_loki", []),
+  },
+  {
     name: "otelcol.processor.batch",
     title: "OpenTelemetry Collector Batch Processor",
     meta: ["OTEL", "Processor"],

@@ -54,6 +54,7 @@ const TypedInput = ({
     );
   const [inputType, setInputType] = React.useState<Type>("literal");
   const [inputValue, setInputValue] = React.useState<string>(() => {
+    if (!defaultValue) return "";
     if (typeof defaultValue === "string") return defaultValue;
     if (defaultValue["-reference"]) {
       setInputType("reference");

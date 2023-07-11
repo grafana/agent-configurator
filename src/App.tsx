@@ -17,6 +17,7 @@ import ConfigEditor from "./components/ConfigEditor";
 import { useState, useMemo } from "react";
 import ExamplesCatalog from "./components/ExamplesCatalog";
 import { useModelContext } from "./state";
+import InstallationInstructions from "./components/InstallationInstructions";
 
 function App() {
   const styles = useStyles(getStyles);
@@ -98,6 +99,9 @@ function App() {
             ></Alert>
           </VerticalGroup>
         </div>
+      </section>
+      <section className={styles.section}>
+        <InstallationInstructions />
       </section>
       <Modal
         title="Example Catalog"

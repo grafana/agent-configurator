@@ -2,6 +2,7 @@ type LiteralType = "string" | "number" | "boolean" | "list(string)";
 // adapted slightly from upstream to provide a safer way to select references
 export type ExportType =
   | "list(PrometheusTarget)"
+  | "list(FileTarget)"
   | "PrometheusReceiver"
   | "LokiReceiver"
   | "PyroscopeReceiver"
@@ -180,6 +181,15 @@ export const KnownComponents: Record<string, BlockType> = {
       sysfs_path: new LiteralArgument("string", "/sys"),
       rootfs_path: new LiteralArgument("string", "/"),
     },
+  }),
+  "discovery.file": new BlockType({
+    multi: true,
+    exports: {
+      targets: "list(FileTarget)",
+    },
+  }),
+  "loki.source.file": new BlockType({
+    multi: true,
   }),
 };
 

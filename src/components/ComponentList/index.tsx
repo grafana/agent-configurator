@@ -106,6 +106,22 @@ const components: ListEntry[] = [
     icon: "process",
     component: new Block("otelcol.processor.batch", "default", []),
   },
+  {
+    name: "discovery.file",
+    title: "File discovery",
+    meta: ["Discovery", "Logs"],
+    icon: "file-alt",
+    component: new Block("discovery.file", "log_files", [
+      new Attribute("path_targets", [{ __path__: "/var/log/**/*.log" }]),
+    ]),
+  },
+  {
+    name: "loki.source.file",
+    title: "Loki File Source",
+    meta: ["Logs", "Loki", "Source"],
+    icon: "gf-logs",
+    component: new Block("loki.source.file", "log_files", []),
+  },
 ];
 
 const ComponentList = ({ addComponent }: ComponentListProps) => {

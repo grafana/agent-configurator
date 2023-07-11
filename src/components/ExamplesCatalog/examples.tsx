@@ -2,9 +2,13 @@ import { Attribute, Block } from "../../lib/river";
 
 function promScrapePushExample(collector: Block): string {
   return (
-    `prometheus.remote_write "grafana_cloud" {
-  endpoint {
-    url = "<your Grafana Cloud endpoint>" // Go to your account console to view this
+    `module.git "grafana_cloud" {
+  repository = "https://github.com/grafana/agent-modules.git"
+  path = "modules/grafana-cloud/autoconfigure/module.river"
+  revision = "main"
+  arguments {
+    stack_name = "stackname" // Replace this with your stack name
+    token = env("GRAFANA_CLOUD_TOKEN") 
   }
 }
 
@@ -45,6 +49,47 @@ const Examples: Array<{ name: string; source: string; logo: string }> = [
       new Block("prometheus.exporter.github", "default", [])
     ),
     logo: "https://storage.googleapis.com/grafanalabs-integration-logos/github.png",
+  },
+  {
+    name: "OpenTelemetry to Grafana Cloud",
+    source: `module.git "grafana_cloud" {
+  repository = "https://github.com/grafana/agent-modules.git"
+  path = "modules/grafana-cloud/autoconfigure/module.river"
+  revision = "main"
+  arguments {
+    stack_name = "stackname" // Replace this with your stack name
+    token = env("GRAFANA_CLOUD_TOKEN")
+  }
+}
+otelcol.exporter.prometheus "to_prometheus" {
+  forward_to = [
+    module.git.grafana_cloud.exports.metrics_receiver,
+  ]
+}
+otelcol.exporter.loki "to_loki" {
+  forward_to = [
+    module.git.grafana_cloud.exports.logs_receiver,
+  ]
+}
+otelcol.receiver.otlp "default" {
+  grpc {
+  }
+  http {
+  }
+  output {
+    metrics = [
+      otelcol.exporter.prometheus.to_prometheus.input,
+    ]
+    logs = [
+      otelcol.exporter.loki.to_loki.input,
+    ]
+    traces = [
+      module.git.grafana_cloud.exports.traces_receiver,
+    ]
+  }
+}
+`,
+    logo: `${process.env.PUBLIC_URL}/logos/otel.png`,
   },
 ];
 export default Examples;

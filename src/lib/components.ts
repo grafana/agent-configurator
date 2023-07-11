@@ -125,6 +125,11 @@ export const KnownComponents: Record<string, BlockType> = {
       input: "otel.MetricsConsumer",
     },
   }),
+  "otelcol.exporter.loki": new BlockType({
+    exports: {
+      input: "otel.LogsConsumer",
+    },
+  }),
   "prometheus.exporter.github": new BlockType({
     exports: {
       targets: "list(PrometheusTarget)",

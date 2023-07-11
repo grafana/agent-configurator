@@ -69,21 +69,21 @@ const InstallationInstructions = () => {
           </HorizontalGroup>
           <p>
             The default River configuration file for flow mode is located at:
-            <ul>
-              <li>
-                Linux: <code>/etc/grafana-agent-flow.river</code>
-              </li>
-              <li>
-                macOS:{" "}
-                <code>
-                  $(brew --prefix)/etc/grafana-agent-flow/config.river
-                </code>
-              </li>
-              <li>
-                Windows:{" "}
-                <code>C:\Program Files\Grafana Agent Flow\config.river</code>
-              </li>
-            </ul>
+          </p>
+          <ul>
+            <li>
+              Linux: <code>/etc/grafana-agent-flow.river</code>
+            </li>
+            <li>
+              macOS:{" "}
+              <code>$(brew --prefix)/etc/grafana-agent-flow/config.river</code>
+            </li>
+            <li>
+              Windows:{" "}
+              <code>C:\Program Files\Grafana Agent Flow\config.river</code>
+            </li>
+          </ul>
+          <p>
             If you are using environment variables in your configuration, make
             sure these are present as well.
           </p>

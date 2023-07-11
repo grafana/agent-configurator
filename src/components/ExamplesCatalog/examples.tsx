@@ -13,9 +13,10 @@ function promScrapePushExample(collector: Block): string {
 }
 
 prometheus.scrape "default" {
-  targets = ${collector.name}.${collector.label}.targets
+  targets = ${collector.name}.${collector.label ? collector.label + "." : ""
+    }targets
   forward_to = [
-    prometheus.remote_write.grafana_cloud.receiver,
+    module.git.grafana_cloud.exports.metrics_receiver,,
   ]
 }
 ` +
@@ -94,7 +95,7 @@ otelcol.receiver.otlp "default" {
   {
     name: "Monitor a Linux Host",
     source: promScrapePushExample(
-      new Block("prometheus.exporter.unix", "default", [])
+      new Block("prometheus.exporter.unix", null, [])
     ),
     logo: "https://storage.googleapis.com/grafanalabs-integration-logos/linux.png",
   },

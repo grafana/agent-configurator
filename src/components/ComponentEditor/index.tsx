@@ -23,6 +23,7 @@ import OTelColProcessorBatch from "./components/OTelColProcessorBatch";
 import OTelColExporterPrometheus from "./components/OTelColExporterPrometheus";
 import GrafanaCloudAutoconfigure from "./components/modules/GrafanaCloudAutoConfigure";
 import OTelColExporterLoki from "./components/OTelColExporterLoki";
+import PrometheusExporterUnix from "./components/PrometheusExporterUnix";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -95,6 +96,8 @@ const ComponentEditor = ({
         return OTelColExporterPrometheus;
       case "otelcol.exporter.loki":
         return OTelColExporterLoki;
+      case "prometheus.exporter.unix":
+        return PrometheusExporterUnix;
       //@ts-ignore if no module matches, we fall through to the unsupported component path
       case "module.git":
         const repo = component.attributes.find(
@@ -117,13 +120,14 @@ const ComponentEditor = ({
     }
   })();
 
-  let formValues = component.formValues(KnownComponents[component.name]);
+  let spec = KnownComponents[component.name];
+  let formValues = component.formValues(spec);
   formValues = preTransform(formValues);
-  formValues["label"] = component.label;
+  if (spec && spec.multi) formValues["label"] = component.label;
 
   return (
     <Form
-      onSubmit={async ({ label, ...args }) => {
+      onSubmit={({ label, ...args }) => {
         const transformed = postTransform(args);
         updateComponent(
           toBlock(
@@ -141,14 +145,16 @@ const ComponentEditor = ({
         const { register, errors } = methods;
         return (
           <>
-            <Field
-              label="Label"
-              description="Component Label"
-              invalid={!!errors["label"]}
-              error="A label is required"
-            >
-              <Input {...register("label", { required: true })} />
-            </Field>
+            {spec && spec.multi && (
+              <Field
+                label="Label"
+                description="Component Label"
+                invalid={!!errors["label"]}
+                error="A label is required"
+              >
+                <Input {...register("label", { required: true })} />
+              </Field>
+            )}
             <Component methods={methods} />
             <HorizontalGroup>
               <Button type="submit">Save</Button>

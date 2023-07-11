@@ -72,6 +72,7 @@ export interface ArgumentType {
 
 export const KnownComponents: Record<string, BlockType> = {
   "prometheus.remote_write": new BlockType({
+    multi: true,
     exports: {
       receiver: "PrometheusReceiver",
     },
@@ -82,6 +83,7 @@ export const KnownComponents: Record<string, BlockType> = {
     },
   }),
   "discovery.ec2": new BlockType({
+    multi: true,
     exports: {
       targets: "list(PrometheusTarget)",
     },
@@ -96,6 +98,7 @@ export const KnownComponents: Record<string, BlockType> = {
     },
   }),
   "otelcol.receiver.otlp": new BlockType({
+    multi: true,
     exports: {
       targets: "list(PrometheusTarget)",
     },
@@ -117,6 +120,7 @@ export const KnownComponents: Record<string, BlockType> = {
     },
   }),
   "otelcol.exporter.prometheus": new BlockType({
+    multi: true,
     args: {
       include_target_info: new LiteralArgument("boolean", true),
       include_scope_info: new LiteralArgument("boolean", true),
@@ -131,11 +135,13 @@ export const KnownComponents: Record<string, BlockType> = {
     },
   }),
   "prometheus.exporter.github": new BlockType({
+    multi: true,
     exports: {
       targets: "list(PrometheusTarget)",
     },
   }),
   "prometheus.exporter.redis": new BlockType({
+    multi: true,
     exports: {
       targets: "list(PrometheusTarget)",
     },
@@ -154,6 +160,25 @@ export const KnownComponents: Record<string, BlockType> = {
       export_client_list: new LiteralArgument("boolean", false),
       is_tile38: new LiteralArgument("boolean", false),
       set_client_name: new LiteralArgument("boolean", true),
+    },
+  }),
+  "module.git": new BlockType({
+    multi: true,
+  }),
+  "prometheus.exporter.unix": new BlockType({
+    allowEmpty: true,
+    multi: false,
+    exports: {
+      targets: "list(PrometheusTarget)",
+    },
+    args: {
+      set_collectors: new LiteralArgument("list(string)", []),
+      enable_collectors: new LiteralArgument("list(string)", []),
+      disable_collectors: new LiteralArgument("list(string)", []),
+      include_exporter_metrics: new LiteralArgument("boolean", false),
+      procfs_path: new LiteralArgument("string", "/proc"),
+      sysfs_path: new LiteralArgument("string", "/sys"),
+      rootfs_path: new LiteralArgument("string", "/"),
     },
   }),
 };

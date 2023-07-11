@@ -91,5 +91,12 @@ otelcol.receiver.otlp "default" {
 `,
     logo: `${process.env.PUBLIC_URL}/logos/otel.png`,
   },
+  {
+    name: "Monitor a Linux Host",
+    source: promScrapePushExample(
+      new Block("prometheus.exporter.unix", "default", [])
+    ),
+    logo: "https://storage.googleapis.com/grafanalabs-integration-logos/linux.png",
+  },
 ];
 export default Examples;

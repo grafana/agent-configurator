@@ -35,12 +35,21 @@ export function toOptions(
     if (!spec) continue;
     for (const en of Object.keys(spec.exports)) {
       if (spec.exports[en] === exportName) {
-        options.push({
-          label: `${component.label} [${component.name}]`,
-          value: {
-            "-reference": `${component.name}.${component.label}.${en}`,
-          },
-        });
+        if (component.label) {
+          options.push({
+            label: `${component.label} [${component.name}]`,
+            value: {
+              "-reference": `${component.name}.${component.label}.${en}`,
+            },
+          });
+        } else {
+          options.push({
+            label: `${component.name}`,
+            value: {
+              "-reference": `${component.name}.${en}`,
+            },
+          });
+        }
       }
     }
   }

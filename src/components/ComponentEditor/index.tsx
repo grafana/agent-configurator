@@ -24,6 +24,8 @@ import OTelColExporterPrometheus from "./components/OTelColExporterPrometheus";
 import GrafanaCloudAutoconfigure from "./components/modules/GrafanaCloudAutoConfigure";
 import OTelColExporterLoki from "./components/OTelColExporterLoki";
 import PrometheusExporterUnix from "./components/PrometheusExporterUnix";
+import DiscoveryFile from "./components/DiscoveryFile";
+import LokiSourceFile from "./components/LokiSourceFile";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -98,6 +100,10 @@ const ComponentEditor = ({
         return OTelColExporterLoki;
       case "prometheus.exporter.unix":
         return PrometheusExporterUnix;
+      case "discovery.file":
+        return DiscoveryFile;
+      case "loki.source.file":
+        return LokiSourceFile;
       //@ts-ignore if no module matches, we fall through to the unsupported component path
       case "module.git":
         const repo = component.attributes.find(

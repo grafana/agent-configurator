@@ -1,4 +1,9 @@
-type LiteralType = "string" | "number" | "boolean" | "list(string)";
+type LiteralType =
+  | "string"
+  | "number"
+  | "boolean"
+  | "list(string)"
+  | "map(string)";
 // adapted slightly from upstream to provide a safer way to select references
 export type ExportType =
   | "list(PrometheusTarget)"
@@ -8,17 +13,16 @@ export type ExportType =
   | "PyroscopeReceiver"
   | "otel.LogsConsumer"
   | "otel.TracesConsumer"
+  | "RelabelRules"
   | "otel.MetricsConsumer";
 
 export class LiteralArgument {
-  type: LiteralType;
+  arg_type: LiteralType;
   def: any;
+  type: "attribute" = "attribute";
   constructor(type: LiteralType, def: any) {
-    this.type = type;
+    this.arg_type = type;
     this.def = def;
-  }
-  isBlock(): boolean {
-    return false;
   }
   multiple(): boolean {
     return false;
@@ -33,9 +37,7 @@ export class BlockType {
   exports: Record<string, ExportType> = {};
   multi: boolean = false;
   allowEmpty: boolean = false;
-  isBlock(): boolean {
-    return true;
-  }
+  type: "block" = "block";
   multiple(): boolean {
     return this.multi;
   }
@@ -66,9 +68,9 @@ export class BlockType {
 }
 
 export interface ArgumentType {
-  isBlock(): boolean;
   multiple(): boolean;
   default(): any;
+  type: "block" | "attribute";
 }
 
 export const KnownComponents: Record<string, BlockType> = {
@@ -190,6 +192,33 @@ export const KnownComponents: Record<string, BlockType> = {
   }),
   "loki.source.file": new BlockType({
     multi: true,
+  }),
+  "loki.source.journal": new BlockType({
+    multi: true,
+    args: {
+      format_as_json: new LiteralArgument("boolean", false),
+      max_age: new LiteralArgument("string", "7h"),
+      path: new LiteralArgument("string", ""),
+      matches: new LiteralArgument("string", ""),
+      labels: new LiteralArgument("map(string)", {}),
+    },
+  }),
+  "loki.relabel": new BlockType({
+    multi: true,
+    args: {
+      max_cache_size: new LiteralArgument("number", 10000),
+      rule: new BlockType({
+        multi: true,
+        args: {
+          target_label: new LiteralArgument("string", ""),
+          action: new LiteralArgument("string", "replace"),
+        },
+      }),
+    },
+    exports: {
+      receiver: "LokiReceiver",
+      relabel_rules: "RelabelRules",
+    },
   }),
 };
 

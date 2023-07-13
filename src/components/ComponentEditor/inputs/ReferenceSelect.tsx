@@ -60,10 +60,12 @@ const ReferenceSelect = ({
   control,
   name,
   exportName,
+  width,
 }: {
   control: Control<Record<string, any>>;
   name: string;
   exportName: ExportType;
+  width?: number;
 }) => {
   const { components } = useComponentContext();
   const defaultValue = control.defaultValuesRef.current[name];
@@ -92,6 +94,7 @@ const ReferenceSelect = ({
             setValue(v);
           }}
           value={value}
+          width={width}
           onCreateOption={(newOption) => {
             const customValue: SelectableValue<object> = {
               value: JSON.parse(newOption),

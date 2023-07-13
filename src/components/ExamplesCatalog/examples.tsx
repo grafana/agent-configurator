@@ -16,7 +16,7 @@ prometheus.scrape "default" {
   targets = ${collector.name}.${collector.label ? collector.label + "." : ""
     }targets
   forward_to = [
-    module.git.grafana_cloud.exports.metrics_receiver,,
+    module.git.grafana_cloud.exports.metrics_receiver,
   ]
 }
 ` +
@@ -94,9 +94,61 @@ otelcol.receiver.otlp "default" {
   },
   {
     name: "Monitor a Linux Host",
-    source: promScrapePushExample(
-      new Block("prometheus.exporter.unix", null, [])
-    ),
+    source: `module.git "grafana_cloud" {
+  repository = "https://github.com/grafana/agent-modules.git"
+  path = "modules/grafana-cloud/autoconfigure/module.river"
+  revision = "main"
+  arguments {
+    stack_name = "stackname" // Replace this with your stack name
+    token = env("GRAFANA_CLOUD_TOKEN")
+  }
+}
+
+prometheus.scrape "default" {
+  targets = prometheus.exporter.unix.targets
+  forward_to = [
+    module.git.grafana_cloud.exports.metrics_receiver,
+  ]
+}
+
+prometheus.exporter.unix {
+}
+
+loki.relabel "journal" {
+  forward_to = []
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+  rule {
+    source_labels = ["__journal__boot_id"]
+    target_label  = "boot_id"
+  }
+  rule {
+    source_labels = ["__journal__transport"]
+    target_label  = "transport"
+  }
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+  rule {
+    source_labels = ["__journal__hostname"]
+    target_label  = "instance"
+  }
+}
+
+loki.source.journal "read" {
+  forward_to = [
+    module.git.grafana_cloud.exports.logs_receiver,
+  ]
+  relabel_rules = loki.relabel.journal.rules
+  labels = {
+    "job" = "integrations/node_exporter",
+  }
+}
+`,
     logo: "https://storage.googleapis.com/grafanalabs-integration-logos/linux.png",
   },
 ];

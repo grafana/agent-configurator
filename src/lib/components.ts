@@ -1,4 +1,9 @@
-type LiteralType = "string" | "number" | "boolean" | "list(string)";
+type LiteralType =
+  | "string"
+  | "number"
+  | "boolean"
+  | "list(string)"
+  | "map(string)";
 // adapted slightly from upstream to provide a safer way to select references
 export type ExportType =
   | "list(PrometheusTarget)"
@@ -8,6 +13,7 @@ export type ExportType =
   | "PyroscopeReceiver"
   | "otel.LogsConsumer"
   | "otel.TracesConsumer"
+  | "RelabelRules"
   | "otel.MetricsConsumer";
 
 export class LiteralArgument {
@@ -190,6 +196,33 @@ export const KnownComponents: Record<string, BlockType> = {
   }),
   "loki.source.file": new BlockType({
     multi: true,
+  }),
+  "loki.source.journal": new BlockType({
+    multi: true,
+    args: {
+      format_as_json: new LiteralArgument("boolean", false),
+      max_age: new LiteralArgument("string", "7h"),
+      path: new LiteralArgument("string", ""),
+      matches: new LiteralArgument("string", ""),
+      labels: new LiteralArgument("map(string)", {}),
+    },
+  }),
+  "loki.relabel": new BlockType({
+    multi: true,
+    args: {
+      max_cache_size: new LiteralArgument("number", 10000),
+      rule: new BlockType({
+        multi: true,
+        args: {
+          target_label: new LiteralArgument("string", ""),
+          action: new LiteralArgument("string", "replace"),
+        },
+      }),
+    },
+    exports: {
+      receiver: "LokiReceiver",
+      relabel_rules: "RelabelRules",
+    },
   }),
 };
 

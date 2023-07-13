@@ -107,6 +107,13 @@ const components: ListEntry[] = [
     component: new Block("otelcol.processor.batch", "default", []),
   },
   {
+    name: "loki.relabel",
+    title: "Loki relabeling",
+    meta: ["Logs", "Loki", "relabel"],
+    icon: "process",
+    component: new Block("loki.relabel", "default", []),
+  },
+  {
     name: "discovery.file",
     title: "File discovery",
     meta: ["Discovery", "Logs"],
@@ -121,6 +128,13 @@ const components: ListEntry[] = [
     meta: ["Logs", "Loki", "Source"],
     icon: "gf-logs",
     component: new Block("loki.source.file", "log_files", []),
+  },
+  {
+    name: "loki.source.journal",
+    title: "Loki Journal Source",
+    meta: ["Logs", "Loki", "Source"],
+    icon: "gf-logs",
+    component: new Block("loki.source.journal", "journal", []),
   },
 ];
 

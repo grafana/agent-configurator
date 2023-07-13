@@ -179,6 +179,8 @@ export function toArgument(
   spec?: ArgumentType
 ): Argument | null {
   switch (typeof v) {
+    case "undefined":
+      return null;
     case "string":
     case "boolean":
     case "number":
@@ -190,6 +192,9 @@ export function toArgument(
         return v.length === 0 ? null : new Attribute(k, v);
       }
       if (v["-reference"] || v["-function"]) {
+        return new Attribute(k, v);
+      }
+      if (!spec?.isBlock()) {
         return new Attribute(k, v);
       }
       return toBlock(k, v, undefined, spec as BlockType);

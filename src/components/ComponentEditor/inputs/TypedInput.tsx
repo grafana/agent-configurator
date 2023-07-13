@@ -41,10 +41,13 @@ const TypedInput = ({
   name,
   control,
   rules,
+  placeholder,
 }: {
   name: string;
   control: Control<Record<string, any>>;
   rules?: Object;
+  placeholder?: string;
+  defaultValue?: string;
 }) => {
   const defaultValue: Record<string, any> | string = name
     .split(".")
@@ -85,6 +88,7 @@ const TypedInput = ({
       rules={rules || {}}
       render={({ field: { onChange } }) => (
         <Input
+          placeholder={placeholder}
           prefix={
             <Dropdown
               overlay={

@@ -12,11 +12,13 @@ const ReferenceMultiSelect = ({
   name,
   exportName,
   rules,
+  width,
 }: {
   control: Control<Record<string, any>>;
   name: string;
   exportName: ExportType;
   rules?: Object;
+  width?: number;
 }) => {
   const { components } = useComponentContext();
   const defaultValue = name
@@ -58,6 +60,7 @@ const ReferenceMultiSelect = ({
             setCustomOptions([...customOptions, customValue]);
             setValue([...value, customValue]);
           }}
+          width={width}
         />
       )}
       control={control}

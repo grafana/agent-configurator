@@ -194,7 +194,7 @@ export function toArgument(
       if (v["-reference"] || v["-function"]) {
         return new Attribute(k, v);
       }
-      if (!spec?.isBlock()) {
+      if (spec?.type === "attribute") {
         return new Attribute(k, v);
       }
       return toBlock(k, v, undefined, spec as BlockType);

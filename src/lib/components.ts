@@ -17,14 +17,12 @@ export type ExportType =
   | "otel.MetricsConsumer";
 
 export class LiteralArgument {
-  type: LiteralType;
+  arg_type: LiteralType;
   def: any;
+  type: "attribute" = "attribute";
   constructor(type: LiteralType, def: any) {
-    this.type = type;
+    this.arg_type = type;
     this.def = def;
-  }
-  isBlock(): boolean {
-    return false;
   }
   multiple(): boolean {
     return false;
@@ -39,9 +37,7 @@ export class BlockType {
   exports: Record<string, ExportType> = {};
   multi: boolean = false;
   allowEmpty: boolean = false;
-  isBlock(): boolean {
-    return true;
-  }
+  type: "block" = "block";
   multiple(): boolean {
     return this.multi;
   }
@@ -72,9 +68,9 @@ export class BlockType {
 }
 
 export interface ArgumentType {
-  isBlock(): boolean;
   multiple(): boolean;
   default(): any;
+  type: "block" | "attribute";
 }
 
 export const KnownComponents: Record<string, BlockType> = {

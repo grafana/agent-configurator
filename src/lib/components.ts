@@ -220,6 +220,25 @@ export const KnownComponents: Record<string, BlockType> = {
       relabel_rules: "RelabelRules",
     },
   }),
+  "prometheus.relabel": new BlockType({
+    multi: true,
+    args: {
+      rule: new BlockType({
+        multi: true,
+        args: {
+          target_label: new LiteralArgument("string", ""),
+          action: new LiteralArgument("string", "replace"),
+        },
+      }),
+    },
+    exports: {
+      receiver: "PrometheusReceiver",
+      relabel_rules: "RelabelRules",
+    },
+  }),
+  "prometheus.scrape": new BlockType({
+    multi: true,
+  }),
 };
 
 export const KnownModules: Record<string, Record<string, BlockType>> = {

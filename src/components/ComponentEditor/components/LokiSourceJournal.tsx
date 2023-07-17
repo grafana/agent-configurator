@@ -1,16 +1,8 @@
-import {
-  Button,
-  FieldArray,
-  FieldSet,
-  FormAPI,
-  InlineField,
-  InlineFieldRow,
-  InlineSwitch,
-  Input,
-} from "@grafana/ui";
+import { FieldSet, FormAPI, InlineField, InlineSwitch } from "@grafana/ui";
 import ReferenceSelect from "../inputs/ReferenceSelect";
 import ReferenceMultiSelect from "../inputs/ReferenceMultiSelect";
 import TypedInput from "../inputs/TypedInput";
+import LabelsInput from "../inputs/LabelsInput";
 
 const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
   const commonOptions = { labelWidth: 24 };
@@ -76,45 +68,7 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
         />
       </InlineField>
       <FieldSet label="Labels">
-        <FieldArray control={methods.control} name="labels_array">
-          {({ fields, append, remove }) => (
-            <>
-              {fields.map((field, index) => (
-                <InlineFieldRow key={field.id}>
-                  <InlineField label="Key">
-                    <Input
-                      defaultValue={field["key"]}
-                      {...methods.register(
-                        `labels_array[${index}].key` as const
-                      )}
-                    />
-                  </InlineField>
-                  <InlineField label="Value">
-                    <Input
-                      defaultValue={field["value"]}
-                      {...methods.register(
-                        `labels_array[${index}].value` as const
-                      )}
-                    />
-                  </InlineField>
-                  <Button
-                    fill="outline"
-                    variant="secondary"
-                    icon="trash-alt"
-                    tooltip="Delete this filter"
-                    onClick={(e) => {
-                      remove(index);
-                      e.preventDefault();
-                    }}
-                  />
-                </InlineFieldRow>
-              ))}
-              <Button onClick={() => append({})} icon="plus">
-                Add
-              </Button>
-            </>
-          )}
-        </FieldArray>
+        <LabelsInput name="labels_array" control={methods.control} />
       </FieldSet>
     </>
   );

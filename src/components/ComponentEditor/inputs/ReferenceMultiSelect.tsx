@@ -1,6 +1,6 @@
 import { SelectableValue } from "@grafana/data";
 import { MultiSelect, InputControl } from "@grafana/ui";
-import { Control } from "react-hook-form";
+import { Control, get } from "react-hook-form";
 import { useState } from "react";
 import { toOptions } from "./ReferenceSelect";
 
@@ -21,9 +21,7 @@ const ReferenceMultiSelect = ({
   width?: number;
 }) => {
   const { components } = useComponentContext();
-  const defaultValue = name
-    .split(".")
-    .reduce((o, k) => (o ? o[k] : null), control.defaultValuesRef.current);
+  const defaultValue = get(control.defaultValuesRef.current, name);
   const [value, setValue] = useState<Array<SelectableValue<object>>>(() => {
     if (!defaultValue) return [];
     return defaultValue.map((x: SelectableValue<object>) => {

@@ -9,6 +9,7 @@ import {
 } from "@grafana/ui";
 import { useMemo, useState } from "react";
 import { Block, Attribute } from "../../lib/river";
+import { faro } from "@grafana/faro-web-sdk";
 
 interface ComponentListProps {
   addComponent: (component: Block) => void;
@@ -168,7 +169,16 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
               </Card.Figure>
               <Card.Meta>{c.meta}</Card.Meta>
               <Card.Actions>
-                <Button onClick={() => addComponent(c.component)}>Add</Button>
+                <Button
+                  onClick={() => {
+                    addComponent(c.component);
+                    faro.api.pushEvent("added_component", {
+                      component: c.name,
+                    });
+                  }}
+                >
+                  Add
+                </Button>
                 <LinkButton
                   variant="secondary"
                   href={`https://grafana.com/docs/agent/latest/flow/reference/components/${c.name}/`}

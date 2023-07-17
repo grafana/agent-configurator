@@ -7,7 +7,7 @@ import {
   InputControl,
   Menu,
 } from "@grafana/ui";
-import { Control } from "react-hook-form";
+import { Control, get } from "react-hook-form";
 
 type Type = "literal" | "reference" | "env";
 
@@ -49,12 +49,10 @@ const TypedInput = ({
   placeholder?: string;
   defaultValue?: string;
 }) => {
-  const defaultValue: Record<string, any> | string = name
-    .split(".")
-    .reduce(
-      (o, k) => (o ? o[k] : null),
-      control.defaultValuesRef.current as any
-    );
+  const defaultValue: Record<string, any> | string = get(
+    control.defaultValuesRef.current,
+    name
+  );
   const [inputType, setInputType] = React.useState<Type>("literal");
   const [inputValue, setInputValue] = React.useState<string>(() => {
     if (!defaultValue) return "";

@@ -76,11 +76,7 @@ const ComponentEditor = ({
           preTransform: id,
         };
       case "prometheus.scrape":
-        return {
-          Component: PrometheusScrape,
-          postTransform: id,
-          preTransform: id,
-        };
+        return PrometheusScrape;
       case "prometheus.exporter.mysql":
         return {
           Component: PrometheusExporterMysql,

@@ -74,7 +74,7 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
   );
 };
 
-const DiscoveryFile = {
+const LocalFileMatch = {
   preTransform(data: Record<string, any>): Record<string, any> {
     return data;
   },
@@ -92,4 +92,4 @@ const DiscoveryFile = {
   Component,
 };
 
-export default DiscoveryFile;
+export default LocalFileMatch;

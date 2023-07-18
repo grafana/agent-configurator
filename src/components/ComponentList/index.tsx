@@ -115,11 +115,11 @@ const components: ListEntry[] = [
     component: new Block("loki.relabel", "default", []),
   },
   {
-    name: "discovery.file",
+    name: "local.file_match",
     title: "File discovery",
     meta: ["Discovery", "Logs"],
     icon: "file-alt",
-    component: new Block("discovery.file", "log_files", [
+    component: new Block("local.file_match", "log_files", [
       new Attribute("path_targets", [{ __path__: "/var/log/**/*.log" }]),
     ]),
   },

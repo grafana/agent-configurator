@@ -25,11 +25,11 @@ import OTelColExporterPrometheus from "./components/OTelColExporterPrometheus";
 import GrafanaCloudAutoconfigure from "./components/modules/GrafanaCloudAutoConfigure";
 import OTelColExporterLoki from "./components/OTelColExporterLoki";
 import PrometheusExporterUnix from "./components/PrometheusExporterUnix";
-import DiscoveryFile from "./components/DiscoveryFile";
 import LokiSourceFile from "./components/LokiSourceFile";
 import LokiRelabel from "./components/LokiRelabel";
 import LokiSourceJournal from "./components/LokiSourceJournal";
 import PrometheusRelabel from "./components/PrometheusRelabel";
+import LocalFileMatch from "./components/LocalFileMatch";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -100,8 +100,8 @@ const ComponentEditor = ({
         return OTelColExporterLoki;
       case "prometheus.exporter.unix":
         return PrometheusExporterUnix;
-      case "discovery.file":
-        return DiscoveryFile;
+      case "local.file_match":
+        return LocalFileMatch;
       case "loki.source.file":
         return LokiSourceFile;
       case "loki.source.journal":

@@ -17,7 +17,7 @@ const ExamplesCatalog = ({ dismiss }: { dismiss: () => void }) => {
           key={item.name}
           onClick={() => {
             setModel(item.source);
-            faro.api.pushEvent("applied_example", { example: item.name });
+            faro.api?.pushEvent("applied_example", { example: item.name });
             dismiss();
           }}
         >

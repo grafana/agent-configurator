@@ -3,6 +3,7 @@ import { css } from "@emotion/css";
 import { useStyles } from "../../theme";
 import { GrafanaTheme2 } from "@grafana/data";
 import { useModelContext } from "../../state";
+import { faro } from "@grafana/faro-web-sdk";
 
 import Examples from "./examples";
 
@@ -16,6 +17,7 @@ const ExamplesCatalog = ({ dismiss }: { dismiss: () => void }) => {
           key={item.name}
           onClick={() => {
             setModel(item.source);
+            faro.api.pushEvent("applied_example", { example: item.name });
             dismiss();
           }}
         >

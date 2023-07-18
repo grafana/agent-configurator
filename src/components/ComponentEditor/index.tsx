@@ -6,6 +6,7 @@ import {
   FormAPI,
   HorizontalGroup,
 } from "@grafana/ui";
+import { faro } from "@grafana/faro-web-sdk";
 import { Attribute, Block, toBlock } from "../../lib/river";
 import PrometheusRemoteWrite from "./components/PrometheusRemoteWrite";
 import PrometheusExporterRedis from "./components/PrometheusExporterRedis";
@@ -123,6 +124,7 @@ const ComponentEditor = ({
         }
       //@ts-ignore if no module matches, we fall through to the unsupported component path
       default:
+        faro.api.pushEvent("edit_unsupported", { component: component.name });
         return {
           Component: UnsupportedComponent,
           postTransform: id,

@@ -184,7 +184,7 @@ export const KnownComponents: Record<string, BlockType> = {
       rootfs_path: new LiteralArgument("string", "/"),
     },
   }),
-  "discovery.file": new BlockType({
+  "local.file_match": new BlockType({
     multi: true,
     exports: {
       targets: "list(FileTarget)",

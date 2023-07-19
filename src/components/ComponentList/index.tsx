@@ -19,7 +19,7 @@ type ListEntry = {
   name: string;
   title: string;
   meta: Array<string>;
-  icon: IconName;
+  icon: IconName | `https://${string}`;
   component: Block;
 };
 
@@ -137,6 +137,15 @@ const components: ListEntry[] = [
     icon: "gf-logs",
     component: new Block("loki.source.journal", "journal", []),
   },
+  {
+    name: "discovery.kubernetes",
+    title: "Kubernetes Discovery",
+    meta: ["Discovery", "Kuberentes"],
+    icon: "https://storage.googleapis.com/grafanalabs-integration-logos/kubernetes.svg",
+    component: new Block("discovery.kubernetes", "application_pods", [
+      new Attribute("role", "pod"),
+    ]),
+  },
 ];
 
 const ComponentList = ({ addComponent }: ComponentListProps) => {
@@ -165,7 +174,12 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
             <Card key={c.name + c.title}>
               <Card.Heading>{c.title}</Card.Heading>
               <Card.Figure>
-                <Icon size="xxxl" name={c.icon} />
+                {!c.icon.startsWith("https") && (
+                  <Icon size="xxxl" name={c.icon as IconName} />
+                )}
+                {c.icon.startsWith("https") && (
+                  <img src={c.icon} alt={`Icon representing ${c.title}`} />
+                )}
               </Card.Figure>
               <Card.Meta>{c.meta}</Card.Meta>
               <Card.Actions>

@@ -4,6 +4,7 @@ type LiteralType =
   | "boolean"
   | "list(string)"
   | "map(string)";
+
 // adapted slightly from upstream to provide a safer way to select references
 export type ExportType =
   | "list(PrometheusTarget)"
@@ -238,6 +239,22 @@ export const KnownComponents: Record<string, BlockType> = {
   }),
   "prometheus.scrape": new BlockType({
     multi: true,
+  }),
+  "discovery.kubernetes": new BlockType({
+    multi: true,
+    args: {
+      follow_redirects: new LiteralArgument("boolean", true),
+      enable_http2: new LiteralArgument("boolean", true),
+      selectors: new BlockType({ multi: true }),
+      attach_metadata: new BlockType({
+        args: {
+          node: new LiteralArgument("boolean", false),
+        },
+      }),
+    },
+    exports: {
+      targets: "list(PrometheusTarget)",
+    },
   }),
 };
 

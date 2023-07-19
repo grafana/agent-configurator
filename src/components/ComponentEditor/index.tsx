@@ -124,7 +124,7 @@ const ComponentEditor = ({
         }
       //@ts-ignore if no module matches, we fall through to the unsupported component path
       default:
-        faro.api.pushEvent("edit_unsupported", { component: component.name });
+        faro.api?.pushEvent("edit_unsupported", { component: component.name });
         return {
           Component: UnsupportedComponent,
           postTransform: id,

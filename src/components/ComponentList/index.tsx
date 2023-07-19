@@ -172,7 +172,7 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
                 <Button
                   onClick={() => {
                     addComponent(c.component);
-                    faro.api.pushEvent("added_component", {
+                    faro.api?.pushEvent("added_component", {
                       component: c.name,
                     });
                   }}

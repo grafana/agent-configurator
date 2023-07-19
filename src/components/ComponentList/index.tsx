@@ -146,6 +146,20 @@ const components: ListEntry[] = [
       new Attribute("role", "pod"),
     ]),
   },
+  {
+    name: "prometheus.relabel",
+    title: "Relabel Prometheus Metrics",
+    meta: ["Prometheus", "Relabel"],
+    icon: "process",
+    component: new Block("prometheus.relabel", "relabel_metrics", []),
+  },
+  {
+    name: "discovery.relabel",
+    title: "Relabel Discovery Targets",
+    meta: ["Discovery", "Relabel"],
+    icon: "process",
+    component: new Block("discovery.relabel", "relabel_targets", []),
+  },
 ];
 
 const ComponentList = ({ addComponent }: ComponentListProps) => {

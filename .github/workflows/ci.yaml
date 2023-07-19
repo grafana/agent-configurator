@@ -19,3 +19,4 @@ jobs:
         node-version: 18
     - run: npm ci --force # needed for react-hook-form to play nicely with newer react versions
     - run: npm test
+    - run: npm run lint

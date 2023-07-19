@@ -1,5 +1,4 @@
-import { FormAPI, InlineField, Input } from "@grafana/ui";
-import ReferenceMultiSelect from "../inputs/ReferenceMultiSelect";
+import { FormAPI, InlineField } from "@grafana/ui";
 import { RelabelRules, transformRules } from "../common/RelabelRules";
 import ReferenceSelect from "../inputs/ReferenceSelect";
 

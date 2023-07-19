@@ -31,6 +31,7 @@ import LokiSourceJournal from "./components/LokiSourceJournal";
 import PrometheusRelabel from "./components/PrometheusRelabel";
 import LocalFileMatch from "./components/LocalFileMatch";
 import DiscoveryKubernetes from "./components/DiscoveryKubernetes";
+import DiscoveryRelabel from "./components/DiscoveryRelabel";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -113,6 +114,8 @@ const ComponentEditor = ({
         return PrometheusRelabel;
       case "discovery.kubernetes":
         return DiscoveryKubernetes;
+      case "discovery.relabel":
+        return DiscoveryRelabel;
       //@ts-ignore if no module matches, we fall through to the unsupported component path
       case "module.git":
         const repo = component.attributes.find(

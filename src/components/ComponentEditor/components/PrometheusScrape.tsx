@@ -78,7 +78,7 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
           >
             <ReferenceSelect
               name="targets"
-              exportName="list(PrometheusTarget)"
+              exportName="list(Target)"
               control={methods.control}
             />
           </InlineField>

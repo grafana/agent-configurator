@@ -5,10 +5,8 @@ type LiteralType =
   | "list(string)"
   | "map(string)";
 
-// adapted slightly from upstream to provide a safer way to select references
-export type ExportType =
-  | "list(PrometheusTarget)"
-  | "list(FileTarget)"
+type Capsule =
+  | "Target"
   | "PrometheusReceiver"
   | "LokiReceiver"
   | "PyroscopeReceiver"
@@ -16,6 +14,13 @@ export type ExportType =
   | "otel.TracesConsumer"
   | "RelabelRules"
   | "otel.MetricsConsumer";
+
+type Collection =
+  | `list(${Capsule | LiteralType})`
+  | `map(${Capsule | LiteralType})`;
+
+// adapted slightly from upstream to provide a safer way to select references
+export type ExportType = LiteralType | Capsule | Collection;
 
 export class LiteralArgument {
   arg_type: LiteralType;
@@ -89,7 +94,7 @@ export const KnownComponents: Record<string, BlockType> = {
   "discovery.ec2": new BlockType({
     multi: true,
     exports: {
-      targets: "list(PrometheusTarget)",
+      targets: "list(Target)",
     },
     args: {
       filter: new BlockType({
@@ -104,7 +109,7 @@ export const KnownComponents: Record<string, BlockType> = {
   "otelcol.receiver.otlp": new BlockType({
     multi: true,
     exports: {
-      targets: "list(PrometheusTarget)",
+      targets: "list(Target)",
     },
     args: {
       grpc: new BlockType({
@@ -141,13 +146,13 @@ export const KnownComponents: Record<string, BlockType> = {
   "prometheus.exporter.github": new BlockType({
     multi: true,
     exports: {
-      targets: "list(PrometheusTarget)",
+      targets: "list(Target)",
     },
   }),
   "prometheus.exporter.redis": new BlockType({
     multi: true,
     exports: {
-      targets: "list(PrometheusTarget)",
+      targets: "list(Target)",
     },
     args: {
       namespace: new LiteralArgument("string", "redis"),
@@ -173,7 +178,7 @@ export const KnownComponents: Record<string, BlockType> = {
     allowEmpty: true,
     multi: false,
     exports: {
-      targets: "list(PrometheusTarget)",
+      targets: "list(Target)",
     },
     args: {
       set_collectors: new LiteralArgument("list(string)", []),
@@ -188,7 +193,7 @@ export const KnownComponents: Record<string, BlockType> = {
   "local.file_match": new BlockType({
     multi: true,
     exports: {
-      targets: "list(FileTarget)",
+      targets: "list(Target)",
     },
   }),
   "loki.source.file": new BlockType({
@@ -253,7 +258,23 @@ export const KnownComponents: Record<string, BlockType> = {
       }),
     },
     exports: {
-      targets: "list(PrometheusTarget)",
+      targets: "list(Target)",
+    },
+  }),
+  "discovery.relabel": new BlockType({
+    multi: true,
+    args: {
+      rule: new BlockType({
+        multi: true,
+        args: {
+          target_label: new LiteralArgument("string", ""),
+          action: new LiteralArgument("string", "replace"),
+        },
+      }),
+    },
+    exports: {
+      output: "list(Target)",
+      rules: "RelabelRules",
     },
   }),
 };

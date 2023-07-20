@@ -51,6 +51,20 @@ const ConfigEditor = () => {
     [theme]
   );
 
+  const parseComponents = useCallback(() => {
+    if (!parserRef.current) return;
+    const { parser, river } = parserRef.current;
+    const tree = parser.parse(model);
+    const componentQuery = river.query(`(config_file (block) @component)`);
+    const matches = componentQuery.matches(tree.rootNode);
+    const components = matches.map((match) => {
+      const node = match.captures[0].node;
+      return { node, block: River.UnmarshalBlock(node) };
+    });
+    setComponents(components);
+    componentsRef.current = components;
+  }, [setComponents, model]);
+
   useEffect(() => {
     (async () => {
       await Parser.init({
@@ -62,8 +76,9 @@ const ConfigEditor = () => {
       const river = await Parser.Language.load("tree-sitter-river.wasm");
       parser.setLanguage(river);
       parserRef.current = { parser, river };
+      parseComponents();
     })();
-  }, []);
+  }, [parseComponents]);
 
   const provideCodeLenses = useCallback(function(
     model: monaco.editor.ITextModel,
@@ -175,19 +190,9 @@ const ConfigEditor = () => {
     },
     [editorTheme, provideCodeLenses]
   );
-  useEffect(() => {
-    if (!parserRef.current) return;
-    const { parser, river } = parserRef.current;
-    const tree = parser.parse(model);
-    const componentQuery = river.query(`(config_file (block) @component)`);
-    const matches = componentQuery.matches(tree.rootNode);
-    const components = matches.map((match) => {
-      const node = match.captures[0].node;
-      return { node, block: River.UnmarshalBlock(node) };
-    });
-    setComponents(components);
-    componentsRef.current = components;
-  }, [model, setComponents]);
+
+  useEffect(parseComponents, [model, setComponents, parseComponents]);
+
   const onChange = (text: string | undefined) => {
     setModel(text || "");
     localStorage.setItem("config.river", text || "");

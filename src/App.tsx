@@ -18,10 +18,16 @@ import { useState, useMemo } from "react";
 import ExamplesCatalog from "./components/ExamplesCatalog";
 import { useModelContext } from "./state";
 import InstallationInstructions from "./components/InstallationInstructions";
+import ConfigurationWizard from "./components/ConfigurationWizard";
 
 function App() {
   const styles = useStyles(getStyles);
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const openWizard = () => setWizardOpen(true);
+  const closeWizard = () => setWizardOpen(false);
+  const [examplesCatalogOpen, setExamplesCatalogOpen] = useState(false);
+  const openExamples = () => setExamplesCatalogOpen(true);
+  const closeExamples = () => setExamplesCatalogOpen(false);
   const { model } = useModelContext();
   const [copied, setCopied] = useState(false);
 
@@ -53,11 +59,14 @@ function App() {
           <VerticalGroup>
             <p>
               If this is your first time working with the agent, we reccomend
-              you get started with an example configuration, based on your
-              usecase.
+              you use the configuration wizard or get started with an example
+              configuration, based on your usecase.
             </p>
             <HorizontalGroup>
-              <Button onClick={() => setModalOpen(true)}>Open catalog</Button>
+              <Button onClick={openWizard} variant="success">
+                Start configuration wizard
+              </Button>
+              <Button onClick={openExamples}>Open examples catalog</Button>
               <LinkButton
                 variant="secondary"
                 href="https://grafana.com/docs/agent/latest/flow/"
@@ -104,11 +113,19 @@ function App() {
         <InstallationInstructions />
       </section>
       <Modal
-        title="Example Catalog"
-        isOpen={isModalOpen}
-        onDismiss={() => setModalOpen(false)}
+        title="Configuration Wizard"
+        isOpen={wizardOpen}
+        onDismiss={closeWizard}
+        className={styles.wizardModal}
       >
-        <ExamplesCatalog dismiss={() => setModalOpen(false)} />
+        <ConfigurationWizard dismiss={closeWizard} />
+      </Modal>
+      <Modal
+        title="Examples Catalog"
+        isOpen={examplesCatalogOpen}
+        onDismiss={closeExamples}
+      >
+        <ExamplesCatalog dismiss={closeExamples} />
       </Modal>
     </div>
   );
@@ -165,6 +182,9 @@ const getStyles = (theme: GrafanaTheme2) => {
     `,
     splitLeft: css`
       height: 5rem;
+    `,
+    wizardModal: css`
+      min-width: 40%;
     `,
   };
 };

@@ -184,7 +184,7 @@ const getStyles = (theme: GrafanaTheme2) => {
       height: 5rem;
     `,
     wizardModal: css`
-      min-width: 40%;
+      min-width: 50%;
     `,
   };
 };

@@ -9,24 +9,26 @@ type Capsule =
   | "Target"
   | "PrometheusReceiver"
   | "LokiReceiver"
-  | "PyroscopeReceiver"
   | "otel.LogsConsumer"
   | "otel.TracesConsumer"
   | "RelabelRules"
+  | "ProfilesReceiver"
   | "otel.MetricsConsumer";
 
-type Collection =
-  | `list(${Capsule | LiteralType})`
-  | `map(${Capsule | LiteralType})`;
+type Collection<T extends string> = `list(${T})` | `map(${T})`;
 
 // adapted slightly from upstream to provide a safer way to select references
-export type ExportType = LiteralType | Capsule | Collection;
+export type ExportType =
+  | LiteralType
+  | Capsule
+  | Collection<Capsule | LiteralType>
+  | Collection<Collection<Capsule | LiteralType>>;
 
 export class LiteralArgument {
-  arg_type: LiteralType;
+  arg_type: ExportType;
   def: any;
   type: "attribute" = "attribute";
-  constructor(type: LiteralType, def: any) {
+  constructor(type: ExportType, def: any) {
     this.arg_type = type;
     this.def = def;
   }
@@ -79,6 +81,15 @@ export interface ArgumentType {
   type: "block" | "attribute";
 }
 
+const BasicAuthBlock = new BlockType({
+  multi: false,
+  args: {
+    username: new LiteralArgument("string", ""),
+    password: new LiteralArgument("string", ""),
+    password_file: new LiteralArgument("string", ""),
+  },
+});
+
 export const KnownComponents: Record<string, BlockType> = {
   "prometheus.remote_write": new BlockType({
     multi: true,
@@ -101,7 +112,7 @@ export const KnownComponents: Record<string, BlockType> = {
         multi: true,
         args: {
           name: new LiteralArgument("string", ""),
-          value: new LiteralArgument("list(string)", []),
+          values: new LiteralArgument("list(string)", []),
         },
       }),
     },
@@ -277,6 +288,79 @@ export const KnownComponents: Record<string, BlockType> = {
       rules: "RelabelRules",
     },
   }),
+  "pyroscope.scrape": new BlockType({
+    multi: true,
+    args: {
+      targets: new LiteralArgument("list(Target)", []),
+      forward_to: new LiteralArgument("list(ProfilesReceiver)", []),
+      job_name: new LiteralArgument("string", ""),
+      scrape_interval: new LiteralArgument("string", "15s"),
+      scrape_timeout: new LiteralArgument("string", "15s"),
+      scheme: new LiteralArgument("string", ""),
+      bearer_token: new LiteralArgument("string", ""),
+      bearer_token_file: new LiteralArgument("string", ""),
+      proxy_url: new LiteralArgument("string", ""),
+      follow_redirects: new LiteralArgument("boolean", true),
+      enable_http2: new LiteralArgument("boolean", true),
+
+      basic_auth: BasicAuthBlock,
+      profiling_config: new BlockType({
+        multi: false,
+        args: {
+          "profile.memory": new BlockType({
+            args: {
+              path: new LiteralArgument("string", "/debug/pprof/memory"),
+              enabled: new LiteralArgument("boolean", true),
+              delta: new LiteralArgument("boolean", false),
+            },
+          }),
+          "profile.block": new BlockType({
+            args: {
+              path: new LiteralArgument("string", "/debug/pprof/block"),
+              enabled: new LiteralArgument("boolean", true),
+              delta: new LiteralArgument("boolean", false),
+            },
+          }),
+          "profile.goroutine": new BlockType({
+            args: {
+              path: new LiteralArgument("string", "/debug/pprof/goroutine"),
+              enabled: new LiteralArgument("boolean", true),
+              delta: new LiteralArgument("boolean", false),
+            },
+          }),
+          "profile.mutex": new BlockType({
+            args: {
+              path: new LiteralArgument("string", "/debug/pprof/mutex"),
+              enabled: new LiteralArgument("boolean", true),
+              delta: new LiteralArgument("boolean", false),
+            },
+          }),
+          "profile.process_cpu": new BlockType({
+            args: {
+              path: new LiteralArgument("string", "/debug/pprof/profile"),
+              enabled: new LiteralArgument("boolean", true),
+              delta: new LiteralArgument("boolean", true),
+            },
+          }),
+          "profile.fgprof": new BlockType({
+            args: {
+              path: new LiteralArgument("string", "/debug/fgprof"),
+              enabled: new LiteralArgument("boolean", false),
+              delta: new LiteralArgument("boolean", true),
+            },
+          }),
+          "profile.custom": new BlockType({
+            args: {
+              path: new LiteralArgument("string", ""),
+              enabled: new LiteralArgument("boolean", false),
+              delta: new LiteralArgument("boolean", false),
+            },
+          }),
+        },
+      }),
+    },
+    exports: {},
+  }),
 };
 
 export const KnownModules: Record<string, Record<string, BlockType>> = {
@@ -286,7 +370,7 @@ export const KnownModules: Record<string, Record<string, BlockType>> = {
         "exports.metrics_receiver": "PrometheusReceiver",
         "exports.logs_receiver": "LokiReceiver",
         "exports.traces_receiver": "otel.TracesConsumer",
-        "exports.profiles_receiver": "PyroscopeReceiver",
+        "exports.profiles_receiver": "ProfilesReceiver",
       },
     }),
   },

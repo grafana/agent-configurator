@@ -1,6 +1,4 @@
-import { SelectableValue } from "@grafana/data";
 import {
-  Alert,
   Button,
   FieldArray,
   FieldSet,
@@ -10,10 +8,9 @@ import {
   InlineSwitch,
   Input,
   InputControl,
-  MultiSelect,
-  RadioButtonGroup,
   Select,
 } from "@grafana/ui";
+import AuthenticationEditor from "../common/AuthenticationEditor";
 import TypedInput from "../inputs/TypedInput";
 
 const roleOptions = [
@@ -35,7 +32,6 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
   const selectorsOptions = {
     labelWidth: 14,
   };
-  const watchAuthType = methods.watch("auth_type");
   return (
     <>
       <InlineField
@@ -97,149 +93,11 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
       >
         <InlineSwitch {...methods.register("attach_metadata.node")} />
       </InlineField>
-      <FieldSet label="Authentication">
-        <InputControl
-          name="auth_type"
-          control={methods.control}
-          defaultValue="in_cluster"
-          render={({ field: { ref, ...f } }) => (
-            <RadioButtonGroup
-              fullWidth
-              {...f}
-              options={[
-                {
-                  value: "in_cluster",
-                  label: "In-cluster",
-                },
-                {
-                  value: "bearer",
-                  label: "Bearer Token",
-                },
-                {
-                  value: "basic_auth",
-                  label: "Basic Auth",
-                },
-                {
-                  value: "authorization",
-                  label: "Authorization Header",
-                },
-                {
-                  value: "oauth2",
-                  label: "OAuth2",
-                },
-              ]}
-            />
-          )}
-        />
-        {watchAuthType === "in_cluster" && (
-          <Alert
-            severity="info"
-            title="No further configuration is neccesarry when running the agent in a
-            Kubernetes environment with the correct service account"
-          />
-        )}
-        {watchAuthType === "basic_auth" && (
-          <>
-            <InlineField label="Username" {...commonOptions}>
-              <TypedInput
-                name="basic_auth.username"
-                control={methods.control}
-              />
-            </InlineField>
-            <InlineField label="Password" {...commonOptions}>
-              <TypedInput
-                name="basic_auth.password"
-                control={methods.control}
-              />
-            </InlineField>
-            <InlineField label="Password file" {...commonOptions}>
-              <TypedInput
-                name="basic_auth.password_file"
-                control={methods.control}
-              />
-            </InlineField>
-          </>
-        )}
-        {watchAuthType === "bearer" && (
-          <>
-            <InlineField
-              label="Bearer token"
-              tooltip="Bearer token to authenticate with."
-              {...commonOptions}
-            >
-              <TypedInput name="bearer_token" control={methods.control} />
-            </InlineField>
-            <InlineField
-              label="Bearer token file"
-              tooltip="File containing a bearer token to authenticate with."
-              {...commonOptions}
-            >
-              <TypedInput name="bearer_token_file" control={methods.control} />
-            </InlineField>
-          </>
-        )}
-        {watchAuthType === "authorization" && (
-          <>
-            <InlineField
-              label="Type"
-              tooltip="Authorization type, for example, 'Bearer'"
-              {...commonOptions}
-            >
-              <TypedInput name="authorization.type" control={methods.control} />
-            </InlineField>
-            <InlineField label="Credentials" {...commonOptions}>
-              <TypedInput
-                name="authorization.credentials"
-                control={methods.control}
-              />
-            </InlineField>
-            <InlineField label="Credentials file" {...commonOptions}>
-              <TypedInput
-                name="authorization.credentials_file"
-                control={methods.control}
-              />
-            </InlineField>
-          </>
-        )}
-        {watchAuthType === "oauth2" && (
-          <>
-            <InlineField label="Client ID" {...commonOptions}>
-              <TypedInput name="oauth2.client_id" control={methods.control} />
-            </InlineField>
-            <InlineField label="Client secret" {...commonOptions}>
-              <TypedInput
-                name="oauth2.client_secret"
-                control={methods.control}
-              />
-            </InlineField>
-            <InlineField label="Client secret file" {...commonOptions}>
-              <TypedInput
-                name="oauth2.client_secret_file"
-                control={methods.control}
-              />
-            </InlineField>
-            <InlineField label="Scopes" {...commonOptions}>
-              <InputControl
-                name="oauth2.scopes"
-                control={methods.control}
-                render={({ field: { ref, ...f } }) => (
-                  <MultiSelect
-                    {...f}
-                    allowCustomValue
-                    placeholder="Enter to add"
-                  />
-                )}
-              />
-            </InlineField>
-            <InlineField label="Token URL" {...commonOptions}>
-              <TypedInput name="oauth2.token_url" control={methods.control} />
-            </InlineField>
-            <InlineField label="Proxy URL" {...commonOptions}>
-              <TypedInput name="oauth2.proxy_url" control={methods.control} />
-            </InlineField>
-          </>
-        )}
-      </FieldSet>
+      <AuthenticationEditor.Component
+        methods={methods}
+        options={["in_cluster", "basic_auth", "authorization", "oauth2"]}
+        defaultValue="in_cluster"
+      />
       <FieldSet label="Selectors">
         <p>
           Optional label and field selectors to limit the discovery process to a
@@ -341,44 +199,7 @@ const DiscoveryKubernetes = {
   },
   postTransform(data: Record<string, any>): Record<string, any> {
     if (data["role"]?.value) data["role"] = data["role"].value;
-    switch (data["auth_type"]) {
-      case "bearer":
-        delete data["oauth2"];
-        delete data["basic_auth"];
-        delete data["authorization"];
-        break;
-      case "oauth2":
-        data.oauth2.scopes = data.oauth2.scopes.map(
-          (x: string | SelectableValue<string>) =>
-            typeof x === "object" ? x.value : x
-        );
-
-        delete data["bearer_token"];
-        delete data["bearer_token_file"];
-        delete data["basic_auth"];
-        delete data["authorization"];
-        break;
-      case "authorization":
-        delete data["bearer_token"];
-        delete data["bearer_token_file"];
-        delete data["basic_auth"];
-        delete data["oauth2"];
-        break;
-      case "basic_auth":
-        delete data["bearer_token"];
-        delete data["bearer_token_file"];
-        delete data["authorization"];
-        delete data["oauth2"];
-        break;
-      case "in_cluster":
-        delete data["bearer_token"];
-        delete data["bearer_token_file"];
-        delete data["authorization"];
-        delete data["oauth2"];
-        delete data["basic_auth"];
-        break;
-    }
-    delete data["auth_type"];
+    data = AuthenticationEditor.postTransform(data);
     return data;
   },
   Component,

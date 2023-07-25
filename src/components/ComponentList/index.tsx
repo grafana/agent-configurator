@@ -19,7 +19,7 @@ type ListEntry = {
   name: string;
   title: string;
   meta: Array<string>;
-  icon: IconName | `https://${string}`;
+  icon: IconName | `${string}.svg` | `${string}.png`;
   component: Block;
 };
 
@@ -160,6 +160,19 @@ const components: ListEntry[] = [
     icon: "process",
     component: new Block("discovery.relabel", "relabel_targets", []),
   },
+  {
+    name: "pyroscope.scrape",
+    title: "Scrape profiles",
+    meta: ["Profiling", "Pyroscope", "Source"],
+    icon: `${process.env.PUBLIC_URL}/logos/pyroscope.svg`,
+    component: new Block("pyroscope.scrape", "default", [
+      new Attribute("targets", [
+        {
+          __address__: "http://localhost:8080",
+        },
+      ]),
+    ]),
+  },
 ];
 
 const ComponentList = ({ addComponent }: ComponentListProps) => {
@@ -188,10 +201,10 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
             <Card key={c.name + c.title}>
               <Card.Heading>{c.title}</Card.Heading>
               <Card.Figure>
-                {!c.icon.startsWith("https") && (
+                {!c.icon.includes(".") && (
                   <Icon size="xxxl" name={c.icon as IconName} />
                 )}
-                {c.icon.startsWith("https") && (
+                {c.icon.includes(".") && (
                   <img src={c.icon} alt={`Icon representing ${c.title}`} />
                 )}
               </Card.Figure>

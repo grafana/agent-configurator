@@ -26,7 +26,6 @@ const TlsBlock = ({
   };
   return (
     <VerticalGroup>
-      <h6>TLS Settings</h6>
       <InlineField
         label="CA PEM"
         tooltip="CA PEM-encoded text to validate the server with."

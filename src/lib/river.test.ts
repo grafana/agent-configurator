@@ -260,6 +260,77 @@ targets = [prometheus.exporter.redis.target]
       ])
     );
   });
+  test("unmarshal blocks with dot in name", () => {
+    const tree = parser.parse(`pyroscope.scrape "default" {
+  profiling_config {
+    profile.memory {
+      enabled = true
+      delta = false
+    }
+  }
+}`);
+    const out = UnmarshalBlock(tree.rootNode.namedChild(0)!);
+    expect(out).toEqual(
+      new Block("pyroscope.scrape", "default", [
+        new Block("profiling_config", null, [
+          new Block("profile.memory", null, [
+            new Attribute("enabled", true),
+            new Attribute("delta", false),
+          ]),
+        ]),
+      ])
+    );
+  });
+  test("preserve dots in form value", () => {
+    expect(
+      new Block("pyroscope.scrape", "default", [
+        new Block("profiling_config", null, [
+          new Attribute("path_prefix", "/app"),
+          new Block("profile.memory", null, [
+            new Attribute("enabled", true),
+            new Attribute("delta", false),
+          ]),
+        ]),
+      ]).formValues(KnownComponents["pyroscope.scrape"])["profiling_config"]
+    ).toEqual({
+      path_prefix: "/app",
+      "profile.memory": {
+        path: "/debug/pprof/memory",
+        delta: false,
+        enabled: true,
+      },
+      "profile.mutex": {
+        path: "/debug/pprof/mutex",
+        delta: false,
+        enabled: true,
+      },
+      "profile.process_cpu": {
+        path: "/debug/pprof/profile",
+        delta: true,
+        enabled: true,
+      },
+      "profile.goroutine": {
+        path: "/debug/pprof/goroutine",
+        delta: false,
+        enabled: true,
+      },
+      "profile.fgprof": {
+        path: "/debug/fgprof",
+        delta: true,
+        enabled: false,
+      },
+      "profile.custom": {
+        path: "",
+        delta: false,
+        enabled: false,
+      },
+      "profile.block": {
+        path: "/debug/pprof/block",
+        delta: false,
+        enabled: true,
+      },
+    });
+  });
   test("reproducability", () => {
     const testcases: { raw: string; parsed: Block }[] = [
       {
@@ -322,3 +393,4 @@ targets = [prometheus.exporter.redis.target]
     }
   });
 });
+                

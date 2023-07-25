@@ -65,9 +65,12 @@ export class Block {
     }
     this.attributes.forEach((a) => {
       if (a instanceof Attribute) {
-        values[`${a.name}`] = a.value;
+        values[a.name] = a.value;
       } else {
-        const fv = a.formValues();
+        const nestedSpec = spec?.args[a.name];
+        const fv = a.formValues(
+          nestedSpec instanceof BlockType ? nestedSpec : undefined
+        );
         if (spec?.args[a.name]?.multiple()) {
           values[a.name] = values[a.name] ? [...values[a.name], fv] : [fv];
         } else {

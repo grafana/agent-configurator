@@ -32,6 +32,7 @@ import PrometheusRelabel from "./components/PrometheusRelabel";
 import LocalFileMatch from "./components/LocalFileMatch";
 import DiscoveryKubernetes from "./components/DiscoveryKubernetes";
 import DiscoveryRelabel from "./components/DiscoveryRelabel";
+import PyroscopeScrape from "./components/PyroscopeScrape";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -116,6 +117,8 @@ const ComponentEditor = ({
         return DiscoveryKubernetes;
       case "discovery.relabel":
         return DiscoveryRelabel;
+      case "pyroscope.scrape":
+        return PyroscopeScrape;
       //@ts-ignore if no module matches, we fall through to the unsupported component path
       case "module.git":
         const repo = component.attributes.find(

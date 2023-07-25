@@ -90,6 +90,20 @@ const BasicAuthBlock = new BlockType({
   },
 });
 
+const TLSConfig = new BlockType({
+  multi: false,
+  args: {
+    ca_pem: new LiteralArgument("string", ""),
+    ca_file: new LiteralArgument("string", ""),
+    cert_pem: new LiteralArgument("string", ""),
+    cert_file: new LiteralArgument("string", ""),
+    key_pem: new LiteralArgument("string", ""),
+    key_file: new LiteralArgument("string", ""),
+    server_name: new LiteralArgument("string", ""),
+    insecure_skip_verify: new LiteralArgument("boolean", false),
+  },
+});
+
 export const KnownComponents: Record<string, BlockType> = {
   "prometheus.remote_write": new BlockType({
     multi: true,
@@ -255,6 +269,20 @@ export const KnownComponents: Record<string, BlockType> = {
   }),
   "prometheus.scrape": new BlockType({
     multi: true,
+    args: {
+      follow_redirects: new LiteralArgument("boolean", true),
+      enable_http2: new LiteralArgument("boolean", true),
+      proxy_url: new LiteralArgument("string", ""),
+      basic_auth: BasicAuthBlock,
+      tls_config: TLSConfig,
+      scrape_interval: new LiteralArgument("string", "60s"),
+      scrape_timeout: new LiteralArgument("string", "10s"),
+      scheme: new LiteralArgument("string", ""),
+      job_name: new LiteralArgument("string", ""),
+      extra_metrics: new LiteralArgument("boolean", false),
+      honor_labels: new LiteralArgument("boolean", false),
+      honor_timestamps: new LiteralArgument("boolean", true),
+    },
   }),
   "discovery.kubernetes": new BlockType({
     multi: true,

@@ -232,7 +232,7 @@ const AuthenticationEditor = {
         delete data["authorization"];
         delete data["oauth2"];
         break;
-      case "in_cluster":
+      default:
         delete data["bearer_token"];
         delete data["bearer_token_file"];
         delete data["authorization"];

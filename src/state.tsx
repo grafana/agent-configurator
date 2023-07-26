@@ -42,6 +42,13 @@ export const ModelProvider = ({ children }: React.PropsWithChildren) => {
   let initialModel = "";
   if (urlModel) initialModel = atob(urlModel);
   else if (localStorageModel) initialModel = localStorageModel;
+  if (initialModel === "") {
+    initialModel = `// Welcome to the Grafana Agent Configurator!
+// You can paste your configuration here or start by using the configuration wizard or by loading an example from the catalog.
+
+`;
+  }
+  window.history.replaceState(null, "", window.location.pathname);
   const [model, setModel] = useState<string>(initialModel);
   // Remember to pass the state and the updater function to the provider
   return (

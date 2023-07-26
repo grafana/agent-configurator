@@ -234,6 +234,32 @@ targets = [prometheus.exporter.redis.target]
       ])
     );
   });
+  test("omit nested default values", () => {
+    const fv = {
+      endpoint: [
+        {
+          url: "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom",
+          enable_http2: true,
+        },
+      ],
+    };
+    const out = toBlock(
+      "prometheus.remote_write",
+      fv,
+      "default",
+      KnownComponents["prometheus.remote_write"]
+    );
+    expect(out).toEqual(
+      new Block("prometheus.remote_write", "default", [
+        new Block("endpoint", null, [
+          new Attribute(
+            "url",
+            "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom"
+          ),
+        ]),
+      ])
+    );
+  });
   test("fill default values", () => {
     const block = new Block("otelcol.exporter.prometheus", "default", []);
     const out = block.formValues(
@@ -393,4 +419,3 @@ targets = [prometheus.exporter.redis.target]
     }
   });
 });
-                

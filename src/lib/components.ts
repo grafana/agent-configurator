@@ -111,8 +111,49 @@ export const KnownComponents: Record<string, BlockType> = {
       receiver: "PrometheusReceiver",
     },
     args: {
+      wal: new BlockType({
+        multi: false,
+        args: {
+          truncate_frequency: new LiteralArgument("string", "2h"),
+          min_keepalive_time: new LiteralArgument("string", "5m"),
+          max_keepalive_time: new LiteralArgument("string", "8h"),
+        },
+      }),
       endpoint: new BlockType({
         multi: true,
+        args: {
+          name: new LiteralArgument("string", ""),
+          url: new LiteralArgument("string", ""),
+          send_exemplars: new LiteralArgument("boolean", true),
+          send_native_histograms: new LiteralArgument("boolean", false),
+          remote_timeout: new LiteralArgument("string", "30s"),
+          tls_config: TLSConfig,
+          basic_auth: BasicAuthBlock,
+          enable_http2: new LiteralArgument("boolean", true),
+          follow_redirects: new LiteralArgument("boolean", false),
+
+          queue_config: new BlockType({
+            multi: false,
+            args: {
+              capacity: new LiteralArgument("number", 10000),
+              min_shards: new LiteralArgument("number", 1),
+              max_shards: new LiteralArgument("number", 50),
+              max_samples_per_send: new LiteralArgument("number", 2000),
+              batch_send_deadline: new LiteralArgument("string", "5s"),
+              min_backoff: new LiteralArgument("string", "30ms"),
+              max_backoff: new LiteralArgument("string", "5s"),
+              retry_on_http_429: new LiteralArgument("boolean", false),
+            },
+          }),
+          metadata_config: new BlockType({
+            multi: false,
+            args: {
+              send: new LiteralArgument("boolean", true),
+              send_interval: new LiteralArgument("string", "1m"),
+              max_samples_per_send: new LiteralArgument("number", 2000),
+            },
+          }),
+        },
       }),
     },
   }),

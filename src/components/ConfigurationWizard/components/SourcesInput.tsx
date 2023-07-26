@@ -20,10 +20,7 @@ const SourcesInput = () => {
       control={control}
       name="sources"
       render={({ field: { ref, ...f } }) => (
-        <MultiSelect
-          onChange={(v) => f.onChange(v.map((x) => x.template))}
-          options={options}
-        />
+        <MultiSelect onChange={f.onChange} options={options} />
       )}
     />
   );

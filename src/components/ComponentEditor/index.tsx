@@ -59,6 +59,9 @@ const ComponentEditor = ({
     preTransform: (data: Record<string, any>) => Record<string, any>;
     postTransform: (data: Record<string, any>) => Record<string, any>;
   } = (() => {
+    faro.api?.pushEvent("edit_component", {
+      component: component.name,
+    });
     const id = (data: any) => data;
     switch (component.name) {
       case "discovery.ec2":

@@ -1,5 +1,5 @@
+import { SelectableValue } from "@grafana/data";
 import { DestinationFormType } from "./destination";
-import { SourceTransformer } from "./source";
 export type WizardFormValues = {
   destination: DestinationFormType;
   stackName?: string;
@@ -9,7 +9,8 @@ export type WizardFormValues = {
     traces: boolean;
     profiles: boolean;
   };
-  sources: SourceTransformer[];
+  // cannot use 'Source[]' here due to https://github.com/orgs/react-hook-form/discussions/7764
+  sources: SelectableValue[];
 };
 
 export const WizardFormDefaults: WizardFormValues = {

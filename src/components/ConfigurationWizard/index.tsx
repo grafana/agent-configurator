@@ -18,6 +18,7 @@ import { CloudDestination } from "./destinations/cloud";
 import { LocalDestination } from "./destinations/local";
 import { Destination } from "./types/destination";
 import { WizardFormDefaults, WizardFormValues } from "./types/form";
+import { faro } from "@grafana/faro-web-sdk";
 
 const ConfigurationWizard = ({ dismiss }: { dismiss: () => void }) => {
   const { setModel } = useModelContext();
@@ -41,12 +42,17 @@ const ConfigurationWizard = ({ dismiss }: { dismiss: () => void }) => {
     destination.profiles.enabled = data.telemetry.profiles;
 
     let out = destination.template();
-    for (const t of data.sources) {
-      out += t(destination);
+    for (const source of data.sources) {
+      out += source.template(destination);
       out += "\n";
     }
     setModel(out);
     dismiss();
+    faro.api?.pushEvent("used_wizard", {
+      destination: data.destination,
+      telemetry: JSON.stringify(data.telemetry),
+      sources: JSON.stringify(data.sources.map((x) => x.label)),
+    });
   };
   const styles = useStyles(getStyles);
   return (

@@ -95,7 +95,8 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
                 <ControlledCollapse label="TLS Configuration">
                   <TlsConfig
                     methods={methods}
-                    parent={`endpoint[${index}]` as const}
+                    parent={`endpoint[${index}].tls_config` as const}
+                    defaultValues={field?.tls_config}
                   />
                 </ControlledCollapse>
                 <ControlledCollapse label="Metadata">

@@ -45,7 +45,18 @@ const components: ListEntry[] = [
     icon: "cloud-upload",
     component: new Block("prometheus.remote_write", "default", [
       new Block("endpoint", null, [
-        new Attribute("url", "https://example.com"),
+        new Attribute("url", "http://mimir:9009/api/v1/push"),
+      ]),
+    ]),
+  },
+  {
+    name: "loki.write",
+    title: "Loki Write",
+    meta: ["Output", "Cloud", "Loki"],
+    icon: "cloud-upload",
+    component: new Block("loki.write", "default", [
+      new Block("endpoint", null, [
+        new Attribute("url", "http://loki:3100/loki/api/v1/push"),
       ]),
     ]),
   },

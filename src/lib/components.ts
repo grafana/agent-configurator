@@ -157,6 +157,33 @@ export const KnownComponents: Record<string, BlockType> = {
       }),
     },
   }),
+  "loki.write": new BlockType({
+    multi: true,
+    exports: {
+      receiver: "LokiReceiver",
+    },
+    args: {
+      endpoint: new BlockType({
+        multi: true,
+        args: {
+          name: new LiteralArgument("string", ""),
+          url: new LiteralArgument("string", ""),
+          batch_wait: new LiteralArgument("string", "1s"),
+          batch_size: new LiteralArgument("string", "1MiB"),
+          tenant_id: new LiteralArgument("string", ""),
+          remote_timeout: new LiteralArgument("string", "10s"),
+          tls_config: TLSConfig,
+          basic_auth: BasicAuthBlock,
+          enable_http2: new LiteralArgument("boolean", true),
+          follow_redirects: new LiteralArgument("boolean", true),
+
+          min_backoff_period: new LiteralArgument("string", "500ms"),
+          max_backoff_period: new LiteralArgument("string", "5m"),
+          max_backoff_retries: new LiteralArgument("number", 10),
+        },
+      }),
+    },
+  }),
   "discovery.ec2": new BlockType({
     multi: true,
     exports: {

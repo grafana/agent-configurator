@@ -230,7 +230,6 @@ const AuthenticationEditor = {
       data.basic_auth?.password_file
     )
       data["auth_type"] = "basic_auth";
-    console.log(data);
     return data;
   },
   postTransform(data: Record<string, any>): Record<string, any> {

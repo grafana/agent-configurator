@@ -40,7 +40,6 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
         }}
       >
         {(field, index) => {
-          console.log(field);
           return (
             <FieldSet label="Endpoint">
               <InlineField

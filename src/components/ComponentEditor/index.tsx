@@ -33,6 +33,7 @@ import LocalFileMatch from "./components/LocalFileMatch";
 import DiscoveryKubernetes from "./components/DiscoveryKubernetes";
 import DiscoveryRelabel from "./components/DiscoveryRelabel";
 import PyroscopeScrape from "./components/PyroscopeScrape";
+import LokiWrite from "./components/LokiWrite";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -104,6 +105,8 @@ const ComponentEditor = ({
         return PrometheusExporterUnix;
       case "local.file_match":
         return LocalFileMatch;
+      case "loki.write":
+        return LokiWrite;
       case "loki.source.file":
         return LokiSourceFile;
       case "loki.source.journal":

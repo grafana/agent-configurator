@@ -42,17 +42,15 @@ const TypedInput = ({
   control,
   rules,
   placeholder,
+  defaultValue,
 }: {
   name: string;
   control: Control<Record<string, any>>;
   rules?: Object;
   placeholder?: string;
-  defaultValue?: string;
+  defaultValue?: Record<string, any> | string;
 }) => {
-  const defaultValue: Record<string, any> | string = get(
-    control.defaultValuesRef.current,
-    name
-  );
+  defaultValue = defaultValue ?? get(control.defaultValuesRef.current, name);
   const [inputType, setInputType] = React.useState<Type>("literal");
   const [inputValue, setInputValue] = React.useState<string>(() => {
     if (!defaultValue) return "";

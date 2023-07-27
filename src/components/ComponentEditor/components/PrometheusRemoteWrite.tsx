@@ -1,18 +1,22 @@
 import {
-  Field,
   FormAPI,
   Input,
   Alert,
   LinkButton,
-  VerticalGroup,
+  FieldSet,
+  ControlledCollapse,
+  InlineField,
+  InlineSwitch,
 } from "@grafana/ui";
+import AuthenticationEditor from "../common/AuthenticationEditor";
+import TlsConfig from "../common/TlsConfig";
 import MultiBlock from "../inputs/MultiBlock";
+import TypedInput from "../inputs/TypedInput";
 
-const PrometheusRemoteWrite = ({
-  methods,
-}: {
-  methods: FormAPI<Record<string, any>>;
-}) => {
+const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
+  const commonOptions = {
+    labelWidth: 24,
+  };
   return (
     <>
       <Alert severity="info" title="Connection Information">
@@ -26,58 +30,322 @@ const PrometheusRemoteWrite = ({
           your cloud console
         </LinkButton>
       </Alert>
-      <MultiBlock name="endpoint" title="Endpoints" methods={methods}>
-        {(field, index) => (
-          <VerticalGroup>
-            <Field
-              label="Endpoint URL"
-              description="Where to send metrics to"
-              error="An endpoint URL is required"
-              invalid={!!methods.errors["endpoint"]?.url}
-            >
-              <Input
-                {...methods.register(`endpoint[${index}].url` as const, {
-                  required: true,
-                })}
-                defaultValue={field["url"]}
+      <MultiBlock
+        name="endpoint"
+        title="Endpoints"
+        methods={methods}
+        newBlock={{
+          enable_http2: true,
+          send_exemplars: true,
+          remote_timeout: "30s",
+          metadata_config: {
+            send: true,
+            send_interval: "1m",
+            max_samples_per_send: 2000,
+          },
+        }}
+      >
+        {(field, index) => {
+          console.log(field);
+          return (
+            <FieldSet label="Endpoint">
+              <InlineField
+                label="Endpoint URL"
+                tooltip="Where to send metrics to"
+                error="An endpoint URL is required"
+                invalid={!!methods.errors["endpoint"]?.url}
+                {...commonOptions}
+              >
+                <TypedInput
+                  name={`endpoint[${index}].url` as const}
+                  control={methods.control}
+                  defaultValue={field["url"]}
+                />
+              </InlineField>
+              <InlineField
+                label="Send exemplars"
+                tooltip="Whether exemplars should be sent."
+                {...commonOptions}
+              >
+                <InlineSwitch
+                  {...methods.register(
+                    `endpoint[${index}].send_exemplars` as const
+                  )}
+                  defaultChecked={field["send_exemplars"]}
+                />
+              </InlineField>
+              <InlineField
+                label="Send native histograms"
+                tooltip="Whether native histograms should be sent."
+                {...commonOptions}
+              >
+                <InlineSwitch
+                  {...methods.register(
+                    `endpoint[${index}].send_native_histograms` as const
+                  )}
+                  defaultChecked={field["send_native_histograms"]}
+                />
+              </InlineField>
+              <AuthenticationEditor.Component
+                methods={methods}
+                parent={`endpoint[${index}]` as const}
+                defaultValue={field.auth_type}
               />
-            </Field>
-            <Field label="Basic auth username">
-              <Input
-                {...methods.register(
-                  `endpoint[${index}].basic_auth.username` as const
-                )}
-                defaultValue={field.basic_auth?.username}
-              />
-            </Field>
-            <Field label="Basic auth password">
-              <Input
-                {...methods.register(
-                  `endpoint[${index}].basic_auth.password` as const
-                )}
-                defaultValue={field.basic_auth?.password}
-              />
-            </Field>
-            <Field
-              label="Basic auth password file"
-              description="File containing the basic auth password."
-            >
-              <Input
-                {...methods.register(
-                  `endpoint[${index}].basic_auth.password_file` as const
-                )}
-                defaultValue={field.basic_auth?.password_file}
-              />
-            </Field>
-            <Alert
-              severity="info"
-              title="password and password_file are mutually exclusive and only one can be provided."
-            ></Alert>
-          </VerticalGroup>
-        )}
+              <FieldSet label="Advanced settings">
+                <ControlledCollapse label="TLS Configuration">
+                  <TlsConfig
+                    methods={methods}
+                    parent={`endpoint[${index}]` as const}
+                  />
+                </ControlledCollapse>
+                <ControlledCollapse label="Metadata">
+                  <InlineField
+                    label="Send metadata"
+                    tooltip="Controls whether metric metadata is sent to the endpoint."
+                    {...commonOptions}
+                  >
+                    <InlineSwitch
+                      {...methods.register(
+                        `endpoint[${index}].metadata_config.send` as const
+                      )}
+                      defaultChecked={field?.metadata_config?.send}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Send interval"
+                    tooltip="How frequently metric metadata is sent to the endpoint."
+                    {...commonOptions}
+                  >
+                    <TypedInput
+                      name={
+                        `endpoint[${index}].metadata_config.send_interval` as const
+                      }
+                      control={methods.control}
+                      defaultValue={field?.metadata_config?.send_interval}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Maximum samples per send"
+                    tooltip="Maximum number of metadata samples to send to the endpoint at once."
+                    {...commonOptions}
+                  >
+                    <Input
+                      type="number"
+                      {...methods.register(
+                        `endpoint[${index}].metadata_config.max_samples_per_send` as const
+                      )}
+                      defaultValue={
+                        field?.metadata_config?.max_samples_per_send
+                      }
+                    />
+                  </InlineField>
+                </ControlledCollapse>
+                <ControlledCollapse label="Connection settings">
+                  <InlineField
+                    label="Proxy URL"
+                    tooltip="HTTP proxy to proxy requests through."
+                    {...commonOptions}
+                  >
+                    <TypedInput
+                      name={`endpoint[${index}].proxy_url` as const}
+                      control={methods.control}
+                      defaultValue={field["proxy_url"]}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Remote timeout"
+                    tooltip="Timeout for requests made to the URL."
+                    {...commonOptions}
+                  >
+                    <TypedInput
+                      name={`endpoint[${index}].remote_timeout` as const}
+                      control={methods.control}
+                      defaultValue={field["remote_timeout"]}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Follow redirects"
+                    tooltip="Whether redirects returned by the server should be followed."
+                    {...commonOptions}
+                  >
+                    <InlineSwitch
+                      {...methods.register(
+                        `endpoint[${index}].follow_redirects` as const
+                      )}
+                      defaultChecked={field["follow_redirects"]}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Enable HTTP2"
+                    tooltip="Whether HTTP2 is supported for requests."
+                    {...commonOptions}
+                  >
+                    <InlineSwitch
+                      {...methods.register(
+                        `endpoint[${index}].enable_http2` as const
+                      )}
+                      defaultChecked={field["enable_http2"]}
+                    />
+                  </InlineField>
+                </ControlledCollapse>
+                <ControlledCollapse label="Queue Configuration">
+                  <InlineField
+                    label="Capacity"
+                    tooltip="Number of samples to buffer per shard."
+                    {...commonOptions}
+                  >
+                    <Input
+                      type="number"
+                      {...methods.register(
+                        `endpoint[${index}].queue_config.capacity` as const
+                      )}
+                      defaultValue={field?.queue_config?.capacity}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Minimum shards"
+                    tooltip="Minimum amount of concurrent shards sending samples to the endpoint."
+                    {...commonOptions}
+                  >
+                    <Input
+                      type="number"
+                      {...methods.register(
+                        `endpoint[${index}].queue_config.min_shards` as const
+                      )}
+                      defaultValue={field?.queue_config?.min_shards}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Maximum shards"
+                    tooltip="Maximum number of concurrent shards sending samples to the endpoint."
+                    {...commonOptions}
+                  >
+                    <Input
+                      type="number"
+                      {...methods.register(
+                        `endpoint[${index}].queue_config.max_shards` as const
+                      )}
+                      defaultValue={field?.queue_config?.max_shards}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Maximum samples per send"
+                    {...commonOptions}
+                  >
+                    <Input
+                      type="number"
+                      {...methods.register(
+                        `endpoint[${index}].queue_config.max_samples_per_send` as const
+                      )}
+                      defaultValue={field?.queue_config?.max_samples_per_send}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Batch send deadline"
+                    tooltip="Maximum time samples will wait in the buffer before sending."
+                    {...commonOptions}
+                  >
+                    <Input
+                      {...methods.register(
+                        `endpoint[${index}].queue_config.batch_send_deadline` as const
+                      )}
+                      defaultValue={field?.queue_config?.batch_send_deadline}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Minimum backoff"
+                    tooltip="Initial retry delay. The backoff time gets doubled for each retry."
+                    {...commonOptions}
+                  >
+                    <Input
+                      {...methods.register(
+                        `endpoint[${index}].queue_config.min_backoff` as const
+                      )}
+                      defaultValue={field?.queue_config?.min_backoff}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Maximum backoff"
+                    tooltip="Maximum retry delay."
+                    {...commonOptions}
+                  >
+                    <Input
+                      {...methods.register(
+                        `endpoint[${index}].queue_config.max_backoff` as const
+                      )}
+                      defaultValue={field?.queue_config?.max_backoff}
+                    />
+                  </InlineField>
+                  <InlineField
+                    label="Retry on HTTP 429"
+                    tooltip="Retry when an HTTP 429 status code is received."
+                    {...commonOptions}
+                  >
+                    <InlineSwitch
+                      {...methods.register(
+                        `endpoint[${index}].queue_config.retry_on_http_429` as const
+                      )}
+                      defaultChecked={field?.queue_config?.retry_on_http_429}
+                    />
+                  </InlineField>
+                </ControlledCollapse>
+              </FieldSet>
+            </FieldSet>
+          );
+        }}
       </MultiBlock>
+      <FieldSet label="Advanced Settings">
+        <ControlledCollapse label="WAL">
+          <InlineField
+            label="Truncate frequency"
+            tooltip="How frequently to clean up the WAL."
+            {...commonOptions}
+          >
+            <TypedInput
+              name="wal.truncate_frequency"
+              control={methods.control}
+            />
+          </InlineField>
+          <InlineField
+            label="Minimum keepalive time"
+            tooltip="Minimum time to keep data in the WAL before it can be removed."
+            {...commonOptions}
+          >
+            <TypedInput
+              name="wal.min_keepalive_time"
+              control={methods.control}
+            />
+          </InlineField>
+          <InlineField
+            label="Maximum keepalive time"
+            tooltip="Maximum time to keep data in the WAL before removing it."
+            {...commonOptions}
+          >
+            <TypedInput
+              name="wal.max_keepalive_time"
+              control={methods.control}
+            />
+          </InlineField>
+        </ControlledCollapse>
+      </FieldSet>
     </>
   );
+};
+
+const PrometheusRemoteWrite = {
+  Component,
+  preTransform(data: Record<string, any>): Record<string, any> {
+    data.endpoint = data.endpoint.map((ep: Record<string, any>) => {
+      return AuthenticationEditor.preTransform(ep);
+    });
+    return data;
+  },
+  postTransform(data: Record<string, any>): Record<string, any> {
+    data.endpoint = data.endpoint.map((ep: Record<string, any>) => {
+      return AuthenticationEditor.postTransform(ep);
+    });
+    return data;
+  },
 };
 
 export default PrometheusRemoteWrite;

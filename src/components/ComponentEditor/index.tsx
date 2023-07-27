@@ -71,11 +71,7 @@ const ComponentEditor = ({
           preTransform: id,
         };
       case "prometheus.remote_write":
-        return {
-          Component: PrometheusRemoteWrite,
-          postTransform: id,
-          preTransform: id,
-        };
+        return PrometheusRemoteWrite;
       case "prometheus.exporter.redis":
         return {
           Component: PrometheusExporterRedis,
@@ -197,7 +193,7 @@ const ComponentEditor = ({
 const getStyles = (theme: GrafanaTheme2) => {
   return {
     form: css`
-      width: 60%;
+      width: 100%;
     `,
   };
 };

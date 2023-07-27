@@ -214,7 +214,12 @@ export function toBlock(
   const args = Object.keys(v).flatMap((x) => {
     if (spec?.args[x]?.multiple()) {
       return (v[x] as Array<any>).flatMap((blockinstance) => {
-        const b = toBlock(x, blockinstance);
+        const b = toBlock(
+          x,
+          blockinstance,
+          undefined,
+          spec?.args[x] as BlockType
+        );
         if (b == null) return [];
         return [b];
       });

@@ -21,10 +21,12 @@ const Component = ({
   methods,
   options,
   defaultValue,
+  parent,
 }: {
   methods: FormAPI<Record<string, any>>;
   options?: AuthenticationType[];
   defaultValue?: AuthenticationType;
+  parent?: string;
 }) => {
   const commonOptions = {
     labelWidth: 24,
@@ -35,11 +37,12 @@ const Component = ({
   if (!defaultValue) {
     defaultValue = "none";
   }
-  const watchAuthType = methods.watch("auth_type");
+  parent = parent ? parent + "." : "";
+  const watchAuthType = methods.watch(`${parent}auth_type` as const);
   return (
     <FieldSet label="Authentication">
       <InputControl
-        name="auth_type"
+        name={`${parent}auth_type` as const}
         control={methods.control}
         defaultValue={defaultValue}
         render={({ field: { ref, ...f } }) => (
@@ -85,14 +88,20 @@ const Component = ({
       {watchAuthType === "basic_auth" && (
         <>
           <InlineField label="Username" {...commonOptions}>
-            <TypedInput name="basic_auth.username" control={methods.control} />
+            <TypedInput
+              name={`${parent}basic_auth.username`}
+              control={methods.control}
+            />
           </InlineField>
           <InlineField label="Password" {...commonOptions}>
-            <TypedInput name="basic_auth.password" control={methods.control} />
+            <TypedInput
+              name={`${parent}basic_auth.password`}
+              control={methods.control}
+            />
           </InlineField>
           <InlineField label="Password file" {...commonOptions}>
             <TypedInput
-              name="basic_auth.password_file"
+              name={`${parent}basic_auth.password_file`}
               control={methods.control}
             />
           </InlineField>
@@ -105,14 +114,20 @@ const Component = ({
             tooltip="Bearer token to authenticate with."
             {...commonOptions}
           >
-            <TypedInput name="bearer_token" control={methods.control} />
+            <TypedInput
+              name={`${parent}bearer_token`}
+              control={methods.control}
+            />
           </InlineField>
           <InlineField
             label="Bearer token file"
             tooltip="File containing a bearer token to authenticate with."
             {...commonOptions}
           >
-            <TypedInput name="bearer_token_file" control={methods.control} />
+            <TypedInput
+              name={`${parent}bearer_token_file`}
+              control={methods.control}
+            />
           </InlineField>
         </>
       )}
@@ -123,17 +138,20 @@ const Component = ({
             tooltip="Authorization type, for example, 'Bearer'"
             {...commonOptions}
           >
-            <TypedInput name="authorization.type" control={methods.control} />
+            <TypedInput
+              name={`${parent}authorization.type`}
+              control={methods.control}
+            />
           </InlineField>
           <InlineField label="Credentials" {...commonOptions}>
             <TypedInput
-              name="authorization.credentials"
+              name={`${parent}authorization.credentials`}
               control={methods.control}
             />
           </InlineField>
           <InlineField label="Credentials file" {...commonOptions}>
             <TypedInput
-              name="authorization.credentials_file"
+              name={`${parent}authorization.credentials_file`}
               control={methods.control}
             />
           </InlineField>
@@ -142,20 +160,26 @@ const Component = ({
       {watchAuthType === "oauth2" && (
         <>
           <InlineField label="Client ID" {...commonOptions}>
-            <TypedInput name="oauth2.client_id" control={methods.control} />
+            <TypedInput
+              name={`${parent}oauth2.client_id`}
+              control={methods.control}
+            />
           </InlineField>
           <InlineField label="Client secret" {...commonOptions}>
-            <TypedInput name="oauth2.client_secret" control={methods.control} />
+            <TypedInput
+              name={`${parent}oauth2.client_secret`}
+              control={methods.control}
+            />
           </InlineField>
           <InlineField label="Client secret file" {...commonOptions}>
             <TypedInput
-              name="oauth2.client_secret_file"
+              name={`${parent}oauth2.client_secret_file`}
               control={methods.control}
             />
           </InlineField>
           <InlineField label="Scopes" {...commonOptions}>
             <InputControl
-              name="oauth2.scopes"
+              name={`${parent}oauth2.scopes`}
               control={methods.control}
               render={({ field: { ref, ...f } }) => (
                 <MultiSelect
@@ -167,10 +191,16 @@ const Component = ({
             />
           </InlineField>
           <InlineField label="Token URL" {...commonOptions}>
-            <TypedInput name="oauth2.token_url" control={methods.control} />
+            <TypedInput
+              name={`${parent}oauth2.token_url`}
+              control={methods.control}
+            />
           </InlineField>
           <InlineField label="Proxy URL" {...commonOptions}>
-            <TypedInput name="oauth2.proxy_url" control={methods.control} />
+            <TypedInput
+              name={`${parent}oauth2.proxy_url`}
+              control={methods.control}
+            />
           </InlineField>
         </>
       )}
@@ -200,6 +230,7 @@ const AuthenticationEditor = {
       data.basic_auth?.password_file
     )
       data["auth_type"] = "basic_auth";
+    console.log(data);
     return data;
   },
   postTransform(data: Record<string, any>): Record<string, any> {

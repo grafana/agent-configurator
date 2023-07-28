@@ -1,6 +1,6 @@
 import { SelectableValue } from "@grafana/data";
 import { DestinationFormType } from "./destination";
-export type WizardFormValues = {
+export type WizardFormBasicValues = {
   destination: DestinationFormType;
   stackName?: string;
   telemetry: {
@@ -13,7 +13,7 @@ export type WizardFormValues = {
   sources: SelectableValue[];
 };
 
-export const WizardFormDefaults: WizardFormValues = {
+export const WizardFormDefaults: WizardFormBasicValues = {
   destination: "cloud",
   telemetry: {
     logs: true,
@@ -22,4 +22,8 @@ export const WizardFormDefaults: WizardFormValues = {
     profiles: true,
   },
   sources: [],
+};
+
+export type AdvancedFormProps = {
+  basicValues: WizardFormBasicValues;
 };

@@ -2,10 +2,14 @@ import { MultiSelect } from "@grafana/ui";
 import { useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import Sources from "../sources";
-import { WizardFormValues } from "../types/form";
+import { WizardFormBasicValues } from "../types/form";
 
 const SourcesInput = () => {
-  const { control, watch } = useFormContext<WizardFormValues>();
+  const {
+    control,
+    watch,
+    formState: { errors },
+  } = useFormContext<WizardFormBasicValues>();
   const telemetry = watch("telemetry");
   const options = useMemo(() => {
     const enabled: string[] = [];
@@ -20,8 +24,13 @@ const SourcesInput = () => {
       control={control}
       name="sources"
       render={({ field: { ref, ...f } }) => (
-        <MultiSelect onChange={f.onChange} options={options} />
+        <MultiSelect
+          onChange={f.onChange}
+          options={options}
+          invalid={!!errors?.sources}
+        />
       )}
+      rules={{ required: true }}
     />
   );
 };

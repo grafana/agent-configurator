@@ -99,7 +99,7 @@ export class Attribute {
   }
 }
 
-interface Argument {
+export interface Argument {
   name: string;
   marshal(): string;
   formValues(spec?: BlockType): Record<string, any>;

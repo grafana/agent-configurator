@@ -13,12 +13,12 @@ export const LocalDestination = {
   },
   profiles: {
     enabled: true,
-    receiver: "pyroscope.remote_write.default.receiver",
+    receiver: "pyroscope.remote_write.local.receiver",
   },
   template(): string {
     let out = "";
     if (this.metrics.enabled) {
-      out += `prometheus.remote_write "default" {
+      out += `prometheus.remote_write "local" {
   endpoint {
     url = "http://mimir:9009/api/v1/push"
   }
@@ -45,7 +45,7 @@ export const LocalDestination = {
 `;
     }
     if (this.profiles.enabled) {
-      out += `pyroscope.write "staging" {
+      out += `pyroscope.write "local" {
   endpoint {
     url = "http://pyroscope:4100"
   }

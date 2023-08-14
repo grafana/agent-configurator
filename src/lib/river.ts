@@ -40,7 +40,7 @@ export class Block {
   constructor(
     name: string,
     label: string | null = null,
-    attributes: Argument[] = []
+    attributes: Argument[] = [],
   ) {
     this.name = name;
     this.label = label;
@@ -69,7 +69,7 @@ export class Block {
       } else {
         const nestedSpec = spec?.args[a.name];
         const fv = a.formValues(
-          nestedSpec instanceof BlockType ? nestedSpec : undefined
+          nestedSpec instanceof BlockType ? nestedSpec : undefined,
         );
         if (spec?.args[a.name]?.multiple()) {
           values[a.name] = values[a.name] ? [...values[a.name], fv] : [fv];
@@ -143,7 +143,7 @@ export function UnmarshalValue(node: Parser.SyntaxNode): any {
       };
       if (node.childForFieldName("params")) {
         out["-function"].params = UnmarshalArray(
-          node.childForFieldName("params")!
+          node.childForFieldName("params")!,
         );
       }
       break;
@@ -164,7 +164,7 @@ export function UnmarshalBlock(n: Parser.SyntaxNode): Block {
         case "attribute":
           const key = arg.childForFieldName("key")!.text;
           args.push(
-            new Attribute(key, UnmarshalValue(arg.childForFieldName("value")!))
+            new Attribute(key, UnmarshalValue(arg.childForFieldName("value")!)),
           );
           break;
         case "block":
@@ -179,7 +179,7 @@ export function UnmarshalBlock(n: Parser.SyntaxNode): Block {
 export function toArgument(
   k: string,
   v: any,
-  spec?: ArgumentType
+  spec?: ArgumentType,
 ): Argument | null {
   switch (typeof v) {
     case "undefined":
@@ -192,7 +192,9 @@ export function toArgument(
       return new Attribute(k, v);
     default:
       if (Array.isArray(v)) {
-        return v.length === 0 ? null : new Attribute(k, v);
+        return JSON.stringify(v) === JSON.stringify(spec?.default())
+          ? null
+          : new Attribute(k, v);
       }
       if (v["-reference"] || v["-function"]) {
         return new Attribute(k, v);
@@ -208,7 +210,7 @@ export function toBlock(
   k: string,
   v: any,
   label?: string,
-  spec?: BlockType
+  spec?: BlockType,
 ): Block | null {
   // flatmap instead of filter to avoid introducing the null type
   const args = Object.keys(v).flatMap((x) => {
@@ -218,7 +220,7 @@ export function toBlock(
           x,
           blockinstance,
           undefined,
-          spec?.args[x] as BlockType
+          spec?.args[x] as BlockType,
         );
         if (b == null) return [];
         return [b];

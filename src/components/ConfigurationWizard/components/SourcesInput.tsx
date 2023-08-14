@@ -25,6 +25,7 @@ const SourcesInput = () => {
       name="sources"
       render={({ field: { ref, ...f } }) => (
         <MultiSelect
+          menuPlacement="top"
           onChange={f.onChange}
           options={options}
           invalid={!!errors?.sources}

@@ -43,12 +43,14 @@ const TypedInput = ({
   rules,
   placeholder,
   defaultValue,
+  type,
 }: {
   name: string;
   control: Control<Record<string, any>>;
   rules?: Object;
   placeholder?: string;
   defaultValue?: Record<string, any> | string;
+  type?: "text" | "number";
 }) => {
   defaultValue = defaultValue ?? get(control.defaultValuesRef.current, name);
   const [inputType, setInputType] = React.useState<Type>("literal");
@@ -74,7 +76,7 @@ const TypedInput = ({
         onChange(outValue(inputValue, t));
       };
     },
-    [inputValue]
+    [inputValue],
   );
   const types = Object.keys(InputTypes);
   return (
@@ -113,6 +115,7 @@ const TypedInput = ({
             </Dropdown>
           }
           value={inputValue}
+          type={inputType !== "literal" ? "text" : type ?? "text"}
           onChange={(v) => {
             setInputValue(v.currentTarget.value);
             onChange(outValue(v.currentTarget.value, inputType));

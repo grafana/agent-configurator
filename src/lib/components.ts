@@ -302,6 +302,19 @@ export const KnownComponents: Record<string, BlockType> = {
       labels: new LiteralArgument("map(string)", {}),
     },
   }),
+  "loki.source.windowsevent": new BlockType({
+    multi: true,
+    args: {
+      event_log_name: new LiteralArgument("string", ""),
+      forward_to: new LiteralArgument("list(LokiReceiver)", ""),
+      xpath_query: new LiteralArgument("string", "*"),
+      bookmark_path: new LiteralArgument("string", "DATA_PATH/bookmark.xml"),
+      poll_interval: new LiteralArgument("string", "3s"),
+      exclude_event_data: new LiteralArgument("boolean", false),
+      exclude_user_data: new LiteralArgument("boolean", false),
+      use_incoming_timestamp: new LiteralArgument("boolean", false),
+    },
+  }),
   "loki.relabel": new BlockType({
     multi: true,
     args: {

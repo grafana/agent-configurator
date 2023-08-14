@@ -34,6 +34,7 @@ import DiscoveryKubernetes from "./components/DiscoveryKubernetes";
 import DiscoveryRelabel from "./components/DiscoveryRelabel";
 import PyroscopeScrape from "./components/PyroscopeScrape";
 import LokiWrite from "./components/LokiWrite";
+import LokiSourceWindowsEvent from "./components/LokiSourceWindowsEvent";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -111,6 +112,8 @@ const ComponentEditor = ({
         return LokiSourceFile;
       case "loki.source.journal":
         return LokiSourceJournal;
+      case "loki.source.windowsevent":
+        return LokiSourceWindowsEvent;
       case "loki.relabel":
         return LokiRelabel;
       case "prometheus.relabel":
@@ -124,10 +127,10 @@ const ComponentEditor = ({
       //@ts-ignore if no module matches, we fall through to the unsupported component path
       case "module.git":
         const repo = component.attributes.find(
-          (x) => x.name === "repository"
+          (x) => x.name === "repository",
         ) as Attribute | null;
         const path = component.attributes.find(
-          (x) => x.name === "path"
+          (x) => x.name === "path",
         ) as Attribute | null;
         switch (`${repo?.value};${path?.value}`) {
           case "https://github.com/grafana/agent-modules.git;modules/grafana-cloud/autoconfigure/module.river":
@@ -158,8 +161,8 @@ const ComponentEditor = ({
             component.name,
             transformed,
             label,
-            KnownComponents[component.name]
-          )!
+            KnownComponents[component.name],
+          )!,
         );
       }}
       defaultValues={formValues}

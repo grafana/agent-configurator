@@ -32,7 +32,7 @@ const components: ListEntry[] = [
     component: new Block("module.git", "grafana_cloud", [
       new Attribute(
         "repository",
-        "https://github.com/grafana/agent-modules.git"
+        "https://github.com/grafana/agent-modules.git",
       ),
       new Attribute("path", "modules/grafana-cloud/autoconfigure/module.river"),
       new Attribute("revision", "main"),
@@ -149,6 +149,15 @@ const components: ListEntry[] = [
     component: new Block("loki.source.journal", "journal", []),
   },
   {
+    name: "loki.source.windowsevent",
+    title: "Loki Windows Event Log Source",
+    meta: ["Logs", "Loki", "Source", "Windows"],
+    icon: "gf-logs",
+    component: new Block("loki.source.windowsevent", "application", [
+      new Attribute("eventlog_name", "Application"),
+    ]),
+  },
+  {
     name: "discovery.kubernetes",
     title: "Kubernetes Discovery",
     meta: ["Discovery", "Kuberentes"],
@@ -193,7 +202,7 @@ const ComponentList = ({ addComponent }: ComponentListProps) => {
     return components.filter(
       (c) =>
         c.name.includes(filter.toLowerCase()) ||
-        c.title.toLowerCase().includes(filter.toLowerCase())
+        c.title.toLowerCase().includes(filter.toLowerCase()),
     );
   }, [filter]);
   return (

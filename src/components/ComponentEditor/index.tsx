@@ -35,6 +35,7 @@ import DiscoveryRelabel from "./components/DiscoveryRelabel";
 import PyroscopeScrape from "./components/PyroscopeScrape";
 import LokiWrite from "./components/LokiWrite";
 import LokiSourceWindowsEvent from "./components/LokiSourceWindowsEvent";
+import PrometheusExporterWindows from "./components/PrometheusExporterWindows";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -104,6 +105,8 @@ const ComponentEditor = ({
         return OTelColExporterLoki;
       case "prometheus.exporter.unix":
         return PrometheusExporterUnix;
+      case "prometheus.exporter.windows":
+        return PrometheusExporterWindows;
       case "local.file_match":
         return LocalFileMatch;
       case "loki.write":

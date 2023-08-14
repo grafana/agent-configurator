@@ -283,6 +283,24 @@ export const KnownComponents: Record<string, BlockType> = {
       rootfs_path: new LiteralArgument("string", "/"),
     },
   }),
+  "prometheus.exporter.windows": new BlockType({
+    multi: true,
+    exports: {
+      targets: "list(Target)",
+    },
+    args: {
+      enabled_collectors: new LiteralArgument("list(string)", [
+        "cpu",
+        "cs",
+        "logical_disk",
+        "net",
+        "os",
+        "service",
+        "system",
+      ]),
+      timeout: new LiteralArgument("string", "4m"),
+    },
+  }),
   "local.file_match": new BlockType({
     multi: true,
     exports: {

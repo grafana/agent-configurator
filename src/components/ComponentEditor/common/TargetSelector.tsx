@@ -86,6 +86,7 @@ const TargetSelector = {
       data = StaticTargets.postTransform(data);
     }
     delete data["target_type"];
+    delete data["static_targets"];
     return data;
   },
 };

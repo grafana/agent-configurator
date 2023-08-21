@@ -199,6 +199,9 @@ export const KnownComponents: Record<string, BlockType> = {
       }),
     },
   }),
+  "otelcol.processor.batch": new BlockType({
+    multi: true,
+  }),
   "otelcol.receiver.otlp": new BlockType({
     multi: true,
     exports: {

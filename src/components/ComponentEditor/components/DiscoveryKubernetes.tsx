@@ -137,7 +137,7 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
                       defaultValue={field["label"]}
                       placeholder="app=frontend"
                       {...methods.register(
-                        `selectors[${index}].label` as const
+                        `selectors[${index}].label` as const,
                       )}
                     />
                   </InlineField>
@@ -150,7 +150,7 @@ const Component = ({ methods }: { methods: FormAPI<Record<string, any>> }) => {
                       defaultValue={field["field"]}
                       placeholder="metadata.name=my-service"
                       {...methods.register(
-                        `selectors[${index}].field` as const
+                        `selectors[${index}].field` as const,
                       )}
                     />
                   </InlineField>
@@ -200,6 +200,12 @@ const DiscoveryKubernetes = {
   postTransform(data: Record<string, any>): Record<string, any> {
     if (data["role"]?.value) data["role"] = data["role"].value;
     data = AuthenticationEditor.postTransform(data);
+    data.selectors = data.selectors.map((selector: Record<string, any>) => {
+      if (typeof selector.role === "object") {
+        selector.role = selector.role.value;
+      }
+      return selector;
+    });
     return data;
   },
   Component,

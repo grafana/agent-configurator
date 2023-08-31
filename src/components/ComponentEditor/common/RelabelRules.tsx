@@ -125,7 +125,7 @@ export const RelabelRules = ({
                     <Input
                       defaultValue={field["target_label"]}
                       {...methods.register(
-                        `rule[${index}].target_label` as const
+                        `rule[${index}].target_label` as const,
                       )}
                     />
                   </InlineField>
@@ -135,7 +135,7 @@ export const RelabelRules = ({
                     {...commonOptions}
                   >
                     <Input
-                      defaultValue={field["target_label"]}
+                      defaultValue={field["separator"]}
                       placeholder=";"
                       {...methods.register(`rule[${index}].separator` as const)}
                     />
@@ -173,7 +173,7 @@ export const RelabelRules = ({
                       defaultValue={field["replacement"]}
                       placeholder="$1"
                       {...methods.register(
-                        `rule[${index}].replacement` as const
+                        `rule[${index}].replacement` as const,
                       )}
                     />
                   </InlineField>
@@ -238,7 +238,7 @@ export function transformRules(data: Record<string, any>): Record<string, any> {
       typeof rule["source_labels"][0] === "object"
     ) {
       rule["source_labels"] = rule["source_labels"]?.map(
-        (x: SelectableValue) => x.value
+        (x: SelectableValue) => x.value,
       );
     }
     if (typeof rule["action"] === "object")

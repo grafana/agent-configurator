@@ -432,6 +432,7 @@ export const KnownComponents: Record<string, BlockType> = {
       proxy_url: new LiteralArgument("string", ""),
       follow_redirects: new LiteralArgument("boolean", true),
       enable_http2: new LiteralArgument("boolean", true),
+      tls_config: TLSConfig,
 
       basic_auth: BasicAuthBlock,
       profiling_config: new BlockType({

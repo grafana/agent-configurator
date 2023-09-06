@@ -61,7 +61,8 @@ export class Block {
   formValues(spec?: BlockType): Record<string, any> {
     let values: Record<string, any> = {};
     for (const argName of spec ? Object.keys(spec.args) : []) {
-      values[argName] = spec!.args[argName].default();
+      const def = spec!.args[argName].default();
+      if (def) values[argName] = def;
     }
     this.attributes.forEach((a) => {
       if (a instanceof Attribute) {
@@ -71,6 +72,10 @@ export class Block {
         const fv = a.formValues(
           nestedSpec instanceof BlockType ? nestedSpec : undefined,
         );
+        if (nestedSpec?.orderedIn) {
+          values[nestedSpec.orderedIn].push({ ...fv, "comp-name": a.name });
+          return;
+        }
         if (spec?.args[a.name]?.multiple()) {
           values[a.name] = values[a.name] ? [...values[a.name], fv] : [fv];
         } else {
@@ -181,6 +186,9 @@ export function toArgument(
   v: any,
   spec?: ArgumentType,
 ): Argument | null {
+  if (k.indexOf("-") !== -1) {
+    return null;
+  }
   switch (typeof v) {
     case "undefined":
       return null;
@@ -221,6 +229,17 @@ export function toBlock(
           blockinstance,
           undefined,
           spec?.args[x] as BlockType,
+        );
+        if (b == null) return [];
+        return [b];
+      });
+    } else if (spec?.args[x]?.ordered()) {
+      return (v[x] as Array<any>).flatMap((blockinstance) => {
+        const b = toBlock(
+          blockinstance["comp-name"],
+          blockinstance,
+          undefined,
+          spec?.args[blockinstance["comp-name"]] as BlockType,
         );
         if (b == null) return [];
         return [b];

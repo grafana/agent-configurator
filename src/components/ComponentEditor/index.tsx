@@ -36,6 +36,7 @@ import PyroscopeScrape from "./components/PyroscopeScrape";
 import LokiWrite from "./components/LokiWrite";
 import LokiSourceWindowsEvent from "./components/LokiSourceWindowsEvent";
 import PrometheusExporterWindows from "./components/PrometheusExporterWindows";
+import LokiProcess from "./components/LokiProcess";
 
 interface ComponentEditorProps {
   updateComponent: (component: Block) => void;
@@ -119,6 +120,8 @@ const ComponentEditor = ({
         return LokiSourceWindowsEvent;
       case "loki.relabel":
         return LokiRelabel;
+      case "loki.process":
+        return LokiProcess;
       case "prometheus.relabel":
         return PrometheusRelabel;
       case "discovery.kubernetes":

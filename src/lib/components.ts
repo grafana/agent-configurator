@@ -35,6 +35,9 @@ export class LiteralArgument {
   multiple(): boolean {
     return false;
   }
+  ordered(): boolean {
+    return false;
+  }
   default(): any {
     return this.def;
   }
@@ -46,6 +49,8 @@ export class BlockType {
   multi: boolean = false;
   allowEmpty: boolean = false;
   type: "block" = "block";
+  ord: boolean = false;
+  orderedIn?: string;
   multiple(): boolean {
     return this.multi;
   }
@@ -54,30 +59,43 @@ export class BlockType {
     args = {},
     allowEmpty = false,
     exports = {},
+    ordered = false,
+    orderedIn = undefined,
   }: {
     multi?: boolean;
     args?: Record<string, ArgumentType>;
     allowEmpty?: boolean;
     exports?: Record<string, ExportType>;
+    ordered?: boolean;
+    orderedIn?: string;
   }) {
     this.multi = multi;
     this.args = args;
     this.allowEmpty = allowEmpty;
     this.exports = exports;
+    this.ord = ordered;
+    this.orderedIn = orderedIn;
   }
   default(): any {
     if (this.multi) return [];
+    if (this.ord) return [];
+    if (this.orderedIn) return null;
     const blockDefaults: Record<string, any> = {};
     for (const k of Object.keys(this.args)) {
       blockDefaults[k] = this.args[k].default();
     }
     return blockDefaults;
   }
+  ordered(): boolean {
+    return this.ord;
+  }
 }
 
 export interface ArgumentType {
   multiple(): boolean;
   default(): any;
+  ordered(): boolean;
+  orderedIn?: string;
   type: "block" | "attribute";
 }
 
@@ -101,6 +119,7 @@ const TLSConfig = new BlockType({
     key_file: new LiteralArgument("string", ""),
     server_name: new LiteralArgument("string", ""),
     insecure_skip_verify: new LiteralArgument("boolean", false),
+    insecure: new LiteralArgument("boolean", false),
   },
 });
 
@@ -351,6 +370,183 @@ export const KnownComponents: Record<string, BlockType> = {
     exports: {
       receiver: "LokiReceiver",
       relabel_rules: "RelabelRules",
+    },
+  }),
+  "loki.process": new BlockType({
+    multi: true,
+    args: {
+      stages: new BlockType({
+        ordered: true,
+      }),
+      "stage.cri": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+      }),
+      "stage.docker": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+      }),
+      "stage.drop": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          source: new LiteralArgument("string", ""),
+          expression: new LiteralArgument("string", ""),
+          value: new LiteralArgument("string", ""),
+          older_than: new LiteralArgument("string", ""),
+          longer_than: new LiteralArgument("string", ""),
+          drop_counter_reason: new LiteralArgument("string", ""),
+        },
+      }),
+      "stage.json": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          expressions: new LiteralArgument("map(string)", {}),
+          source: new LiteralArgument("string", ""),
+          drop_malformed: new LiteralArgument("boolean", false),
+        },
+      }),
+      "stage.label_drop": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          values: new LiteralArgument("list(string)", []),
+        },
+      }),
+      "stage.label_keep": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          values: new LiteralArgument("list(string)", []),
+        },
+      }),
+      "stage.labels": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          values: new LiteralArgument("map(string)", {}),
+        },
+      }),
+      "stage.limit": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          rate: new LiteralArgument("number", null),
+          burst: new LiteralArgument("number", null),
+          by_label_name: new LiteralArgument("string", ""),
+          drop: new LiteralArgument("boolean", false),
+          max_distinct_labels: new LiteralArgument("number", 10000),
+        },
+      }),
+      "stage.logfmt": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          mapping: new LiteralArgument("map(string)", {}),
+          source: new LiteralArgument("string", ""),
+        },
+      }),
+      "stage.match": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          selector: new LiteralArgument("string", ""),
+          pipeline_name: new LiteralArgument("string", ""),
+          action: new LiteralArgument("string", "keep"),
+          drop_counter_reason: new LiteralArgument("string", "match_stage"),
+        },
+      }),
+      "stage.metrics": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+      }),
+      "stage.multiline": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          firstline: new LiteralArgument("string", ""),
+          max_wait_time: new LiteralArgument("string", ""),
+          max_lines: new LiteralArgument("number", 128),
+        },
+      }),
+      "stage.output": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          source: new LiteralArgument("string", ""),
+        },
+      }),
+      "stage.pack": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          labels: new LiteralArgument("list(string)", []),
+          ingest_timestamp: new LiteralArgument("boolean", true),
+        },
+      }),
+      "stage.regex": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          expression: new LiteralArgument("string", ""),
+          source: new LiteralArgument("string", ""),
+        },
+      }),
+      "stage.replace": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          expression: new LiteralArgument("string", ""),
+          source: new LiteralArgument("string", ""),
+          replace: new LiteralArgument("string", ""),
+        },
+      }),
+      "stage.static_labels": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          values: new LiteralArgument("map(string)", {}),
+        },
+      }),
+      "stage.template": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          source: new LiteralArgument("string", ""),
+          template: new LiteralArgument("string", ""),
+        },
+      }),
+      "stage.tenant": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          label: new LiteralArgument("string", ""),
+          source: new LiteralArgument("string", ""),
+          value: new LiteralArgument("string", ""),
+        },
+      }),
+      "stage.timestamp": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          source: new LiteralArgument("string", ""),
+          format: new LiteralArgument("string", ""),
+          fallback_formats: new LiteralArgument("list(string)", []),
+          location: new LiteralArgument("string", ""),
+          action_on_failure: new LiteralArgument("string", "fudge"),
+        },
+      }),
+      "stage.geoip": new BlockType({
+        allowEmpty: true,
+        orderedIn: "stages",
+        args: {
+          db: new LiteralArgument("string", ""),
+          source: new LiteralArgument("string", ""),
+          db_type: new LiteralArgument("string", ""),
+          custom_lookups: new LiteralArgument("map(string)", "fudge"),
+        },
+      }),
     },
   }),
   "prometheus.relabel": new BlockType({

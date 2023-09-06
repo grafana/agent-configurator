@@ -133,6 +133,13 @@ const components: ListEntry[] = [
     component: new Block("loki.relabel", "default", []),
   },
   {
+    name: "loki.process",
+    title: "Loki processing",
+    meta: ["Logs", "Loki", "process"],
+    icon: "process",
+    component: new Block("loki.process", "default", []),
+  },
+  {
     name: "local.file_match",
     title: "File discovery",
     meta: ["Discovery", "Logs"],

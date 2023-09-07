@@ -548,6 +548,9 @@ export const KnownComponents: Record<string, BlockType> = {
         },
       }),
     },
+    exports: {
+      receiver: "LokiReceiver",
+    },
   }),
   "prometheus.relabel": new BlockType({
     multi: true,

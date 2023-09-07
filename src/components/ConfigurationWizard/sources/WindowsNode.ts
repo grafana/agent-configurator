@@ -48,16 +48,31 @@ prometheus.exporter.windows "default" {
   }
 }
 
-loki.source.windowsevent "system" {
+loki.process "parse_eventlog" {
   forward_to = [
     loki.relabel.windows_mapping.receiver,
   ]
-  eventlog_name = "System"
+  stage.json {
+    expressions = {
+      "source"  = "source",
+    }
+  }
+  stage.labels {
+    values = {
+      "source"  = "source",
+    }
+  }
 }
 
+loki.source.windowsevent "system" {
+  forward_to = [
+    loki.process.parse_eventlog.receiver,
+  ]
+  eventlog_name = "System"
+}
 loki.source.windowsevent "application" {
   forward_to = [
-    loki.relabel.windows_mapping.receiver,
+    loki.process.parse_eventlog.receiver,
   ]
   eventlog_name = "Application"
 }

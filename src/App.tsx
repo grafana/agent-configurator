@@ -58,7 +58,7 @@ function App() {
           <hr />
           <VerticalGroup>
             <p>
-              If this is your first time working with the agent, we reccomend
+              If this is your first time working with the agent, we recommend
               you use the configuration wizard or get started with an example
               configuration, based on your usecase.
             </p>

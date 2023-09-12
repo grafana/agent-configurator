@@ -84,6 +84,13 @@ const components: ListEntry[] = [
     component: new Block("prometheus.exporter.windows", "default", []),
   },
   {
+    name: "prometheus.exporter.unix",
+    title: "Prometheus Unix Exporter",
+    meta: ["Prometheus", "Unix"],
+    icon: "https://storage.googleapis.com/grafanalabs-integration-logos/linux.png",
+    component: new Block("prometheus.exporter.unix", null, []),
+  },
+  {
     name: "prometheus.scrape",
     title: "Prometheus Scrape",
     meta: ["Prometheus", "Glue"],

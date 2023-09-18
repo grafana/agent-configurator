@@ -10,7 +10,7 @@ Try it out here: [grafana.github.io/agent-configurator/](https://grafana.github.
 
 Features marked as completed are currently present while the rest are still in development.
 
-* [ ] Create a fresh agent configuration file using a guided configuration wizard
+* [x] Create a fresh agent configuration file using a guided configuration wizard
 * [x] Update existing configurations by editing existing components or adding new ones
 * [ ] Have [all components](https://grafana.com/docs/agent/latest/flow/reference/components/) configurable without writing code
 * [x] Share configurations as URLs

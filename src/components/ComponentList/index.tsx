@@ -34,6 +34,7 @@ const components: ListEntry[] = [
         "repository",
         "https://github.com/grafana/agent-modules.git",
       ),
+      new Attribute("pull_frequency", "0s"),
       new Attribute("path", "modules/grafana-cloud/autoconfigure/module.river"),
       new Attribute("revision", "main"),
     ]),

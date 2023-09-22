@@ -21,6 +21,7 @@ export const CloudDestination = (stackName?: string) => {
   repository = "https://github.com/grafana/agent-modules.git"
   path = "modules/grafana-cloud/autoconfigure/module.river"
   revision = "main"
+  pull_frequency = "0s"
   arguments {
     stack_name = "${!!stackName ? stackName : "stackName"}"
     token = env("GRAFANA_CLOUD_TOKEN")

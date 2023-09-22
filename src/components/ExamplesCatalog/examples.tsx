@@ -6,6 +6,7 @@ function promScrapePushExample(collector: Block): string {
   repository = "https://github.com/grafana/agent-modules.git"
   path = "modules/grafana-cloud/autoconfigure/module.river"
   revision = "main"
+  pull_frequency = "0s"
   arguments {
     stack_name = "stackname" // Replace this with your stack name
     token = env("GRAFANA_CLOUD_TOKEN") 
@@ -31,7 +32,7 @@ const Examples: Array<{ name: string; source: string; logo: string }> = [
     source: promScrapePushExample(
       new Block("prometheus.exporter.redis", "default", [
         new Attribute("redis_addr", "localhost:6379"),
-      ])
+      ]),
     ),
     logo: "https://storage.googleapis.com/grafanalabs-integration-logos/redis.png",
   },
@@ -40,14 +41,14 @@ const Examples: Array<{ name: string; source: string; logo: string }> = [
     source: promScrapePushExample(
       new Block("prometheus.exporter.mysql", "default", [
         new Attribute("data_source_name", "root@(server-a:3306)/"),
-      ])
+      ]),
     ),
     logo: "https://storage.googleapis.com/grafanalabs-integration-logos/mysql.png",
   },
   {
     name: "GitHub",
     source: promScrapePushExample(
-      new Block("prometheus.exporter.github", "default", [])
+      new Block("prometheus.exporter.github", "default", []),
     ),
     logo: "https://storage.googleapis.com/grafanalabs-integration-logos/github.png",
   },
@@ -57,6 +58,7 @@ const Examples: Array<{ name: string; source: string; logo: string }> = [
   repository = "https://github.com/grafana/agent-modules.git"
   path = "modules/grafana-cloud/autoconfigure/module.river"
   revision = "main"
+  pull_frequency = "0s"
   arguments {
     stack_name = "stackname" // Replace this with your stack name
     token = env("GRAFANA_CLOUD_TOKEN")
@@ -98,6 +100,7 @@ otelcol.receiver.otlp "default" {
   repository = "https://github.com/grafana/agent-modules.git"
   path = "modules/grafana-cloud/autoconfigure/module.river"
   revision = "main"
+  pull_frequency = "0s"
   arguments {
     stack_name = "stackname" // Replace this with your stack name
     token = env("GRAFANA_CLOUD_TOKEN")

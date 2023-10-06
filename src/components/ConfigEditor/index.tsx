@@ -5,11 +5,13 @@ import { Button, Drawer, HorizontalGroup, LinkButton } from "@grafana/ui";
 
 import Parser from "web-tree-sitter";
 
-import { Theme, useTheme } from "../../theme";
+import { Theme, useStyles, useTheme } from "../../theme";
 import ComponentList from "../ComponentList";
 import ComponentEditor from "../ComponentEditor";
 import * as River from "../../lib/river";
 import { useComponentContext, Component, useModelContext } from "../../state";
+import { css } from "@emotion/css";
+import { GrafanaTheme2 } from "@grafana/data";
 
 const defaultOpts: monaco.editor.IStandaloneEditorConstructionOptions = {
   fontSize: 15,
@@ -25,13 +27,49 @@ type SelectedComponent = {
   node: Parser.SyntaxNode | null;
 };
 
+const findErrors = (cursor: Parser.TreeCursor, level = 0) => {
+  if (!cursor.currentNode().hasError) return [];
+  let errs: monaco.editor.IMarkerData[] = [];
+  while (true) {
+    const n = cursor.currentNode();
+    if (cursor.nodeType === "ERROR") {
+      console.log(n);
+      errs.push({
+        message: "unable to parse",
+        severity: monaco.MarkerSeverity.Error,
+        startLineNumber: n.startPosition.row + 1,
+        startColumn: n.startPosition.column,
+        endLineNumber: n.endPosition.row + 1,
+        endColumn: n.endPosition.column + 1,
+      });
+    }
+    if (cursor.nodeIsMissing) {
+      console.log(cursor.currentNode());
+      errs.push({
+        message: "Missing " + n.type,
+        severity: monaco.MarkerSeverity.Error,
+        startLineNumber: n.startPosition.row + 1,
+        startColumn: n.startPosition.column,
+        endLineNumber: n.endPosition.row + 1,
+        endColumn: n.endPosition.column + 1,
+      });
+    }
+    if (cursor.gotoFirstChild()) {
+      errs = errs.concat(findErrors(cursor, level + 1));
+      cursor.gotoParent();
+    }
+    if (!cursor.gotoNextSibling()) break;
+  }
+  return errs;
+};
+
 const ConfigEditor = () => {
   const { setComponents } = useComponentContext();
   const { model, setModel } = useModelContext();
   const editorRef = useRef<null | monaco.editor.IStandaloneCodeEditor>(null);
   const monacoRef = useRef<null | Monaco>(null);
   const parserRef = useRef<null | { parser: Parser; river: Parser.Language }>(
-    null
+    null,
   );
   const commandRef = useRef<null | {
     addComponent: string;
@@ -40,7 +78,10 @@ const ConfigEditor = () => {
 
   const componentsRef = useRef<Component[]>([]);
 
+  const styles = useStyles(getStyles);
+
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [parsingTime, setParsingTime] = useState("0");
   const [currentComponent, setCurrentComponent] =
     useState<SelectedComponent | null>(null);
 
@@ -48,22 +89,31 @@ const ConfigEditor = () => {
   const editorTheme = useMemo(
     () =>
       theme.name.toLowerCase() === Theme.dark ? "thema-dark" : "thema-light",
-    [theme]
+    [theme],
   );
 
   const parseComponents = useCallback(() => {
     if (!parserRef.current) return;
     const { parser, river } = parserRef.current;
+    const start = performance.now();
     const tree = parser.parse(model);
+    const cursor = tree.walk();
+    const errs = findErrors(cursor);
+    const mmdl = editorRef.current?.getModel();
+    if (mmdl) {
+      monacoRef.current?.editor.setModelMarkers(mmdl, "ts", errs);
+    }
     const componentQuery = river.query(`(config_file (block) @component)`);
     const matches = componentQuery.matches(tree.rootNode);
+    const duration = (performance.now() - start).toFixed(1);
     const components = matches.map((match) => {
       const node = match.captures[0].node;
       return { node, block: River.UnmarshalBlock(node) };
     });
     setComponents(components);
     componentsRef.current = components;
-  }, [setComponents, model]);
+    setParsingTime(duration);
+  }, [setComponents, model, setParsingTime]);
 
   useEffect(() => {
     (async () => {
@@ -82,7 +132,7 @@ const ConfigEditor = () => {
 
   const provideCodeLenses = useCallback(function(
     model: monaco.editor.ITextModel,
-    token: monaco.CancellationToken
+    token: monaco.CancellationToken,
   ) {
     if (!commandRef.current) return;
     const { addComponent, editComponent } = commandRef.current;
@@ -123,14 +173,13 @@ const ConfigEditor = () => {
             arguments: [River.UnmarshalBlock(c.node), c.node],
           },
         };
-      })
+      }),
     );
     return {
       lenses,
       dispose: () => { },
     };
-  },
-    []);
+  }, []);
 
   const handleEditorDidMount = useCallback(
     (editor: monaco.editor.IStandaloneCodeEditor, monaco: Monaco) => {
@@ -159,7 +208,7 @@ const ConfigEditor = () => {
           // need a timeout to prevent the drawer from immediately closing as this happens during the mousedown event
           setTimeout(() => setDrawerOpen(true), 1);
         },
-        ""
+        "",
       );
       var editComponentCommand = editor.addCommand(
         0,
@@ -171,7 +220,7 @@ const ConfigEditor = () => {
           // need a timeout to prevent the drawer from immediately closing as this happens during the mousedown event
           setTimeout(() => setDrawerOpen(true), 1);
         },
-        ""
+        "",
       );
 
       commandRef.current = {
@@ -188,7 +237,7 @@ const ConfigEditor = () => {
       editorRef.current = editor;
       monacoRef.current = monaco;
     },
-    [editorTheme, provideCodeLenses]
+    [editorTheme, provideCodeLenses],
   );
 
   useEffect(parseComponents, [model, setComponents, parseComponents]);
@@ -233,7 +282,7 @@ const ConfigEditor = () => {
         false, // isRegex
         true, // matchCase
         null, // wordSeparators
-        false // captureMatches
+        false, // captureMatches
       );
       for (const ref of existingRefs) {
         edits.push({
@@ -266,12 +315,16 @@ const ConfigEditor = () => {
       <Editor
         options={defaultOpts}
         theme={editorTheme}
-        height="100%"
+        height="95%"
         value={model}
         defaultLanguage="hcl"
         onMount={handleEditorDidMount}
         onChange={onChange}
       />
+      <div className={styles.statusbar}>
+        <span></span>
+        <span>Parsed in {parsingTime}ms</span>
+      </div>
       {isDrawerOpen && (
         <Drawer
           scrollableContent={true}
@@ -321,4 +374,14 @@ const ConfigEditor = () => {
   );
 };
 
+const getStyles = (theme: GrafanaTheme2) => {
+  return {
+    statusbar: css`
+      display: flex;
+      justify-content: space-between;
+      color: ${theme.colors.text.secondary};
+      font-variant-numeric: tabular-nums;
+    `,
+  };
+};
 export default ConfigEditor;

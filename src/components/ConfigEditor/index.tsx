@@ -12,6 +12,7 @@ import * as River from "../../lib/river";
 import { useComponentContext, Component, useModelContext } from "../../state";
 import { css } from "@emotion/css";
 import { GrafanaTheme2 } from "@grafana/data";
+import { markersFor } from "../../lib/componentaddons";
 
 const defaultOpts: monaco.editor.IStandaloneEditorConstructionOptions = {
   fontSize: 15,
@@ -33,7 +34,6 @@ const findErrors = (cursor: Parser.TreeCursor, level = 0) => {
   while (true) {
     const n = cursor.currentNode();
     if (cursor.nodeType === "ERROR") {
-      console.log(n);
       errs.push({
         message: "unable to parse",
         severity: monaco.MarkerSeverity.Error,
@@ -44,7 +44,6 @@ const findErrors = (cursor: Parser.TreeCursor, level = 0) => {
       });
     }
     if (cursor.nodeIsMissing) {
-      console.log(cursor.currentNode());
       errs.push({
         message: "Missing " + n.type,
         severity: monaco.MarkerSeverity.Error,
@@ -61,6 +60,14 @@ const findErrors = (cursor: Parser.TreeCursor, level = 0) => {
     if (!cursor.gotoNextSibling()) break;
   }
   return errs;
+};
+
+const provideInfoMarkers = (
+  components: { node: Parser.SyntaxNode; block: River.Block }[],
+): monaco.editor.IMarkerData[] => {
+  return components.flatMap((c) => {
+    return markersFor(c.node, c.block);
+  }, []);
 };
 
 const ConfigEditor = () => {
@@ -98,20 +105,25 @@ const ConfigEditor = () => {
     const start = performance.now();
     const tree = parser.parse(model);
     const cursor = tree.walk();
-    const errs = findErrors(cursor);
-    const mmdl = editorRef.current?.getModel();
-    if (mmdl) {
-      monacoRef.current?.editor.setModelMarkers(mmdl, "ts", errs);
-    }
     const componentQuery = river.query(`(config_file (block) @component)`);
     const matches = componentQuery.matches(tree.rootNode);
-    const duration = (performance.now() - start).toFixed(1);
     const components = matches.map((match) => {
       const node = match.captures[0].node;
       return { node, block: River.UnmarshalBlock(node) };
     });
-    setComponents(components);
     componentsRef.current = components;
+    setComponents(components);
+
+    const errs = findErrors(cursor);
+    const infos = provideInfoMarkers(components);
+    const mmdl = editorRef.current?.getModel();
+    if (mmdl) {
+      monacoRef.current?.editor.setModelMarkers(mmdl, "ts", [
+        ...errs,
+        ...infos,
+      ]);
+    }
+    const duration = (performance.now() - start).toFixed(1);
     setParsingTime(duration);
   }, [setComponents, model, setParsingTime]);
 

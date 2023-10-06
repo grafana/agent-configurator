@@ -128,7 +128,8 @@
     "modulePaths": [],
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
+      "monaco-editor": "<rootDir>/node_modules/@monaco-editor/react"
     },
     "moduleFileExtensions": [
       "web.js",

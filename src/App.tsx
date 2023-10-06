@@ -33,7 +33,7 @@ function App() {
 
   const shareLink = useMemo(
     () => `${window.location}?c=${btoa(model)}`,
-    [model]
+    [model],
   );
 
   const copyLink = () => {

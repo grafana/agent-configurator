@@ -1,3 +1,7 @@
+import Parser from "web-tree-sitter";
+import * as monaco from "monaco-editor";
+import { Block } from "./river";
+
 type LiteralType =
   | "string"
   | "number"
@@ -91,6 +95,36 @@ export class BlockType {
   }
 }
 
+export class ComponentType extends BlockType {
+  markersFor?: (
+    node: Parser.SyntaxNode,
+    block: Block,
+  ) => monaco.editor.IMarkerData[];
+  constructor({
+    multi = false,
+    args = {},
+    allowEmpty = false,
+    exports = {},
+    ordered = false,
+    orderedIn = undefined,
+    markersFor = undefined,
+  }: {
+    multi?: boolean;
+    args?: Record<string, ArgumentType>;
+    allowEmpty?: boolean;
+    exports?: Record<string, ExportType>;
+    ordered?: boolean;
+    orderedIn?: string;
+    markersFor?: (
+      node: Parser.SyntaxNode,
+      block: Block,
+    ) => monaco.editor.IMarkerData[];
+  }) {
+    super({ multi, args, allowEmpty, exports, ordered, orderedIn });
+    this.markersFor = markersFor;
+  }
+}
+
 export interface ArgumentType {
   multiple(): boolean;
   default(): any;
@@ -123,8 +157,8 @@ const TLSConfig = new BlockType({
   },
 });
 
-export const KnownComponents: Record<string, BlockType> = {
-  "prometheus.remote_write": new BlockType({
+export const KnownComponents: Record<string, ComponentType> = {
+  "prometheus.remote_write": new ComponentType({
     multi: true,
     exports: {
       receiver: "PrometheusReceiver",
@@ -176,7 +210,7 @@ export const KnownComponents: Record<string, BlockType> = {
       }),
     },
   }),
-  "loki.write": new BlockType({
+  "loki.write": new ComponentType({
     multi: true,
     exports: {
       receiver: "LokiReceiver",
@@ -203,7 +237,7 @@ export const KnownComponents: Record<string, BlockType> = {
       }),
     },
   }),
-  "discovery.ec2": new BlockType({
+  "discovery.ec2": new ComponentType({
     multi: true,
     exports: {
       targets: "list(Target)",
@@ -218,10 +252,10 @@ export const KnownComponents: Record<string, BlockType> = {
       }),
     },
   }),
-  "otelcol.processor.batch": new BlockType({
+  "otelcol.processor.batch": new ComponentType({
     multi: true,
   }),
-  "otelcol.receiver.otlp": new BlockType({
+  "otelcol.receiver.otlp": new ComponentType({
     multi: true,
     exports: {
       targets: "list(Target)",
@@ -243,7 +277,7 @@ export const KnownComponents: Record<string, BlockType> = {
       }),
     },
   }),
-  "otelcol.exporter.prometheus": new BlockType({
+  "otelcol.exporter.prometheus": new ComponentType({
     multi: true,
     args: {
       include_target_info: new LiteralArgument("boolean", true),
@@ -253,18 +287,18 @@ export const KnownComponents: Record<string, BlockType> = {
       input: "otel.MetricsConsumer",
     },
   }),
-  "otelcol.exporter.loki": new BlockType({
+  "otelcol.exporter.loki": new ComponentType({
     exports: {
       input: "otel.LogsConsumer",
     },
   }),
-  "prometheus.exporter.github": new BlockType({
+  "prometheus.exporter.github": new ComponentType({
     multi: true,
     exports: {
       targets: "list(Target)",
     },
   }),
-  "prometheus.exporter.redis": new BlockType({
+  "prometheus.exporter.redis": new ComponentType({
     multi: true,
     exports: {
       targets: "list(Target)",
@@ -286,10 +320,10 @@ export const KnownComponents: Record<string, BlockType> = {
       set_client_name: new LiteralArgument("boolean", true),
     },
   }),
-  "module.git": new BlockType({
+  "module.git": new ComponentType({
     multi: true,
   }),
-  "prometheus.exporter.unix": new BlockType({
+  "prometheus.exporter.unix": new ComponentType({
     allowEmpty: true,
     multi: false,
     exports: {
@@ -305,7 +339,7 @@ export const KnownComponents: Record<string, BlockType> = {
       rootfs_path: new LiteralArgument("string", "/"),
     },
   }),
-  "prometheus.exporter.windows": new BlockType({
+  "prometheus.exporter.windows": new ComponentType({
     multi: true,
     exports: {
       targets: "list(Target)",
@@ -323,16 +357,16 @@ export const KnownComponents: Record<string, BlockType> = {
       timeout: new LiteralArgument("string", "4m"),
     },
   }),
-  "local.file_match": new BlockType({
+  "local.file_match": new ComponentType({
     multi: true,
     exports: {
       targets: "list(Target)",
     },
   }),
-  "loki.source.file": new BlockType({
+  "loki.source.file": new ComponentType({
     multi: true,
   }),
-  "loki.source.journal": new BlockType({
+  "loki.source.journal": new ComponentType({
     multi: true,
     args: {
       format_as_json: new LiteralArgument("boolean", false),
@@ -342,7 +376,7 @@ export const KnownComponents: Record<string, BlockType> = {
       labels: new LiteralArgument("map(string)", {}),
     },
   }),
-  "loki.source.windowsevent": new BlockType({
+  "loki.source.windowsevent": new ComponentType({
     multi: true,
     args: {
       event_log_name: new LiteralArgument("string", ""),
@@ -355,7 +389,7 @@ export const KnownComponents: Record<string, BlockType> = {
       use_incoming_timestamp: new LiteralArgument("boolean", false),
     },
   }),
-  "loki.relabel": new BlockType({
+  "loki.relabel": new ComponentType({
     multi: true,
     args: {
       max_cache_size: new LiteralArgument("number", 10000),
@@ -372,7 +406,7 @@ export const KnownComponents: Record<string, BlockType> = {
       relabel_rules: "RelabelRules",
     },
   }),
-  "loki.process": new BlockType({
+  "loki.process": new ComponentType({
     multi: true,
     args: {
       stages: new BlockType({
@@ -552,7 +586,7 @@ export const KnownComponents: Record<string, BlockType> = {
       receiver: "LokiReceiver",
     },
   }),
-  "prometheus.relabel": new BlockType({
+  "prometheus.relabel": new ComponentType({
     multi: true,
     args: {
       rule: new BlockType({
@@ -568,7 +602,7 @@ export const KnownComponents: Record<string, BlockType> = {
       relabel_rules: "RelabelRules",
     },
   }),
-  "prometheus.scrape": new BlockType({
+  "prometheus.scrape": new ComponentType({
     multi: true,
     args: {
       follow_redirects: new LiteralArgument("boolean", true),
@@ -585,7 +619,7 @@ export const KnownComponents: Record<string, BlockType> = {
       honor_timestamps: new LiteralArgument("boolean", true),
     },
   }),
-  "discovery.kubernetes": new BlockType({
+  "discovery.kubernetes": new ComponentType({
     multi: true,
     args: {
       follow_redirects: new LiteralArgument("boolean", true),
@@ -601,7 +635,7 @@ export const KnownComponents: Record<string, BlockType> = {
       targets: "list(Target)",
     },
   }),
-  "discovery.relabel": new BlockType({
+  "discovery.relabel": new ComponentType({
     multi: true,
     args: {
       rule: new BlockType({
@@ -617,7 +651,7 @@ export const KnownComponents: Record<string, BlockType> = {
       rules: "RelabelRules",
     },
   }),
-  "pyroscope.scrape": new BlockType({
+  "pyroscope.scrape": new ComponentType({
     multi: true,
     args: {
       targets: new LiteralArgument("list(Target)", []),
@@ -693,14 +727,44 @@ export const KnownComponents: Record<string, BlockType> = {
   }),
 };
 
-export const KnownModules: Record<string, Record<string, BlockType>> = {
+export const KnownModules: Record<string, Record<string, ComponentType>> = {
   "https://github.com/grafana/agent-modules.git": {
-    "modules/grafana-cloud/autoconfigure/module.river": new BlockType({
+    "modules/grafana-cloud/autoconfigure/module.river": new ComponentType({
       exports: {
         "exports.metrics_receiver": "PrometheusReceiver",
         "exports.logs_receiver": "LokiReceiver",
         "exports.traces_receiver": "otel.TracesConsumer",
         "exports.profiles_receiver": "ProfilesReceiver",
+      },
+      markersFor(node, _block) {
+        const argNodes = node.childForFieldName("body")?.namedChildren;
+        const tokenArg = argNodes
+          ?.find((n) => n.text.trim().startsWith("arguments"))
+          ?.lastChild?.children.find((n) => n.text.trim().startsWith("token"));
+        if (tokenArg) {
+          return [
+            {
+              message:
+                "Make sure the token you use has the stacks:read permission",
+              severity: monaco.MarkerSeverity.Info,
+              startLineNumber: tokenArg.startPosition.row + 1,
+              startColumn: tokenArg.startPosition.column,
+              endLineNumber: tokenArg.endPosition.row + 1,
+              endColumn: tokenArg.endPosition.column + 1,
+            },
+          ];
+        }
+        return [
+          {
+            message:
+              "Make sure the token you use has the stacks:read permission",
+            severity: monaco.MarkerSeverity.Hint,
+            startLineNumber: node.startPosition.row + 1,
+            startColumn: node.startPosition.column,
+            endLineNumber: node.endPosition.row + 1,
+            endColumn: node.endPosition.column + 1,
+          },
+        ];
       },
     }),
   },

@@ -321,7 +321,7 @@ targets = [prometheus.exporter.redis.target]
     ).toEqual({
       path_prefix: "/app",
       "profile.memory": {
-        path: "/debug/pprof/memory",
+        path: "/debug/pprof/allocs",
         delta: false,
         enabled: true,
       },

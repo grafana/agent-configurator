@@ -673,7 +673,7 @@ export const KnownComponents: Record<string, ComponentType> = {
         args: {
           "profile.memory": new BlockType({
             args: {
-              path: new LiteralArgument("string", "/debug/pprof/memory"),
+              path: new LiteralArgument("string", "/debug/pprof/allocs"),
               enabled: new LiteralArgument("boolean", true),
               delta: new LiteralArgument("boolean", false),
             },

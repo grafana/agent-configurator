@@ -108,13 +108,13 @@ otelcol.receiver.otlp "default" {
 }
 
 prometheus.scrape "default" {
-  targets = prometheus.exporter.unix.targets
+  targets = prometheus.exporter.unix.node.targets
   forward_to = [
     module.git.grafana_cloud.exports.metrics_receiver,
   ]
 }
 
-prometheus.exporter.unix {
+prometheus.exporter.unix "node" {
 }
 
 loki.relabel "journal" {

@@ -325,7 +325,7 @@ export const KnownComponents: Record<string, ComponentType> = {
   }),
   "prometheus.exporter.unix": new ComponentType({
     allowEmpty: true,
-    multi: false,
+    multi: true,
     exports: {
       targets: "list(Target)",
     },

@@ -13,13 +13,13 @@ const LinuxNode = {
     let out = "";
     if (d.metrics.enabled) {
       out += `prometheus.scrape "linux_node" {
-  targets = prometheus.exporter.unix.targets
+  targets = prometheus.exporter.unix.node.targets
   forward_to = [
     ${d.metrics.receiver},
   ]
 }
 
-prometheus.exporter.unix {
+prometheus.exporter.unix "node" {
 }
 
 `;

@@ -108,10 +108,19 @@ otelcol.receiver.otlp "default" {
 }
 
 prometheus.scrape "default" {
-  targets = prometheus.exporter.unix.node.targets
+  targets = discovery.relabel.relabel_targets.output
   forward_to = [
     module.git.grafana_cloud.exports.metrics_receiver,
   ]
+}
+
+discovery.relabel "relabel_targets" {
+  rule {
+    target_label = "job"
+    replacement = "integrations/node_exporter"
+    source_labels = []
+  }
+  targets = prometheus.exporter.unix.node.targets
 }
 
 prometheus.exporter.unix "node" {

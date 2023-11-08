@@ -13,7 +13,7 @@ const LinuxNode = {
     let out = "";
     if (d.metrics.enabled) {
       out += `prometheus.scrape "linux_node" {
-  targets = prometheus.exporter.unix.node.targets
+  targets = discovery.relabel.relabel_targets.output
   forward_to = [
     ${d.metrics.receiver},
   ]
@@ -22,6 +22,14 @@ const LinuxNode = {
 prometheus.exporter.unix "node" {
 }
 
+discovery.relabel "relabel_targets" {
+  rule {
+    target_label = "job"
+    replacement = "integrations/node_exporter"
+    source_labels = []
+  }
+  targets = prometheus.exporter.unix.node.targets
+}
 `;
     }
     if (d.logs.enabled) {

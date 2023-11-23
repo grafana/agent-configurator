@@ -6,6 +6,7 @@ import {
   FieldSet,
   Modal,
   Select,
+  Spinner,
   TextArea,
 } from "@grafana/ui";
 import { css } from "@emotion/css";
@@ -49,7 +50,7 @@ const convertConfig = async (
     return {
       diagnostics: [
         {
-          Severity: 1,
+          Severity: 4,
           Summary: "failed to convert: " + (await resp.text()),
           Detail: "",
         },
@@ -62,6 +63,8 @@ const convertConfig = async (
 
 const Converter = ({ dismiss }: { dismiss: () => void }) => {
   const { setModel } = useModelContext();
+
+  const [loading, setLoading] = useState(false);
 
   const [diags, setDiags] = useState<Diagnostic[]>([]);
   const hasDiagnostics = useMemo(() => {
@@ -80,6 +83,19 @@ const Converter = ({ dismiss }: { dismiss: () => void }) => {
     shouldFocusError: true,
   });
   const { register, control, handleSubmit } = formAPI;
+
+  const submit = async (values: ConversionRequest) => {
+    setLoading(true);
+    try {
+      const resp = await convertConfig(values);
+      setDiags(resp.diagnostics);
+      if (resp.data) setConverted(resp.data);
+    } catch (ex) {
+      setDiags([{ Severity: 4, Summary: `${ex}`, Detail: "" }]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -119,15 +135,8 @@ const Converter = ({ dismiss }: { dismiss: () => void }) => {
               </Field>
             </FieldSet>
             <Modal.ButtonRow>
-              <Button
-                type="button"
-                onClick={handleSubmit(async (values) => {
-                  const resp = await convertConfig(values);
-                  setDiags(resp.diagnostics);
-                  if (resp.data) setConverted(resp.data);
-                })}
-              >
-                Next
+              <Button type="button" onClick={handleSubmit(submit)}>
+                Next {loading && <Spinner />}
               </Button>
             </Modal.ButtonRow>
           </form>

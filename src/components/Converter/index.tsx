@@ -41,7 +41,7 @@ const severities: AlertVariant[] = [
 const convertConfig = async (
   r: ConversionRequest,
 ): Promise<ConversionResponse> => {
-  const resp = await fetch("http://localhost:8080/convert", {
+  const resp = await fetch(process.env.REACT_APP_CONVERT_ENDPOINT as string, {
     method: "POST",
     body: JSON.stringify(r),
   });

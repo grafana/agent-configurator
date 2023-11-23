@@ -36,6 +36,8 @@ function App() {
   const { model } = useModelContext();
   const [copied, setCopied] = useState(false);
 
+  const converterEnabled = !!process.env.REACT_APP_CONVERT_ENDPOINT;
+
   const shareLink = useMemo(
     () => `${window.location}?c=${btoa(model)}`,
     [model],
@@ -71,10 +73,12 @@ function App() {
               <Button onClick={openWizard} variant="primary">
                 Start configuration wizard
               </Button>
-              <Button onClick={openConverter} variant="secondary">
-                <Badge text="New" icon="rocket" color="green" />
-                Convert your existing configuration
-              </Button>
+              {converterEnabled && (
+                <Button onClick={openConverter} variant="secondary">
+                  <Badge text="New" icon="rocket" color="green" />
+                  Convert your existing configuration
+                </Button>
+              )}
               <Button onClick={openExamples} variant="secondary">
                 Open examples catalog
               </Button>

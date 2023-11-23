@@ -11,6 +11,7 @@ import {
   Tooltip,
   VerticalGroup,
   HorizontalGroup,
+  Badge,
 } from "@grafana/ui";
 import Header from "./components/Header";
 import ConfigEditor from "./components/ConfigEditor";
@@ -19,6 +20,7 @@ import ExamplesCatalog from "./components/ExamplesCatalog";
 import { useModelContext } from "./state";
 import InstallationInstructions from "./components/InstallationInstructions";
 import ConfigurationWizard from "./components/ConfigurationWizard";
+import Converter from "./components/Converter";
 
 function App() {
   const styles = useStyles(getStyles);
@@ -28,8 +30,13 @@ function App() {
   const [examplesCatalogOpen, setExamplesCatalogOpen] = useState(false);
   const openExamples = () => setExamplesCatalogOpen(true);
   const closeExamples = () => setExamplesCatalogOpen(false);
+  const [converterOpen, setConverterOpen] = useState(false);
+  const openConverter = () => setConverterOpen(true);
+  const closeConverter = () => setConverterOpen(false);
   const { model } = useModelContext();
   const [copied, setCopied] = useState(false);
+
+  const converterEnabled = !!process.env.REACT_APP_CONVERT_ENDPOINT;
 
   const shareLink = useMemo(
     () => `${window.location}?c=${btoa(model)}`,
@@ -63,10 +70,18 @@ function App() {
               configuration, based on your usecase.
             </p>
             <HorizontalGroup>
-              <Button onClick={openWizard} variant="success">
+              <Button onClick={openWizard} variant="primary">
                 Start configuration wizard
               </Button>
-              <Button onClick={openExamples}>Open examples catalog</Button>
+              {converterEnabled && (
+                <Button onClick={openConverter} variant="secondary">
+                  <Badge text="New" icon="rocket" color="green" />
+                  Convert your existing configuration
+                </Button>
+              )}
+              <Button onClick={openExamples} variant="secondary">
+                Open examples catalog
+              </Button>
               <LinkButton
                 variant="secondary"
                 href="https://grafana.com/docs/agent/latest/flow/"
@@ -126,6 +141,13 @@ function App() {
         onDismiss={closeExamples}
       >
         <ExamplesCatalog dismiss={closeExamples} />
+      </Modal>
+      <Modal
+        title="Configuration Converter"
+        isOpen={converterOpen}
+        onDismiss={closeConverter}
+      >
+        <Converter dismiss={closeConverter} />
       </Modal>
     </div>
   );

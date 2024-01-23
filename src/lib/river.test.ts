@@ -1,4 +1,11 @@
-import { toArgument, UnmarshalBlock, Attribute, Block, toBlock } from "./river";
+import {
+  toArgument,
+  UnmarshalBlock,
+  Attribute,
+  Block,
+  toBlock,
+  collectReferences,
+} from "./river";
 import Parser from "web-tree-sitter";
 import { KnownComponents } from "./components";
 
@@ -14,8 +21,39 @@ describe("argument parsing", () => {
     expect(
       toArgument("name", {
         foo: "bar",
-      })
+      }),
     ).toEqual(new Block("name", null, [new Attribute("foo", "bar")]));
+  });
+});
+
+describe("collecting references", () => {
+  test("collect simple references", () => {
+    expect(
+      collectReferences(
+        new Block("otelcol.exporter.loki", "to_loki", [
+          new Attribute("forward_to", [
+            {
+              "-reference": "module.git.grafana_cloud.exports.metrics_receiver",
+            },
+          ]),
+        ]),
+      ),
+    ).toEqual(["module.git.grafana_cloud.exports.metrics_receiver"]);
+  });
+  test("collect block references", () => {
+    expect(
+      collectReferences(
+        new Block("otelcol.receiver.otlp", "default", [
+          new Block("output", null, [
+            new Attribute("metrics", [
+              {
+                "-reference": "otelcol.exporter.prometheus.to_prometheus.input",
+              },
+            ]),
+          ]),
+        ]),
+      ),
+    ).toEqual(["otelcol.exporter.prometheus.to_prometheus.input"]);
   });
 });
 
@@ -65,7 +103,7 @@ describe("marshall/unmarshal", () => {
       new Block("endpoint", null, [
         new Attribute(
           "url",
-          "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom"
+          "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom",
         ),
       ]),
     ]);
@@ -119,7 +157,7 @@ describe("marshall/unmarshal", () => {
     expect(out).toEqual(
       new Block("prometheus.exporter.redis", "my_redis", [
         new Attribute("redis_addr", "localhost:6379"),
-      ])
+      ]),
     );
   });
 
@@ -135,10 +173,10 @@ describe("marshall/unmarshal", () => {
         new Block("endpoint", null, [
           new Attribute(
             "url",
-            "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom"
+            "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom",
           ),
         ]),
-      ])
+      ]),
     );
   });
   test("unmarshal references", () => {
@@ -151,7 +189,7 @@ targets = [prometheus.exporter.redis.target]
         new Attribute("targets", [
           { "-reference": "prometheus.exporter.redis.target" },
         ]),
-      ])
+      ]),
     );
   });
   test("unmarshal mixed array", () => {
@@ -174,7 +212,7 @@ targets = [prometheus.exporter.redis.target]
         new Attribute("forward_to", [
           { "-reference": "prometheus.remote_write.default.receiver" },
         ]),
-      ])
+      ]),
     );
   });
   test("to form with spec", () => {
@@ -200,7 +238,7 @@ targets = [prometheus.exporter.redis.target]
       "discovery.ec2",
       fv,
       "aws",
-      KnownComponents["discovery.ec2"]
+      KnownComponents["discovery.ec2"],
     );
     expect(out).toEqual(
       new Block("discovery.ec2", "aws", [
@@ -212,7 +250,7 @@ targets = [prometheus.exporter.redis.target]
           new Attribute("name", "bar"),
           new Attribute("values", ["b", "c"]),
         ]),
-      ])
+      ]),
     );
   });
   test("omit default values", () => {
@@ -226,12 +264,12 @@ targets = [prometheus.exporter.redis.target]
       "otelcol.receiver.otlp",
       fv,
       "default",
-      KnownComponents["otelcol.receiver.otlp"]
+      KnownComponents["otelcol.receiver.otlp"],
     );
     expect(out).toEqual(
       new Block("otelcol.receiver.otlp", "default", [
         new Block("grpc", null, [new Attribute("endpoint", "0.0.0.0:4137")]),
-      ])
+      ]),
     );
   });
   test("omit nested default values", () => {
@@ -247,23 +285,23 @@ targets = [prometheus.exporter.redis.target]
       "prometheus.remote_write",
       fv,
       "default",
-      KnownComponents["prometheus.remote_write"]
+      KnownComponents["prometheus.remote_write"],
     );
     expect(out).toEqual(
       new Block("prometheus.remote_write", "default", [
         new Block("endpoint", null, [
           new Attribute(
             "url",
-            "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom"
+            "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom",
           ),
         ]),
-      ])
+      ]),
     );
   });
   test("fill default values", () => {
     const block = new Block("otelcol.exporter.prometheus", "default", []);
     const out = block.formValues(
-      KnownComponents["otelcol.exporter.prometheus"]
+      KnownComponents["otelcol.exporter.prometheus"],
     );
     expect(out).toEqual({
       include_scope_info: true,
@@ -278,12 +316,12 @@ targets = [prometheus.exporter.redis.target]
       "otelcol.receiver.otlp",
       fv,
       "default",
-      KnownComponents["otelcol.receiver.otlp"]
+      KnownComponents["otelcol.receiver.otlp"],
     );
     expect(out).toEqual(
       new Block("otelcol.receiver.otlp", "default", [
         new Block("grpc", null, []),
-      ])
+      ]),
     );
   });
   test("unmarshal blocks with dot in name", () => {
@@ -304,7 +342,7 @@ targets = [prometheus.exporter.redis.target]
             new Attribute("delta", false),
           ]),
         ]),
-      ])
+      ]),
     );
   });
   test("preserve dots in form value", () => {
@@ -317,7 +355,7 @@ targets = [prometheus.exporter.redis.target]
             new Attribute("delta", false),
           ]),
         ]),
-      ]).formValues(KnownComponents["pyroscope.scrape"])["profiling_config"]
+      ]).formValues(KnownComponents["pyroscope.scrape"])["profiling_config"],
     ).toEqual({
       path_prefix: "/app",
       "profile.memory": {
@@ -393,7 +431,7 @@ targets = [prometheus.exporter.redis.target]
           new Block("endpoint", null, [
             new Attribute(
               "url",
-              "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom"
+              "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom",
             ),
             new Block("basic_auth", null, [
               new Attribute("username", "foo"),
@@ -413,7 +451,7 @@ targets = [prometheus.exporter.redis.target]
       expect(parsed).toEqual(tc.parsed);
       expect(parsed.marshal()).toEqual(tc.raw);
       let reparsed = UnmarshalBlock(
-        parser.parse(parsed.marshal()).rootNode.namedChild(0)!
+        parser.parse(parsed.marshal()).rootNode.namedChild(0)!,
       );
       expect(reparsed).toEqual(tc.parsed);
     }

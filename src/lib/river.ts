@@ -256,3 +256,26 @@ export function toBlock(
   if (args.length === 0 && !(spec as BlockType)?.allowEmpty) return null;
   return new Block(k, label, args);
 }
+
+function extractRefs(...v: any[]): string[] {
+  const out: string[] = [];
+  for (const e of v) {
+    if (typeof e === "object" && e["-reference"]) out.push(e["-reference"]);
+  }
+  return out;
+}
+
+export function collectReferences(component: Block): string[] {
+  const out: string[] = [];
+  for (const attr of component.attributes) {
+    if (attr instanceof Attribute) {
+      if (typeof attr.value === "object") {
+        if (Array.isArray(attr.value)) out.push(...extractRefs(...attr.value));
+        else out.push(...extractRefs(attr.value));
+      }
+    } else {
+      out.push(...collectReferences(attr as Block));
+    }
+  }
+  return out;
+}

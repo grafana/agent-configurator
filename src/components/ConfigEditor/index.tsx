@@ -217,8 +217,7 @@ const ConfigEditor = () => {
         0,
         function() {
           setCurrentComponent(null);
-          // need a timeout to prevent the drawer from immediately closing as this happens during the mousedown event
-          setTimeout(() => setDrawerOpen(true), 1);
+          setDrawerOpen(true);
         },
         "",
       );
@@ -229,8 +228,7 @@ const ConfigEditor = () => {
             component,
             node,
           });
-          // need a timeout to prevent the drawer from immediately closing as this happens during the mousedown event
-          setTimeout(() => setDrawerOpen(true), 1);
+          setDrawerOpen(true);
         },
         "",
       );
@@ -339,14 +337,12 @@ const ConfigEditor = () => {
       </div>
       {isDrawerOpen && (
         <Drawer
-          scrollableContent={true}
           onClose={() => setDrawerOpen(false)}
           title={
             currentComponent != null
               ? `Edit Component [${currentComponent.component.name}]`
               : "Add Component"
           }
-          closeOnMaskClick={false}
           subtitle={
             currentComponent != null ? (
               <HorizontalGroup>

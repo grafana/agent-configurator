@@ -56,12 +56,15 @@ const getStyles = (theme: GrafanaTheme2) => {
       display: flex;
       justify-content: center;
       gap: 20px;
-      height: 60px;
+      height: 81px;
+      position: fixed;
       width: 100vw;
       padding: 10px 40px;
       border: 1px solid ${theme.colors.border.weak};
       border-radius: 2px;
       color: ${theme.colors.text.primary};
+      z-index: 1060;
+      background-color: ${theme.colors.background.primary};
     `,
     headerText: css`
       margin-bottom: 0;

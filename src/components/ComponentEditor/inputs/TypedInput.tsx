@@ -28,7 +28,7 @@ const InputTypes: Record<Type, { icon: IconName; name: string }> = {
     name: "Environment Variable",
   },
   literal: {
-    icon: "text-fields" as IconName,
+    icon: "pen" as IconName,
     name: "Literal",
   },
   reference: {

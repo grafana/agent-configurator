@@ -10,7 +10,6 @@ import {
   Icon,
   Tooltip,
   VerticalGroup,
-  HorizontalGroup,
   Badge,
 } from "@grafana/ui";
 import Header from "./components/Header";
@@ -21,6 +20,7 @@ import { useModelContext } from "./state";
 import InstallationInstructions from "./components/InstallationInstructions";
 import ConfigurationWizard from "./components/ConfigurationWizard";
 import Converter from "./components/Converter";
+import GraphPanel from "./components/GraphPanel";
 
 function App() {
   const styles = useStyles(getStyles);
@@ -33,6 +33,9 @@ function App() {
   const [converterOpen, setConverterOpen] = useState(false);
   const openConverter = () => setConverterOpen(true);
   const closeConverter = () => setConverterOpen(false);
+  const [graphOpen, setGraphOpen] = useState(false);
+  const openGraph = () => setGraphOpen(true);
+  const closeGraph = () => setGraphOpen(false);
   const { model } = useModelContext();
   const [copied, setCopied] = useState(false);
 
@@ -69,7 +72,7 @@ function App() {
               you use the configuration wizard or get started with an example
               configuration, based on your usecase.
             </p>
-            <HorizontalGroup>
+            <div className={styles.buttonBar}>
               <Button onClick={openWizard} variant="primary">
                 Start configuration wizard
               </Button>
@@ -90,7 +93,15 @@ function App() {
               >
                 View Flow Docs
               </LinkButton>
-            </HorizontalGroup>
+              <div
+                className={css`
+                  flex-grow: 1;
+                `}
+              ></div>
+              <Button onClick={openGraph} variant="secondary" icon="sitemap">
+                Visualize
+              </Button>
+            </div>
           </VerticalGroup>
         </div>
       </section>
@@ -148,6 +159,14 @@ function App() {
         onDismiss={closeConverter}
       >
         <Converter dismiss={closeConverter} />
+      </Modal>
+      <Modal
+        title="Visualization"
+        isOpen={graphOpen}
+        onDismiss={closeGraph}
+        className={styles.wizardModal}
+      >
+        <GraphPanel />
       </Modal>
     </div>
   );
@@ -214,6 +233,11 @@ const getStyles = (theme: GrafanaTheme2) => {
     `,
     wizardModal: css`
       min-width: 50%;
+    `,
+    buttonBar: css`
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
     `,
   };
 };

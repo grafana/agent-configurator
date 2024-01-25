@@ -260,7 +260,10 @@ export function toBlock(
 function extractRefs(...v: any[]): string[] {
   const out: string[] = [];
   for (const e of v) {
-    if (typeof e === "object" && e["-reference"]) out.push(e["-reference"]);
+    if (typeof e === "object") {
+      if (e["-reference"]) out.push(e["-reference"]);
+      else out.push(...extractRefs(...Object.values(e)));
+    }
   }
   return out;
 }

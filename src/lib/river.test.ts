@@ -55,6 +55,19 @@ describe("collecting references", () => {
       ),
     ).toEqual(["otelcol.exporter.prometheus.to_prometheus.input"]);
   });
+  test("collect object arg references", () => {
+    expect(
+      collectReferences(
+        new Block("otelcol.processor.probabilistic_sampler", "default", [
+          new Attribute("output", {
+            traces: {
+              "-reference": "otelcol.exporter.prometheus.to_prometheus.input",
+            },
+          }),
+        ]),
+      ),
+    ).toEqual(["otelcol.exporter.prometheus.to_prometheus.input"]);
+  });
 });
 
 describe("marshall/unmarshal", () => {

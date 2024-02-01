@@ -39,7 +39,14 @@ func convert(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("decoding request: %s", err.Error()), http.StatusBadRequest)
 		return
 	}
-	out, diag := converter.Convert([]byte(cr.Data), cr.Type, nil)
+
+	var extraArgs []string = nil
+	if cr.Type == "static integrations-next" {
+		cr.Type = "static"
+		extraArgs = []string{"-enable-features", "integrations-next", "-config.expand-env"}
+	}
+
+	out, diag := converter.Convert([]byte(cr.Data), cr.Type, extraArgs)
 	json.NewEncoder(w).Encode(ConversionResponse{
 		Data:        string(out),
 		Diagnostics: diag,

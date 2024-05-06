@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> The Grafana Agent has been deprecated. We recommend migrating to the new [Grafana Alloy](https://github.com/grafana/alloy) which is built on the foundation of Grafana Agent Flow.
+> We also provide the [Alloy Configurator](https://grafana.github.io/alloy-configurator/) ([Repository](https://github.com/grafana/alloy-configurator)) which replaces this tool.
+
 # Agent Configurator Tool
 
 The _Agent Configuration Generator_ is an easy to use web interface for creating and editing agent configuration files. It targets the flow configuration format.
